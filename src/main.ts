@@ -151,10 +151,10 @@ class MatrixCubeApp {
         box.appendChild(dot);
       }
 
-      // 각 성분 오른쪽 하단 조그마한 상태 뱃지
+      // 각 성분 오른쪽 하단 조그마한 상태 뱃지 (0, 1, 2, 3 및 대칭 기호)
       const badge = document.createElement('div');
       badge.className = 'cell-state-badge is-solved';
-      badge.innerText = '✔';
+      badge.innerText = '0';
       box.appendChild(badge);
 
       this.boardGrid.appendChild(box);
@@ -415,10 +415,10 @@ class MatrixCubeApp {
     if (lbl) lbl.innerText = `${this.movesCount} 회 조작`;
   }
 
-  // 각 성분의 상태 뱃지 텍스트 반환 (0: ✔, 90: 1, 180: 2, 270: 3, 대칭: 굵은 선 기호)
+  // 각 성분의 상태 뱃지 텍스트 반환 (0, 1, 2, 3 및 대칭 기호)
   private getBadgeInfo(op: D4Op): { text: string; isSolved: boolean } {
     switch (op) {
-      case 'ID': return { text: '✔', isSolved: true };
+      case 'ID': return { text: '0', isSolved: true };
       case 'R90': return { text: '1', isSolved: false };
       case 'R180': return { text: '2', isSolved: false };
       case 'R270': return { text: '3', isSolved: false };
@@ -426,7 +426,7 @@ class MatrixCubeApp {
       case 'MY': return { text: '┃', isSolved: false }; // 좌우 반전 (굵은 세로선)
       case 'MD': return { text: '╲', isSolved: false }; // 주대각선 대칭
       case 'MAD': return { text: '╱', isSolved: false }; // 부대각선 대칭
-      default: return { text: '✔', isSolved: true };
+      default: return { text: '0', isSolved: true };
     }
   }
 
