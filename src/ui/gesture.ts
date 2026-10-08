@@ -90,7 +90,12 @@ export class GestureRecognizer {
       return lines.find(l => l.type === 'diag' && l.idx === 'anti') || null;
     }
 
-    // 지정된 컨트롤러 외 다른 성분은 터치해도 변환하지 않음 (null 반환)
+    // 보드 중앙 성분(예: 3x3의 2행2열) 터치 시 2행 변환으로 매핑하여 무반응 방지
+    if (r === Math.floor(sz / 2) && c === Math.floor(sz / 2)) {
+      return lines.find(l => l.type === 'row' && l.idx === r) || null;
+    }
+
+    // 그 외 비제어 내부 성분
     return null;
   }
 
@@ -98,10 +103,10 @@ export class GestureRecognizer {
     this.boardEl.addEventListener('pointerdown', (e) => {
       if (this.isLocked) return;
 
-      // 보라색 점 클릭 감지 여부
+      // 보라색 점 클릭 감지 시 제스처 무시
       const targetElem = e.target as HTMLElement;
       if (targetElem && targetElem.classList.contains('dot-toggle-11')) {
-        return; // main.ts 클릭 리스너에서 전담 처리
+        return;
       }
 
       const cellBox = (e.target as HTMLElement).closest('.cell-box') as HTMLElement;
@@ -129,6 +134,12 @@ export class GestureRecognizer {
       const target = this.getLineForCell(r, c);
       if (!target) return;
 
+      try {
+        this.boardEl.setPointerCapture(e.pointerId);
+      } catch {
+        // 일부 브라우저 예외 무시
+      }
+
       this.isPointerDown = true;
       this.isLongPressTriggered = false;
       this.startCell = { r, c, target };
@@ -136,7 +147,7 @@ export class GestureRecognizer {
       const startY = e.clientY;
       this.points = [{ x: startX, y: startY }];
 
-      // 🌟 롱프레스 감지: 400ms 이상 길게 누르면 270도(R270) 즉각 회전
+      // 🌟 롱프레스 감지: 380ms 이상 누르고 있으면 270도(R270) 회전
       if (this.longPressTimer) clearTimeout(this.longPressTimer);
       this.longPressTimer = setTimeout(() => {
         if (this.isPointerDown && !this.isLongPressTriggered) {
@@ -146,17 +157,17 @@ export class GestureRecognizer {
             this.onAction(this.startCell.target, 'R270');
           }
         }
-      }, 400);
+      }, 380);
     });
 
-    window.addEventListener('pointermove', (e) => {
+    this.boardEl.addEventListener('pointermove', (e) => {
       if (!this.isPointerDown) return;
       this.points.push({ x: e.clientX, y: e.clientY });
 
-      // 30px 이상 움직이면 롱프레스 취소 (스와이프로 전환)
+      // 35px 이상 이동 시 롱프레스 취소
       if (this.points.length > 1) {
         const start = this.points[0];
-        if (Math.hypot(e.clientX - start.x, e.clientY - start.y) > 30) {
+        if (Math.hypot(e.clientX - start.x, e.clientY - start.y) > 35) {
           if (this.longPressTimer) {
             clearTimeout(this.longPressTimer);
             this.longPressTimer = null;
@@ -189,9 +200,10 @@ export class GestureRecognizer {
       }
 
       const start = this.points[0];
-      const end = { x: e.clientX, y: e.clientY };
-      const dx = end.x - start.x;
-      const dy = end.y - start.y;
+      const endX = e.clientX || start.x;
+      const endY = e.clientY || start.y;
+      const dx = endX - start.x;
+      const dy = endY - start.y;
       const dist = Math.hypot(dx, dy);
 
       const target = this.startCell.target;
@@ -200,16 +212,16 @@ export class GestureRecognizer {
       this.clearTrail();
 
       // ========================================================
-      // 1. 🌟 클릭/탭 판정 (이동거리 < 30px):
+      // 1. 🌟 클릭/탭 판정 (이동거리 < 35px):
       //    - 1번 클릭: 90도 (R90)
       //    - 2번 연속 클릭: 180도 (R180)
       // ========================================================
-      if (dist < 30) {
+      if (dist < 35) {
         const now = performance.now();
         const isSameCell = this.lastTapInfo && this.lastTapInfo.r === r && this.lastTapInfo.c === c;
 
-        // 더블 탭 (350ms 이내 재클릭) ➔ 180도(R180)
-        if (this.singleTapTimer && isSameCell && (now - this.lastTapInfo!.time <= 350)) {
+        // 더블 탭 (380ms 이내 재클릭) ➔ 180도(R180)
+        if (this.singleTapTimer && isSameCell && (now - this.lastTapInfo!.time <= 380)) {
           clearTimeout(this.singleTapTimer);
           this.singleTapTimer = null;
           this.lastTapInfo = null;
@@ -217,7 +229,7 @@ export class GestureRecognizer {
           return;
         }
 
-        // 싱글 탭 대기 ➔ 200ms 후 단일 클릭 확정 시 90도(R90)
+        // 싱글 탭 대기 ➔ 190ms 후 단일 클릭 확정 시 90도(R90)
         if (this.singleTapTimer) {
           clearTimeout(this.singleTapTimer);
         }
@@ -227,13 +239,13 @@ export class GestureRecognizer {
           this.onAction(capturedTarget, 'R90');
           this.singleTapTimer = null;
           this.lastTapInfo = null;
-        }, 200);
+        }, 190);
 
         return;
       }
 
       // ========================================================
-      // 2. 🌟 스와이프 제스처 판정 (이동거리 >= 30px)
+      // 2. 🌟 스와이프 제스처 판정 (이동거리 >= 35px)
       // ========================================================
       if (this.singleTapTimer) {
         clearTimeout(this.singleTapTimer);
@@ -267,8 +279,9 @@ export class GestureRecognizer {
       }
     };
 
+    this.boardEl.addEventListener('pointerup', handleEnd);
+    this.boardEl.addEventListener('pointercancel', handleEnd);
     window.addEventListener('pointerup', handleEnd);
-    window.addEventListener('pointercancel', handleEnd);
   }
 
   private drawTrail() {
