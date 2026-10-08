@@ -164,11 +164,12 @@ body {
   font-size: 0.8rem;
 }
 
-/* Board Wrapper */
+/* Board Wrapper (스마트폰 화면에 시원하게 꽉 차도록 확대) */
 .board-container {
   position: relative;
-  width: 330px;
-  height: 330px;
+  width: min(96vw, 420px);
+  height: min(96vw, 420px);
+  aspect-ratio: 1 / 1;
   margin: 6px auto;
   perspective: 1000px;
 }
@@ -644,4 +645,38 @@ body {
 .victory-actions {
   display: flex;
   gap: 10px;
+}
+
+/* 스마트폰 전용 꽉 찬 화면 레이아웃 (Edge-to-Edge) */
+@media (max-width: 480px) {
+  body {
+    padding: 6px 4px;
+  }
+
+  #app {
+    gap: 6px;
+  }
+
+  .header-bar {
+    padding: 6px 10px;
+  }
+
+  .settings-panel {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  .board-container {
+    width: calc(100vw - 10px);
+    height: calc(100vw - 10px);
+    max-width: 440px;
+    max-height: 440px;
+    margin: 4px auto;
+  }
+
+  .board-grid {
+    padding: 4px;
+    gap: 4px;
+    border-radius: 12px;
+  }
 }
