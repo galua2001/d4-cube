@@ -285,22 +285,7 @@ export class GestureRecognizer {
   }
 
   private drawTrail() {
-    if (!this.ctx || this.points.length < 2) return;
-    this.ctx.clearRect(0, 0, this.trailCanvas.width, this.trailCanvas.height);
-
-    this.ctx.strokeStyle = '#38bdf8';
-    this.ctx.lineWidth = 6;
-    this.ctx.lineCap = 'round';
-    this.ctx.lineJoin = 'round';
-    this.ctx.shadowColor = '#0284c7';
-    this.ctx.shadowBlur = 10;
-
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.points[0].x, this.points[0].y);
-    for (let i = 1; i < this.points.length; i++) {
-      this.ctx.lineTo(this.points[i].x, this.points[i].y);
-    }
-    this.ctx.stroke();
+    // 터치 시 불필요한 선 궤적을 그리지 않도록 완전히 비활성화
   }
 
   private clearTrail() {
