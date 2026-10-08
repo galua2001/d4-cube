@@ -7,6 +7,7 @@ import { campaignManager } from './game/campaign';
 import { renderDogTileCanvas } from './ui/tileRenderer';
 import { GestureRecognizer } from './ui/gesture';
 import { showSolutionModal } from './ui/solutionModal';
+import { victoryManager } from './ui/victoryEffect';
 
 class MatrixCubeApp {
   private boardSize = 3;
@@ -496,11 +497,34 @@ class MatrixCubeApp {
   private checkWinCondition() {
     const isWin = this.currentOps.every(op => op === D4.ID);
     if (isWin) {
+      // 1. 신나는 다성부 승리 팡파르 + 마법 차임벨 사운드
       soundEngine.playWin();
+
       const stars = campaignManager.completeStage(1, this.movesCount);
+
+      // 2. 보드의 모든 타일들이 순차적으로 파도타듯 춤추는 축하 댄스 애니메이션
+      const total = this.boardSize * this.boardSize;
+      for (let i = 0; i < total; i++) {
+        const box = this.boardGrid.children[i] as HTMLElement;
+        if (box) {
+          setTimeout(() => {
+            box.classList.add('celebrate-tile');
+          }, i * 40);
+        }
+      }
+
+      // 3. 화려한 전면 컨페티 폭죽 파티클 및 세련된 승리 축하 배너 발사 (글자 alert 대화상자 완전 대체)
+      victoryManager.launchVictory(this.movesCount, stars, () => {
+        this.scrambleBoard();
+      });
+
+      // 4초 후 타일 축하 댄스 클래스 정리
       setTimeout(() => {
-        alert(`🎉 축하합니다! ${this.boardSize}×${this.boardSize} 퍼즐을 완벽하게 맞추셨습니다!\n별점: ${'⭐'.repeat(stars)}`);
-      }, 350);
+        for (let i = 0; i < total; i++) {
+          const box = this.boardGrid.children[i] as HTMLElement;
+          if (box) box.classList.remove('celebrate-tile');
+        }
+      }, 4200);
     }
   }
 

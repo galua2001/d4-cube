@@ -70,23 +70,49 @@ class SoundEngine {
     this.initCtx();
     if (!this.ctx) return;
 
-    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-    notes.forEach((freq, idx) => {
-      const startTime = this.ctx!.currentTime + idx * 0.1;
+    // 웅장하고 신나는 승리 팡파르 멜로디 (도-미-솔-도-솔-높은도)
+    const melody = [
+      { freq: 523.25, time: 0.00, dur: 0.12 }, // C5
+      { freq: 659.25, time: 0.10, dur: 0.12 }, // E5
+      { freq: 783.99, time: 0.20, dur: 0.12 }, // G5
+      { freq: 1046.50, time: 0.30, dur: 0.16 }, // C6
+      { freq: 783.99, time: 0.44, dur: 0.12 }, // G5
+      { freq: 1046.50, time: 0.54, dur: 0.45 }, // C6 (길게)
+      { freq: 1318.51, time: 0.54, dur: 0.45 }  // E6 화음
+    ];
+
+    melody.forEach(note => {
+      const startTime = this.ctx!.currentTime + note.time;
       const osc = this.ctx!.createOscillator();
       const gain = this.ctx!.createGain();
 
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, startTime);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(note.freq, startTime);
 
-      gain.gain.setValueAtTime(0.25, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+      gain.gain.setValueAtTime(0.28, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + note.dur);
 
       osc.connect(gain);
       gain.connect(this.ctx!.destination);
 
       osc.start(startTime);
-      osc.stop(startTime + 0.3);
+      osc.stop(startTime + note.dur);
+    });
+
+    // 반짝이는 마법 차임벨 효과음
+    const chimes = [1567.98, 1760.00, 2093.00, 2637.02];
+    chimes.forEach((f, i) => {
+      const startTime = this.ctx!.currentTime + 0.6 + i * 0.07;
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f, startTime);
+      gain.gain.setValueAtTime(0.15, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.25);
+      osc.connect(gain);
+      gain.connect(this.ctx!.destination);
+      osc.start(startTime);
+      osc.stop(startTime + 0.25);
     });
   }
 
