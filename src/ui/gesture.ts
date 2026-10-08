@@ -90,8 +90,8 @@ export class GestureRecognizer {
       return lines.find(l => l.type === 'diag' && l.idx === 'anti') || null;
     }
 
-    // 그 외 내부 칸 터치 시 해당 행 변환
-    return lines.find(l => l.type === 'row' && l.idx === r) || null;
+    // 지정된 컨트롤러 외 다른 성분은 터치해도 변환하지 않음 (null 반환)
+    return null;
   }
 
   private bindEvents() {

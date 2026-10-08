@@ -289,10 +289,28 @@ class MatrixCubeApp {
     const lineCellsList = generateLineCells(this.boardSize);
     const lineCells = lineCellsList[lineId] || [];
 
+    // 연산 op에 따른 정밀 3D 대칭/회전 애니메이션 매핑
+    let snapTransform = 'scale(0.95)';
+    if (op === 'MX') {
+      snapTransform = 'perspective(800px) scale(0.95) rotateX(180deg)'; // 가로 X축 대칭 (상하 뒤집힘)
+    } else if (op === 'MY') {
+      snapTransform = 'perspective(800px) scale(0.95) rotateY(180deg)'; // 세로 Y축 대칭 (좌우 뒤집힘)
+    } else if (op === 'MD') {
+      snapTransform = 'perspective(800px) scale(0.95) rotate3d(1, 1, 0, 180deg)'; // 주대각선 대칭
+    } else if (op === 'MAD') {
+      snapTransform = 'perspective(800px) scale(0.95) rotate3d(-1, 1, 0, 180deg)'; // 부대각선 대칭
+    } else if (op === 'R90') {
+      snapTransform = 'perspective(800px) scale(0.95) rotate(90deg)'; // 90도 회전
+    } else if (op === 'R180') {
+      snapTransform = 'perspective(800px) scale(0.95) rotate(180deg)'; // 180도 회전
+    } else if (op === 'R270') {
+      snapTransform = 'perspective(800px) scale(0.95) rotate(-90deg)'; // 270도 회전
+    }
+
     // 3D 스냅 애니메이션 적용
     lineCells.forEach(cellIdx => {
       const box = this.boardGrid.children[cellIdx] as HTMLElement;
-      if (box) box.style.transform = 'scale(0.92) rotateY(180deg)';
+      if (box) box.style.transform = snapTransform;
     });
 
     setTimeout(() => {
