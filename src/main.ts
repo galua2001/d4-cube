@@ -9,6 +9,7 @@ import { renderDogTileCanvas } from './ui/tileRenderer';
 import { GestureRecognizer } from './ui/gesture';
 import { showSolutionModal } from './ui/solutionModal';
 import { showAboutModal } from './ui/aboutModal';
+import { showTutorialModal, isTutorialCompleted } from './ui/tutorialModal';
 import { victoryManager } from './ui/victoryEffect';
 
 class MatrixCubeApp {
@@ -57,6 +58,7 @@ class MatrixCubeApp {
       <div class="header-bar">
         <div class="header-title">🧩 행렬 큐브</div>
         <div class="header-actions">
+          <button id="btn-header-tutorial" class="btn-icon btn-nav-tutorial" title="30초 인터랙티브 D4 연산 튜토리얼">🎓 튜토리얼</button>
           <button id="btn-about" class="btn-icon" title="작품 소개 및 수학적 배경">ℹ️ 소개</button>
           <button id="btn-toggle-guide" class="btn-icon" title="컨트롤러 타일 가이드">🧭 가이드</button>
           <button id="btn-toggle-bgm" class="btn-icon">🔇 BGM</button>
@@ -258,6 +260,17 @@ class MatrixCubeApp {
   }
 
   private bindControls() {
+    // 30초 인터랙티브 튜토리얼 모달 버튼
+    const btnTut = document.getElementById('btn-header-tutorial');
+    if (!isTutorialCompleted() && btnTut) {
+      btnTut.classList.add('pulse-active');
+    }
+    btnTut?.addEventListener('click', () => {
+      soundEngine.playTap();
+      btnTut.classList.remove('pulse-active');
+      showTutorialModal();
+    });
+
     // 공모전 소개 모달 버튼
     document.getElementById('btn-about')?.addEventListener('click', () => {
       soundEngine.playTap();

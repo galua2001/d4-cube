@@ -154,6 +154,56 @@ class SoundEngine {
     });
   }
 
+  public playCombo() {
+    if (!this.sfxEnabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    // 대칭 합성 성공 시 상쾌하고 밝은 상승 아르페지오 화음
+    const notes = [440.00, 554.37, 659.25, 880.00]; // A4 - C#5 - E5 - A5
+    notes.forEach((freq, idx) => {
+      const startTime = this.ctx!.currentTime + idx * 0.05;
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, startTime);
+      gain.gain.setValueAtTime(0.22, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.18);
+
+      osc.connect(gain);
+      gain.connect(this.ctx!.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.18);
+    });
+  }
+
+  public playClear() {
+    if (!this.sfxEnabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    // 단계 완료 및 원상 복구 시 챠링~ 차임벨 화음
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5 - E5 - G5 - C6
+    notes.forEach((freq, idx) => {
+      const startTime = this.ctx!.currentTime + idx * 0.06;
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+      gain.gain.setValueAtTime(0.2, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.22);
+
+      osc.connect(gain);
+      gain.connect(this.ctx!.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.22);
+    });
+  }
+
   public toggleBgm(): boolean {
     this.bgmEnabled = !this.bgmEnabled;
     if (this.bgmAudio) {
