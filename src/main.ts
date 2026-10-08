@@ -415,15 +415,15 @@ class MatrixCubeApp {
     if (lbl) lbl.innerText = `${this.movesCount} 회 조작`;
   }
 
-  // 각 성분의 상태 뱃지 텍스트 반환 (0: ✔, 90: 1, 180: 2, 270: 3, 대칭: 선 기호)
+  // 각 성분의 상태 뱃지 텍스트 반환 (0: ✔, 90: 1, 180: 2, 270: 3, 대칭: 굵은 선 기호)
   private getBadgeInfo(op: D4Op): { text: string; isSolved: boolean } {
     switch (op) {
       case 'ID': return { text: '✔', isSolved: true };
       case 'R90': return { text: '1', isSolved: false };
       case 'R180': return { text: '2', isSolved: false };
       case 'R270': return { text: '3', isSolved: false };
-      case 'MX': return { text: '―', isSolved: false }; // 상하 반전 (가로선)
-      case 'MY': return { text: '│', isSolved: false }; // 좌우 반전 (세로선)
+      case 'MX': return { text: '━', isSolved: false }; // 상하 반전 (굵은 가로선)
+      case 'MY': return { text: '┃', isSolved: false }; // 좌우 반전 (굵은 세로선)
       case 'MD': return { text: '╲', isSolved: false }; // 주대각선 대칭
       case 'MAD': return { text: '╱', isSolved: false }; // 부대각선 대칭
       default: return { text: '✔', isSolved: true };
