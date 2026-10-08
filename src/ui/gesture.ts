@@ -16,6 +16,15 @@ export class GestureRecognizer {
   private isLocked = false;
   private boardSize = 3;
 
+  // 1-1 성분의 현재 모드 ('row': 1행 변환 모드, 'col': 1열 변환 모드)
+  private cell11Mode: 'row' | 'col' = 'row';
+
+  // 탭 / 더블탭 / 롱프레스 타이머
+  private longPressTimer: ReturnType<typeof setTimeout> | null = null;
+  private singleTapTimer: ReturnType<typeof setTimeout> | null = null;
+  private lastTapInfo: { r: number; c: number; time: number } | null = null;
+  private isLongPressTriggered = false;
+
   constructor(boardEl: HTMLElement, trailCanvas: HTMLCanvasElement, onAction: GestureCallback, boardSize = 3) {
     this.boardEl = boardEl;
     this.trailCanvas = trailCanvas;
@@ -36,17 +45,44 @@ export class GestureRecognizer {
     this.isLocked = locked;
   }
 
+  public getCell11Mode(): 'row' | 'col' {
+    return this.cell11Mode;
+  }
+
+  public toggleCell11Mode(): 'row' | 'col' {
+    this.cell11Mode = this.cell11Mode === 'row' ? 'col' : 'row';
+    return this.cell11Mode;
+  }
+
   private syncCanvasSize() {
     const rect = this.boardEl.getBoundingClientRect();
     this.trailCanvas.width = rect.width;
     this.trailCanvas.height = rect.height;
   }
 
-  private getLineForCell(r: number, c: number): LineTarget | null {
+  public getLineForCell(r: number, c: number): LineTarget | null {
     const sz = this.boardSize;
     const lines = generateLines(sz);
 
-    // 1. 대각선 (모서리 칸 우선 매핑)
+    // 1-1 성분 (r=0, c=0): 보라색 점 토글 상태에 따라 1행 또는 1열
+    if (r === 0 && c === 0) {
+      if (this.cell11Mode === 'col') {
+        return lines.find(l => l.type === 'col' && l.idx === 0) || null;
+      }
+      return lines.find(l => l.type === 'row' && l.idx === 0) || null;
+    }
+
+    // 21, 31 등 1열 성분 (c=0, r>0) ➔ 2행, 3행 ... 변환
+    if (c === 0 && r > 0) {
+      return lines.find(l => l.type === 'row' && l.idx === r) || null;
+    }
+
+    // 12, 13 등 1행 성분 (r=0, c>0) ➔ 2열, 3열 ... 변환
+    if (r === 0 && c > 0) {
+      return lines.find(l => l.type === 'col' && l.idx === c) || null;
+    }
+
+    // 대각선: 우측 하단 모서리는 주대각선, (1, sz-1)은 부대각선
     if (r === sz - 1 && c === sz - 1) {
       return lines.find(l => l.type === 'diag' && l.idx === 'main') || null;
     }
@@ -54,23 +90,20 @@ export class GestureRecognizer {
       return lines.find(l => l.type === 'diag' && l.idx === 'anti') || null;
     }
 
-    // 2. 가장자리 행 (첫 번째 열을 행 컨트롤러로 매핑)
-    if (c === 0 && r < sz) {
-      return lines.find(l => l.type === 'row' && l.idx === r) || null;
-    }
-
-    // 3. 가장자리 열 (첫 번째 행을 열 컨트롤러로 매핑)
-    if (r === 0 && c < sz) {
-      return lines.find(l => l.type === 'col' && l.idx === c) || null;
-    }
-
-    // 4. 내부 칸 터치 시 해당 행/열 자동 매핑 (대각선 제외)
+    // 그 외 내부 칸 터치 시 해당 행 변환
     return lines.find(l => l.type === 'row' && l.idx === r) || null;
   }
 
   private bindEvents() {
     this.boardEl.addEventListener('pointerdown', (e) => {
       if (this.isLocked) return;
+
+      // 보라색 점 클릭 감지 여부
+      const targetElem = e.target as HTMLElement;
+      if (targetElem && targetElem.classList.contains('dot-toggle-11')) {
+        return; // main.ts 클릭 리스너에서 전담 처리
+      }
+
       const rect = this.boardEl.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -84,9 +117,22 @@ export class GestureRecognizer {
       if (!target) return;
 
       this.isPointerDown = true;
+      this.isLongPressTriggered = false;
       this.startCell = { r, c, target };
       this.points = [{ x, y }];
       this.drawTrail();
+
+      // 🌟 길게 누름(Long Press) 감지: 450ms 이상 홀드 시 270도(R270) 회전
+      if (this.longPressTimer) clearTimeout(this.longPressTimer);
+      this.longPressTimer = setTimeout(() => {
+        if (this.isPointerDown && this.points.length < 5) {
+          this.isLongPressTriggered = true;
+          this.clearTrail();
+          if (this.startCell) {
+            this.onAction(this.startCell.target, 'R270');
+          }
+        }
+      }, 450);
     });
 
     window.addEventListener('pointermove', (e) => {
@@ -95,10 +141,27 @@ export class GestureRecognizer {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       this.points.push({ x, y });
+
+      // 일정 거리 이상 움직이면 롱프레스 취소
+      if (this.points.length > 1) {
+        const start = this.points[0];
+        if (Math.hypot(x - start.x, y - start.y) > 15) {
+          if (this.longPressTimer) {
+            clearTimeout(this.longPressTimer);
+            this.longPressTimer = null;
+          }
+        }
+      }
+
       this.drawTrail();
     });
 
     const handleEnd = () => {
+      if (this.longPressTimer) {
+        clearTimeout(this.longPressTimer);
+        this.longPressTimer = null;
+      }
+
       if (!this.isPointerDown || !this.startCell) {
         this.isPointerDown = false;
         this.clearTrail();
@@ -106,7 +169,15 @@ export class GestureRecognizer {
       }
 
       this.isPointerDown = false;
-      if (this.points.length < 2) {
+
+      // 롱프레스가 이미 작동했으면 종료
+      if (this.isLongPressTriggered) {
+        this.isLongPressTriggered = false;
+        this.clearTrail();
+        return;
+      }
+
+      if (this.points.length === 0) {
         this.clearTrail();
         return;
       }
@@ -118,30 +189,72 @@ export class GestureRecognizer {
       const dist = Math.hypot(dx, dy);
 
       const target = this.startCell.target;
+      const r = this.startCell.r;
+      const c = this.startCell.c;
       this.clearTrail();
 
+      // ========================================================
+      // 1. 🌟 클릭/탭 판정 (이동거리 < 15px)
+      //    - 1번 클릭: 90도 (R90)
+      //    - 2번 연속 클릭: 180도 (R180)
+      // ========================================================
       if (dist < 15) {
-        // 단일 탭: R90
-        this.onAction(target, 'R90');
+        const now = performance.now();
+        const isSameCell = this.lastTapInfo && this.lastTapInfo.r === r && this.lastTapInfo.c === c;
+
+        // 🌟 더블 탭 (300ms 이내 재클릭) ➔ 180도(R180)
+        if (this.singleTapTimer && isSameCell && this.lastTapInfo && (now - this.lastTapInfo.time <= 300)) {
+          clearTimeout(this.singleTapTimer);
+          this.singleTapTimer = null;
+          this.lastTapInfo = null;
+          this.onAction(target, 'R180');
+          return;
+        }
+
+        // 🌟 싱글 탭 (260ms 후 단일 클릭 확정) ➔ 90도(R90)
+        if (this.singleTapTimer) {
+          clearTimeout(this.singleTapTimer);
+        }
+        this.lastTapInfo = { r, c, time: now };
+        const capturedTarget = target;
+        this.singleTapTimer = setTimeout(() => {
+          this.onAction(capturedTarget, 'R90');
+          this.singleTapTimer = null;
+          this.lastTapInfo = null;
+        }, 260);
+
         return;
+      }
+
+      // ========================================================
+      // 2. 🌟 직선 스와이프 제스처 판정 (이동거리 >= 15px)
+      // ========================================================
+      if (this.singleTapTimer) {
+        clearTimeout(this.singleTapTimer);
+        this.singleTapTimer = null;
+        this.lastTapInfo = null;
       }
 
       const angleDeg = (Math.atan2(dy, dx) * 180) / Math.PI;
 
-      // 제스처 각도 판정
+      // 가로 스와이프: 상하 반전 (MX)
       if (Math.abs(angleDeg) <= 30 || Math.abs(angleDeg) >= 150) {
-        // 가로 스와이프: MX
         this.onAction(target, 'MX');
-      } else if (Math.abs(angleDeg) >= 60 && Math.abs(angleDeg) <= 120) {
-        // 세로 스와이프: MY
+      }
+      // 세로 스와이프: 좌우 반전 (MY)
+      else if (Math.abs(angleDeg) >= 60 && Math.abs(angleDeg) <= 120) {
         this.onAction(target, 'MY');
-      } else if ((angleDeg > 30 && angleDeg < 60) || (angleDeg > -150 && angleDeg < -120)) {
-        // 주대각 스와이프: MD
+      }
+      // 주대각선 스와이프 (MD)
+      else if ((angleDeg > 30 && angleDeg < 60) || (angleDeg > -150 && angleDeg < -120)) {
         this.onAction(target, 'MD');
-      } else if ((angleDeg > -60 && angleDeg < -30) || (angleDeg > 120 && angleDeg < 150)) {
-        // 부대각 스와이프: MAD
+      }
+      // 부대각선 스와이프 (MAD)
+      else if ((angleDeg > -60 && angleDeg < -30) || (angleDeg > 120 && angleDeg < 150)) {
         this.onAction(target, 'MAD');
-      } else if (Math.abs(dx) >= Math.abs(dy)) {
+      }
+      // 폴백
+      else if (Math.abs(dx) >= Math.abs(dy)) {
         this.onAction(target, 'MX');
       } else {
         this.onAction(target, 'MY');

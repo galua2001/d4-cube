@@ -127,11 +127,36 @@ class MatrixCubeApp {
     for (let i = 0; i < totalCells; i++) {
       const box = document.createElement('div');
       box.className = 'cell-box';
+
       const canvas = document.createElement('canvas');
       canvas.className = 'cell-canvas';
       canvas.width = 100;
       canvas.height = 100;
       box.appendChild(canvas);
+
+      // 1행 1열 (i === 0)일 때만 오른쪽 중간에 보라색 토글 점 부착
+      if (i === 0) {
+        const dot = document.createElement('div');
+        dot.className = 'dot-toggle-11';
+        dot.title = '클릭하여 1행 / 1열 변환 모드 전환';
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const mode = this.gestureRecognizer.toggleCell11Mode();
+          dot.classList.toggle('col-mode', mode === 'col');
+          soundEngine.playTap();
+          const modeText = mode === 'col' ? '1열 변환' : '1행 변환';
+          dot.title = `현재 11 성분: [${modeText}] 모드`;
+          alert(`🟣 11성분 모드 변경: 현재 [${modeText}] 조작 상태입니다.`);
+        });
+        box.appendChild(dot);
+      }
+
+      // 각 성분 오른쪽 하단 조그마한 상태 뱃지
+      const badge = document.createElement('div');
+      badge.className = 'cell-state-badge is-solved';
+      badge.innerText = '✔';
+      box.appendChild(badge);
+
       this.boardGrid.appendChild(box);
     }
   }
@@ -372,6 +397,21 @@ class MatrixCubeApp {
     if (lbl) lbl.innerText = `${this.movesCount} 회 조작`;
   }
 
+  // 각 성분의 상태 뱃지 텍스트 반환 (0: ✔, 90: 1, 180: 2, 270: 3, 대칭: 선 기호)
+  private getBadgeInfo(op: D4Op): { text: string; isSolved: boolean } {
+    switch (op) {
+      case 'ID': return { text: '✔', isSolved: true };
+      case 'R90': return { text: '1', isSolved: false };
+      case 'R180': return { text: '2', isSolved: false };
+      case 'R270': return { text: '3', isSolved: false };
+      case 'MX': return { text: '―', isSolved: false }; // 상하 반전 (가로선)
+      case 'MY': return { text: '│', isSolved: false }; // 좌우 반전 (세로선)
+      case 'MD': return { text: '╲', isSolved: false }; // 주대각선 대칭
+      case 'MAD': return { text: '╱', isSolved: false }; // 부대각선 대칭
+      default: return { text: '✔', isSolved: true };
+    }
+  }
+
   private updateBoard() {
     const total = this.boardSize * this.boardSize;
     for (let i = 0; i < total; i++) {
@@ -380,7 +420,16 @@ class MatrixCubeApp {
       const canvas = box.querySelector('canvas') as HTMLCanvasElement;
       if (!canvas) continue;
 
-      renderDogTileCanvas(canvas, this.currentOps[i], this.imgDogFront, this.imgDogBack);
+      const op = this.currentOps[i];
+      renderDogTileCanvas(canvas, op, this.imgDogFront, this.imgDogBack);
+
+      // 오른쪽 하단 뱃지 텍스트 갱신
+      const badge = box.querySelector('.cell-state-badge') as HTMLElement;
+      if (badge) {
+        const info = this.getBadgeInfo(op);
+        badge.innerText = info.text;
+        badge.classList.toggle('is-solved', info.isSolved);
+      }
     }
   }
 }
