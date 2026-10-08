@@ -476,18 +476,18 @@ class MatrixCubeApp {
     if (lbl) lbl.innerText = `${this.movesCount} 회 조작`;
   }
 
-  // 각 성분의 상태 뱃지 텍스트 반환 (0, 1, 2, 3 및 가늘고 깔끔한 대칭 기호)
-  private getBadgeInfo(op: D4Op): { text: string; isSolved: boolean } {
+  // 각 성분의 상태 뱃지 텍스트 반환 (0, 1, 2, 3 및 대칭 기호)
+  private getBadgeInfo(op: D4Op): { text: string; isSolved: boolean; isSymmetry: boolean } {
     switch (op) {
-      case 'ID': return { text: '0', isSolved: true };
-      case 'R90': return { text: '1', isSolved: false };
-      case 'R180': return { text: '2', isSolved: false };
-      case 'R270': return { text: '3', isSolved: false };
-      case 'MX': return { text: '─', isSolved: false }; // 상하 반전 (가로선)
-      case 'MY': return { text: '│', isSolved: false }; // 좌우 반전 (세로선)
-      case 'MD': return { text: '╲', isSolved: false }; // 주대각선 대칭
-      case 'MAD': return { text: '╱', isSolved: false }; // 부대각선 대칭
-      default: return { text: '0', isSolved: true };
+      case 'ID': return { text: '0', isSolved: true, isSymmetry: false };
+      case 'R90': return { text: '1', isSolved: false, isSymmetry: false };
+      case 'R180': return { text: '2', isSolved: false, isSymmetry: false };
+      case 'R270': return { text: '3', isSolved: false, isSymmetry: false };
+      case 'MX': return { text: '―', isSolved: false, isSymmetry: true }; // 상하 반전 (진한 가로선)
+      case 'MY': return { text: '│', isSolved: false, isSymmetry: true }; // 좌우 반전 (진한 세로선)
+      case 'MD': return { text: '╲', isSolved: false, isSymmetry: true }; // 주대각선 대칭
+      case 'MAD': return { text: '╱', isSolved: false, isSymmetry: true }; // 부대각선 대칭
+      default: return { text: '0', isSolved: true, isSymmetry: false };
     }
   }
 
@@ -508,6 +508,7 @@ class MatrixCubeApp {
         const info = this.getBadgeInfo(op);
         badge.innerText = info.text;
         badge.classList.toggle('is-solved', info.isSolved);
+        badge.classList.toggle('is-symmetry', info.isSymmetry);
       }
     }
   }

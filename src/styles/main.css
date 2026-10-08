@@ -278,6 +278,14 @@ body {
   text-shadow: none !important;
 }
 
+/* 대칭 기호는 조금 더 진하고 또렷하게 표시 */
+.cell-state-badge.is-symmetry {
+  font-weight: 800 !important;
+  font-size: 1.25rem !important;
+  color: #00e5ff !important;
+  opacity: 1 !important;
+}
+
 /* Gesture Canvas Overlay */
 #gesture-canvas {
   position: absolute;
