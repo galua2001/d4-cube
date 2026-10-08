@@ -33,7 +33,7 @@ describe('D4 대칭군 수학 코어 테스트', () => {
     expect(solution[0].op).toBe(D4.R270); // R90의 역원 = R270
   });
 
-  it('솔버 최단 풀이 검증 - 2수 스크램블', () => {
+  it('솔버 최단 풀이 검증 - 2수 스크램블 후 자동 풀이 시뮬레이션', () => {
     // 1행 R180, 2열 MX 적용
     let code = applyMoveInt(0, 0, OP_TO_INT[D4.R180]);
     code = applyMoveInt(code, 4, OP_TO_INT[D4.MX]);
@@ -41,5 +41,31 @@ describe('D4 대칭군 수학 코어 테스트', () => {
     const solution = solveBoard(startOps, 3, 'D4');
 
     expect(solution.length).toBeLessThanOrEqual(2);
+
+    // 해법 단계들을 차례대로 적용했을 때 최종적으로 0(완성)이 되는지 검증
+    let curCode = code;
+    for (const step of solution) {
+      curCode = applyMoveInt(curCode, step.lineId, step.opInt);
+    }
+    expect(curCode).toBe(0);
+  });
+
+  it('솔버 최단 풀이 검증 - 3수 스크램블 후 자동 풀이 완벽 성공 검증', () => {
+    // 1행 R90, 3행 MY, 2열 R180 적용
+    let code = applyMoveInt(0, 0, OP_TO_INT[D4.R90]);
+    code = applyMoveInt(code, 2, OP_TO_INT[D4.MY]);
+    code = applyMoveInt(code, 4, OP_TO_INT[D4.R180]);
+
+    const startOps = decodeBoardOps(code);
+    const solution = solveBoard(startOps, 3, 'D4');
+
+    expect(solution.length).toBeGreaterThan(0);
+    expect(solution.length).toBeLessThanOrEqual(3);
+
+    let curCode = code;
+    for (const step of solution) {
+      curCode = applyMoveInt(curCode, step.lineId, step.opInt);
+    }
+    expect(curCode).toBe(0);
   });
 });

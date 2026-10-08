@@ -26,11 +26,17 @@ export function solveBoard3x3(curOps: D4Op[], groupKey: SymmetryGroupKey = 'D4',
     }
   }
 
-  const fParent = new Map<number, number>();
-  const bParent = new Map<number, number>();
+  interface ParentEntry {
+    prevCode: number;
+    lineId: number;
+    opInt: number;
+  }
 
-  fParent.set(startCode, -1);
-  bParent.set(0, -1);
+  const fParent = new Map<number, ParentEntry | null>();
+  const bParent = new Map<number, ParentEntry | null>();
+
+  fParent.set(startCode, null);
+  bParent.set(0, null);
 
   let fQueue = [startCode];
   let bQueue = [0];
@@ -50,7 +56,7 @@ export function solveBoard3x3(curOps: D4Op[], groupKey: SymmetryGroupKey = 'D4',
         const mv = MOVES[m];
         const next = applyMoveInt(cur, mv.lineId, mv.opInt);
         if (!fParent.has(next)) {
-          fParent.set(next, (mv.packed << 28) | (cur & 0x0FFFFFFF));
+          fParent.set(next, { prevCode: cur, lineId: mv.lineId, opInt: mv.opInt });
           if (bParent.has(next)) {
             meetCode = next;
             break;
@@ -71,7 +77,8 @@ export function solveBoard3x3(curOps: D4Op[], groupKey: SymmetryGroupKey = 'D4',
         const mv = MOVES[m];
         const prev = applyInvMoveInt(cur, mv.lineId, mv.opInt);
         if (!bParent.has(prev)) {
-          bParent.set(prev, (mv.packed << 28) | (cur & 0x0FFFFFFF));
+          // prev 상태에서 mv 연산을 적용하면 cur 상태(목표 쪽)가 됨
+          bParent.set(prev, { prevCode: cur, lineId: mv.lineId, opInt: mv.opInt });
           if (fParent.has(prev)) {
             meetCode = prev;
             break;
@@ -90,24 +97,20 @@ export function solveBoard3x3(curOps: D4Op[], groupKey: SymmetryGroupKey = 'D4',
   const fPath: Array<{ lineId: number; opInt: number }> = [];
   let curr = meetCode;
   while (curr !== startCode) {
-    const pInfo = fParent.get(curr);
-    if (pInfo === undefined || pInfo === -1) break;
-    const packed = (pInfo >> 28) & 0xF;
-    const prevCode = pInfo & 0x0FFFFFFF;
-    fPath.push({ lineId: packed >> 4, opInt: packed & 0xF });
-    curr = prevCode;
+    const entry = fParent.get(curr);
+    if (!entry) break;
+    fPath.push({ lineId: entry.lineId, opInt: entry.opInt });
+    curr = entry.prevCode;
   }
   fPath.reverse();
 
   const bPath: Array<{ lineId: number; opInt: number }> = [];
   curr = meetCode;
   while (curr !== 0) {
-    const pInfo = bParent.get(curr);
-    if (pInfo === undefined || pInfo === -1) break;
-    const packed = (pInfo >> 28) & 0xF;
-    const nextCode = pInfo & 0x0FFFFFFF;
-    bPath.push({ lineId: packed >> 4, opInt: packed & 0xF });
-    curr = nextCode;
+    const entry = bParent.get(curr);
+    if (!entry) break;
+    bPath.push({ lineId: entry.lineId, opInt: entry.opInt });
+    curr = entry.prevCode;
   }
 
   const allMoves = [...fPath, ...bPath];
