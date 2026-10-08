@@ -144,9 +144,9 @@ class MatrixCubeApp {
           const mode = this.gestureRecognizer.toggleCell11Mode();
           dot.classList.toggle('col-mode', mode === 'col');
           soundEngine.playTap();
-          const modeText = mode === 'col' ? '1열 변환' : '1행 변환';
-          dot.title = `현재 11 성분: [${modeText}] 모드`;
-          alert(`🟣 11성분 모드 변경: 현재 [${modeText}] 조작 상태입니다.`);
+
+          // 팝업창 없이 1열(또는 1행)을 시각적으로 강조
+          this.highlightActiveLine(mode);
         });
         box.appendChild(dot);
       }
@@ -159,6 +159,45 @@ class MatrixCubeApp {
 
       this.boardGrid.appendChild(box);
     }
+  }
+
+  // 11 토글 시 팝업창 없이 해당 라인(1열 또는 1행)을 시각적으로 네온 강조
+  private highlightActiveLine(mode: 'col' | 'row') {
+    const total = this.boardSize * this.boardSize;
+    for (let i = 0; i < total; i++) {
+      const b = this.boardGrid.children[i] as HTMLElement;
+      if (b) {
+        b.classList.remove('highlight-col', 'highlight-row');
+      }
+    }
+
+    const indices: number[] = [];
+    if (mode === 'col') {
+      for (let r = 0; r < this.boardSize; r++) {
+        indices.push(r * this.boardSize);
+      }
+    } else {
+      for (let c = 0; c < this.boardSize; c++) {
+        indices.push(c);
+      }
+    }
+
+    indices.forEach(idx => {
+      const b = this.boardGrid.children[idx] as HTMLElement;
+      if (b) {
+        b.classList.add(mode === 'col' ? 'highlight-col' : 'highlight-row');
+      }
+    });
+
+    // 1.2초 후 자연스럽게 강조 제거
+    setTimeout(() => {
+      indices.forEach(idx => {
+        const b = this.boardGrid.children[idx] as HTMLElement;
+        if (b) {
+          b.classList.remove('highlight-col', 'highlight-row');
+        }
+      });
+    }, 1200);
   }
 
   private bindControls() {

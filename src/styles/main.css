@@ -237,6 +237,19 @@ body {
   box-shadow: 0 0 8px rgba(6, 182, 212, 0.8);
 }
 
+/* 11 토글 시 1열 / 1행 강조 하이라이트 효과 */
+.cell-box.highlight-col {
+  box-shadow: inset 0 0 0 3px #06b6d4, 0 0 16px rgba(6, 182, 212, 0.8) !important;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  z-index: 15;
+}
+
+.cell-box.highlight-row {
+  box-shadow: inset 0 0 0 3px #a855f7, 0 0 16px rgba(168, 85, 247, 0.8) !important;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  z-index: 15;
+}
+
 /* 각 성분 오른쪽 하단 상태 표기 (사각형 박스는 완전히 지우고 숫자 0,1,2,3과 대칭 기호만 선명하게 표시) */
 .cell-state-badge {
   position: absolute;
