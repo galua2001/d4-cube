@@ -104,14 +104,27 @@ export class GestureRecognizer {
         return; // main.ts 클릭 리스너에서 전담 처리
       }
 
-      const rect = this.boardEl.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const cellBox = (e.target as HTMLElement).closest('.cell-box') as HTMLElement;
+      let r = -1;
+      let c = -1;
 
-      const cellW = rect.width / this.boardSize;
-      const cellH = rect.height / this.boardSize;
-      const c = Math.floor(x / cellW);
-      const r = Math.floor(y / cellH);
+      if (cellBox && cellBox.parentElement === this.boardEl) {
+        const idx = Array.from(this.boardEl.children).indexOf(cellBox);
+        if (idx !== -1) {
+          r = Math.floor(idx / this.boardSize);
+          c = idx % this.boardSize;
+        }
+      }
+
+      if (r === -1 || c === -1) {
+        const rect = this.boardEl.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const cellW = rect.width / this.boardSize;
+        const cellH = rect.height / this.boardSize;
+        c = Math.max(0, Math.min(this.boardSize - 1, Math.floor(x / cellW)));
+        r = Math.max(0, Math.min(this.boardSize - 1, Math.floor(y / cellH)));
+      }
 
       const target = this.getLineForCell(r, c);
       if (!target) return;
@@ -119,33 +132,31 @@ export class GestureRecognizer {
       this.isPointerDown = true;
       this.isLongPressTriggered = false;
       this.startCell = { r, c, target };
-      this.points = [{ x, y }];
-      this.drawTrail();
+      const startX = e.clientX;
+      const startY = e.clientY;
+      this.points = [{ x: startX, y: startY }];
 
-      // 🌟 길게 누름(Long Press) 감지: 450ms 이상 홀드 시 270도(R270) 회전
+      // 🌟 롱프레스 감지: 400ms 이상 길게 누르면 270도(R270) 즉각 회전
       if (this.longPressTimer) clearTimeout(this.longPressTimer);
       this.longPressTimer = setTimeout(() => {
-        if (this.isPointerDown && this.points.length < 5) {
+        if (this.isPointerDown && !this.isLongPressTriggered) {
           this.isLongPressTriggered = true;
           this.clearTrail();
           if (this.startCell) {
             this.onAction(this.startCell.target, 'R270');
           }
         }
-      }, 450);
+      }, 400);
     });
 
     window.addEventListener('pointermove', (e) => {
       if (!this.isPointerDown) return;
-      const rect = this.boardEl.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      this.points.push({ x, y });
+      this.points.push({ x: e.clientX, y: e.clientY });
 
-      // 일정 거리 이상 움직이면 롱프레스 취소
+      // 30px 이상 움직이면 롱프레스 취소 (스와이프로 전환)
       if (this.points.length > 1) {
         const start = this.points[0];
-        if (Math.hypot(x - start.x, y - start.y) > 15) {
+        if (Math.hypot(e.clientX - start.x, e.clientY - start.y) > 30) {
           if (this.longPressTimer) {
             clearTimeout(this.longPressTimer);
             this.longPressTimer = null;
@@ -156,7 +167,7 @@ export class GestureRecognizer {
       this.drawTrail();
     });
 
-    const handleEnd = () => {
+    const handleEnd = (e: PointerEvent) => {
       if (this.longPressTimer) {
         clearTimeout(this.longPressTimer);
         this.longPressTimer = null;
@@ -170,20 +181,15 @@ export class GestureRecognizer {
 
       this.isPointerDown = false;
 
-      // 롱프레스가 이미 작동했으면 종료
+      // 롱프레스가 이미 270도 회전을 실행했으면 종료
       if (this.isLongPressTriggered) {
         this.isLongPressTriggered = false;
         this.clearTrail();
         return;
       }
 
-      if (this.points.length === 0) {
-        this.clearTrail();
-        return;
-      }
-
       const start = this.points[0];
-      const end = this.points[this.points.length - 1];
+      const end = { x: e.clientX, y: e.clientY };
       const dx = end.x - start.x;
       const dy = end.y - start.y;
       const dist = Math.hypot(dx, dy);
@@ -194,16 +200,16 @@ export class GestureRecognizer {
       this.clearTrail();
 
       // ========================================================
-      // 1. 🌟 클릭/탭 판정 (이동거리 < 15px)
+      // 1. 🌟 클릭/탭 판정 (이동거리 < 30px):
       //    - 1번 클릭: 90도 (R90)
       //    - 2번 연속 클릭: 180도 (R180)
       // ========================================================
-      if (dist < 15) {
+      if (dist < 30) {
         const now = performance.now();
         const isSameCell = this.lastTapInfo && this.lastTapInfo.r === r && this.lastTapInfo.c === c;
 
-        // 🌟 더블 탭 (300ms 이내 재클릭) ➔ 180도(R180)
-        if (this.singleTapTimer && isSameCell && this.lastTapInfo && (now - this.lastTapInfo.time <= 300)) {
+        // 더블 탭 (350ms 이내 재클릭) ➔ 180도(R180)
+        if (this.singleTapTimer && isSameCell && (now - this.lastTapInfo!.time <= 350)) {
           clearTimeout(this.singleTapTimer);
           this.singleTapTimer = null;
           this.lastTapInfo = null;
@@ -211,7 +217,7 @@ export class GestureRecognizer {
           return;
         }
 
-        // 🌟 싱글 탭 (260ms 후 단일 클릭 확정) ➔ 90도(R90)
+        // 싱글 탭 대기 ➔ 200ms 후 단일 클릭 확정 시 90도(R90)
         if (this.singleTapTimer) {
           clearTimeout(this.singleTapTimer);
         }
@@ -221,13 +227,13 @@ export class GestureRecognizer {
           this.onAction(capturedTarget, 'R90');
           this.singleTapTimer = null;
           this.lastTapInfo = null;
-        }, 260);
+        }, 200);
 
         return;
       }
 
       // ========================================================
-      // 2. 🌟 직선 스와이프 제스처 판정 (이동거리 >= 15px)
+      // 2. 🌟 스와이프 제스처 판정 (이동거리 >= 30px)
       // ========================================================
       if (this.singleTapTimer) {
         clearTimeout(this.singleTapTimer);

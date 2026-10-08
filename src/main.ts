@@ -69,11 +69,11 @@ class MatrixCubeApp {
         <div class="settings-row">
           <span class="settings-label">🎲 난이도</span>
           <div class="button-group" id="moves-button-group">
-            <button class="btn-pill" data-moves="1">1수</button>
-            <button class="btn-pill" data-moves="2">2수</button>
             <button class="btn-pill active" data-moves="3">3수</button>
             <button class="btn-pill" data-moves="4">4수</button>
             <button class="btn-pill" data-moves="5">5수</button>
+            <button class="btn-pill" data-moves="6">6수</button>
+            <button class="btn-pill" data-moves="7">7수</button>
             <button class="btn-pill" data-moves="8">8수</button>
           </div>
         </div>
