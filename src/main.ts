@@ -290,52 +290,74 @@ class MatrixCubeApp {
     const lineCells = lineCellsList[lineId] || [];
 
     // 연산 op에 따른 정밀 3D 대칭/회전 애니메이션 매핑
-    let snapTransform = 'scale(0.95)';
+    let snapTransform = 'scale(0.92)';
     if (op === 'MX') {
-      snapTransform = 'perspective(800px) scale(0.95) rotateX(180deg)'; // 가로 X축 대칭 (상하 뒤집힘)
+      snapTransform = 'perspective(900px) scale(0.92) rotateX(180deg)'; // 가로 X축 대칭 (상하 뒤집힘)
     } else if (op === 'MY') {
-      snapTransform = 'perspective(800px) scale(0.95) rotateY(180deg)'; // 세로 Y축 대칭 (좌우 뒤집힘)
+      snapTransform = 'perspective(900px) scale(0.92) rotateY(180deg)'; // 세로 Y축 대칭 (좌우 뒤집힘)
     } else if (op === 'MD') {
-      snapTransform = 'perspective(800px) scale(0.95) rotate3d(1, 1, 0, 180deg)'; // 주대각선 대칭
+      snapTransform = 'perspective(900px) scale(0.92) rotate3d(1, 1, 0, 180deg)'; // 주대각선 대칭
     } else if (op === 'MAD') {
-      snapTransform = 'perspective(800px) scale(0.95) rotate3d(-1, 1, 0, 180deg)'; // 부대각선 대칭
+      snapTransform = 'perspective(900px) scale(0.92) rotate3d(-1, 1, 0, 180deg)'; // 부대각선 대칭
     } else if (op === 'R90') {
-      snapTransform = 'perspective(800px) scale(0.95) rotate(90deg)'; // 90도 회전
+      snapTransform = 'perspective(900px) scale(0.92) rotateZ(90deg)'; // 시계방향 90도 회전
     } else if (op === 'R180') {
-      snapTransform = 'perspective(800px) scale(0.95) rotate(180deg)'; // 180도 회전
+      snapTransform = 'perspective(900px) scale(0.92) rotateZ(180deg)'; // 180도 회전
     } else if (op === 'R270') {
-      snapTransform = 'perspective(800px) scale(0.95) rotate(-90deg)'; // 270도 회전
+      snapTransform = 'perspective(900px) scale(0.92) rotateZ(270deg)'; // 시계방향 270도 회전
     }
 
-    // 3D 스냅 애니메이션 적용
+    const ANIM_MS = 340;
+
+    // 타일들에 회전/대칭 스냅 트랜스폼 애니메이션 적용
     lineCells.forEach(cellIdx => {
       const box = this.boardGrid.children[cellIdx] as HTMLElement;
-      if (box) box.style.transform = snapTransform;
+      if (box) {
+        box.style.transition = `transform ${ANIM_MS}ms cubic-bezier(0.2, 0.9, 0.3, 1)`;
+        box.style.transform = snapTransform;
+      }
     });
 
     setTimeout(() => {
-      const prevOps = [...this.currentOps];
+      try {
+        const prevOps = [...this.currentOps];
 
-      // 대수적 라인 연산 적용
-      this.currentOps = applyLineMoveGeneric(this.currentOps, lineCells, op);
+        // 대수적 라인 연산 적용
+        this.currentOps = applyLineMoveGeneric(this.currentOps, lineCells, op);
 
-      if (recordHistory) {
-        this.moveHistory.push({ lineId, op, prevOps });
-        this.movesCount++;
-        this.updateMovesLabel();
+        if (recordHistory) {
+          this.moveHistory.push({ lineId, op, prevOps });
+          this.movesCount++;
+          this.updateMovesLabel();
+        }
+
+        // 보드 Canvas 상태 및 텍스트 갱신
+        this.updateBoard();
+
+        // 트랜지션 해제 후 원래 위치로 즉시 스냅 (깜빡임 없음)
+        lineCells.forEach(cellIdx => {
+          const box = this.boardGrid.children[cellIdx] as HTMLElement;
+          if (box) {
+            box.style.transition = 'none';
+            box.style.transform = '';
+          }
+        });
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            lineCells.forEach(cellIdx => {
+              const box = this.boardGrid.children[cellIdx] as HTMLElement;
+              if (box) box.style.transition = '';
+            });
+          });
+        });
+
+        this.checkWinCondition();
+      } finally {
+        this.isAnimating = false;
+        this.gestureRecognizer.setLocked(false);
       }
-
-      lineCells.forEach(cellIdx => {
-        const box = this.boardGrid.children[cellIdx] as HTMLElement;
-        if (box) box.style.transform = '';
-      });
-
-      this.updateBoard();
-      this.isAnimating = false;
-      this.gestureRecognizer.setLocked(false);
-
-      this.checkWinCondition();
-    }, 280);
+    }, ANIM_MS);
   }
 
   private undoMove() {
