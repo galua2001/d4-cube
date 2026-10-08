@@ -13,6 +13,14 @@ interface Particle {
   shape: 'rect' | 'circle' | 'star';
 }
 
+export interface VictoryRecordInfo {
+  timeFormatted?: string;
+  isNewBestTime?: boolean;
+  isNewBestMoves?: boolean;
+  bestTimeFormatted?: string;
+  bestMoves?: number | null;
+}
+
 export class VictoryEffectManager {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D | null;
@@ -43,7 +51,12 @@ export class VictoryEffectManager {
     this.canvas.height = window.innerHeight;
   }
 
-  public launchVictory(movesCount: number, stars: number, onRestart?: () => void) {
+  public launchVictory(
+    movesCount: number,
+    stars: number,
+    recordInfo?: VictoryRecordInfo,
+    onRestart?: () => void
+  ) {
     this.resizeCanvas();
     this.canvas.style.display = 'block';
     this.particles = [];
@@ -58,7 +71,7 @@ export class VictoryEffectManager {
     const w = this.canvas.width;
     const h = this.canvas.height;
 
-    // 양쪽 및 중앙에서 140개의 화려한 폭죽 파티클 발사
+    // 양쪽 및 중앙에서 150개의 화려한 폭죽 파티클 발사
     for (let i = 0; i < 150; i++) {
       const fromLeft = i % 2 === 0;
       this.particles.push({
@@ -78,7 +91,7 @@ export class VictoryEffectManager {
     this.animate();
 
     // 화면 상단에 세련된 승리 배너 생성 (기존 글자 alert 대화상자 완전 대체)
-    this.showVictoryBanner(movesCount, stars, onRestart);
+    this.showVictoryBanner(movesCount, stars, recordInfo, onRestart);
 
     // 3.8초 후 파티클 자연스럽게 종료
     setTimeout(() => {
@@ -141,7 +154,12 @@ export class VictoryEffectManager {
     }
   };
 
-  private showVictoryBanner(movesCount: number, stars: number, onRestart?: () => void) {
+  private showVictoryBanner(
+    movesCount: number,
+    stars: number,
+    recordInfo?: VictoryRecordInfo,
+    onRestart?: () => void
+  ) {
     // 기존 배너가 있으면 제거
     const old = document.getElementById('victory-banner-overlay');
     if (old) old.remove();
@@ -150,13 +168,25 @@ export class VictoryEffectManager {
     banner.id = 'victory-banner-overlay';
     banner.className = 'victory-banner-anim';
 
+    const isNewBest = recordInfo?.isNewBestTime || recordInfo?.isNewBestMoves;
+    const timeDisplay = recordInfo?.timeFormatted ? `⏱️ 소요 시간: <b>${recordInfo.timeFormatted}</b>` : '';
+
     banner.innerHTML = `
       <div class="victory-card">
         <div class="victory-trophy">🏆</div>
+        ${isNewBest ? '<div class="badge-new-record">🔥 NEW BEST RECORD!</div>' : ''}
         <div class="victory-title">PERFECT CLEAR!</div>
         <div class="victory-stars">${'⭐'.repeat(stars)}</div>
         <div class="victory-desc">모든 대칭 타일을 원위치로 맞추셨습니다!</div>
-        <div class="victory-moves">총 조작 횟수: <b>${movesCount} 회</b></div>
+        <div class="victory-stats-box">
+          <div class="victory-moves">총 조작: <b>${movesCount} 회</b></div>
+          ${timeDisplay ? `<div class="victory-time">${timeDisplay}</div>` : ''}
+        </div>
+        ${recordInfo?.bestTimeFormatted || recordInfo?.bestMoves !== undefined ? `
+          <div class="victory-best-summary">
+            최고 기록: ${recordInfo.bestMoves ? `${recordInfo.bestMoves}회` : '-'} / ${recordInfo.bestTimeFormatted || '-'}
+          </div>
+        ` : ''}
         <div class="victory-actions">
           <button id="btn-victory-replay" class="btn-action primary">🎲 다시 섞기</button>
           <button id="btn-victory-close" class="btn-action">닫기</button>
@@ -177,12 +207,12 @@ export class VictoryEffectManager {
       if (onRestart) onRestart();
     });
 
-    // 5초 후 자동 페이드아웃
+    // 6초 후 자동 페이드아웃
     setTimeout(() => {
       if (document.body.contains(banner)) {
         closeBanner();
       }
-    }, 5500);
+    }, 6000);
   }
 }
 

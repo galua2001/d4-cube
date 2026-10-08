@@ -4,9 +4,11 @@ import { generateLines, generateLineCells, LineTarget, applyLineMoveGeneric } fr
 import { solveBoard, MoveStep } from './core/solver';
 import { soundEngine } from './audio/audioEngine';
 import { campaignManager } from './game/campaign';
+import { recordManager, formatTime } from './game/recordManager';
 import { renderDogTileCanvas } from './ui/tileRenderer';
 import { GestureRecognizer } from './ui/gesture';
 import { showSolutionModal } from './ui/solutionModal';
+import { showAboutModal } from './ui/aboutModal';
 import { victoryManager } from './ui/victoryEffect';
 
 class MatrixCubeApp {
@@ -17,6 +19,8 @@ class MatrixCubeApp {
   private moveHistory: Array<{ lineId: number; op: D4Op; prevOps: D4Op[] }> = [];
   private movesCount = 0;
   private isAnimating = false;
+  private isGameStarted = false;
+  private isGuideActive = false; // 조작 가이드 표시 여부
 
   private imgDogFront = new Image();
   private imgDogBack = new Image();
@@ -31,6 +35,7 @@ class MatrixCubeApp {
     this.renderLayout();
     this.bindControls();
     this.updateBoard();
+    this.updateBestRecordBadge();
   }
 
   private initBoardOps() {
@@ -50,8 +55,10 @@ class MatrixCubeApp {
     const app = document.getElementById('app')!;
     app.innerHTML = `
       <div class="header-bar">
-        <div class="header-title">🧩 행렬 큐브 (Matrix Cube)</div>
+        <div class="header-title">🧩 행렬 큐브</div>
         <div class="header-actions">
+          <button id="btn-about" class="btn-icon" title="작품 소개 및 수학적 배경">ℹ️ 소개</button>
+          <button id="btn-toggle-guide" class="btn-icon" title="컨트롤러 타일 가이드">🧭 가이드</button>
           <button id="btn-toggle-bgm" class="btn-icon">🔇 BGM</button>
           <button id="btn-toggle-sfx" class="btn-icon">🔊 SFX</button>
         </div>
@@ -81,9 +88,15 @@ class MatrixCubeApp {
       </div>
 
       <div class="status-bar">
-        <span class="badge-group" id="badge-group-name">D₄ (정사면군)</span>
-        <span id="label-stage-info">${this.boardSize}×${this.boardSize} (${this.scrambleMoves}수 도전)</span>
-        <span id="label-moves">0 회 조작</span>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span class="badge-group" id="badge-group-name">D₄ (정사면군)</span>
+          <span id="label-stage-info">${this.boardSize}×${this.boardSize} (${this.scrambleMoves}수)</span>
+        </div>
+        <div class="timer-container">
+          <span class="timer-display" id="label-timer">00:00.0</span>
+          <span id="label-moves">0 회</span>
+          <span class="best-record-badge" id="badge-best-record">🏆 BEST: -</span>
+        </div>
       </div>
 
       <div class="board-container">
@@ -108,8 +121,6 @@ class MatrixCubeApp {
     this.boardGrid = document.getElementById('board-grid')!;
     this.gestureCanvas = document.getElementById('gesture-canvas') as HTMLCanvasElement;
 
-    this.rebuildBoardDOM();
-
     // 제스처 인식기 활성화
     this.gestureRecognizer = new GestureRecognizer(
       this.boardGrid,
@@ -117,12 +128,15 @@ class MatrixCubeApp {
       (target, op) => this.handleLineOperation(target, op),
       this.boardSize
     );
+
+    this.rebuildBoardDOM();
   }
 
   private rebuildBoardDOM() {
     this.boardGrid.style.gridTemplateColumns = `repeat(${this.boardSize}, 1fr)`;
     this.boardGrid.style.gridTemplateRows = `repeat(${this.boardSize}, 1fr)`;
     this.boardGrid.innerHTML = '';
+    this.boardGrid.classList.toggle('show-guide', this.isGuideActive);
 
     const totalCells = this.boardSize * this.boardSize;
     for (let i = 0; i < totalCells; i++) {
@@ -135,6 +149,41 @@ class MatrixCubeApp {
       canvas.height = 100;
       box.appendChild(canvas);
 
+      const r = Math.floor(i / this.boardSize);
+      const c = i % this.boardSize;
+
+      // 컨트롤러 조작 가이드 안내 태그 배지 (.controller-guide-label) 생성
+      let guideText = '';
+      let guideClass = '';
+
+      if (r === 0 && c === 0) {
+        const mode = this.gestureRecognizer ? this.gestureRecognizer.getCell11Mode() : 'row';
+        guideText = mode === 'col' ? '1열' : '1행';
+        guideClass = mode === 'col' ? 'guide-col' : 'guide-row';
+      } else if (c === 0 && r > 0) {
+        guideText = `${r + 1}행`;
+        guideClass = 'guide-row';
+      } else if (r === 0 && c > 0) {
+        guideText = `${c + 1}열`;
+        guideClass = 'guide-col';
+      } else if (r === this.boardSize - 1 && c === this.boardSize - 1) {
+        guideText = '↖대각';
+        guideClass = 'guide-diag';
+      } else if (r === 1 && c === this.boardSize - 1) {
+        guideText = '↗대각';
+        guideClass = 'guide-diag';
+      }
+
+      if (guideText) {
+        const guideTag = document.createElement('div');
+        guideTag.className = `controller-guide-label ${guideClass}`;
+        guideTag.innerText = guideText;
+        if (r === 0 && c === 0) {
+          guideTag.id = 'guide-label-11';
+        }
+        box.appendChild(guideTag);
+      }
+
       // 1행 1열 (i === 0)일 때만 오른쪽 중간에 보라색 토글 점 부착
       if (i === 0) {
         const dot = document.createElement('div');
@@ -145,6 +194,13 @@ class MatrixCubeApp {
           const mode = this.gestureRecognizer.toggleCell11Mode();
           dot.classList.toggle('col-mode', mode === 'col');
           soundEngine.playTap();
+
+          // 가이드 태그 동적 변경 (1행 <-> 1열)
+          const tag11 = document.getElementById('guide-label-11');
+          if (tag11) {
+            tag11.innerText = mode === 'col' ? '1열' : '1행';
+            tag11.className = `controller-guide-label ${mode === 'col' ? 'guide-col' : 'guide-row'}`;
+          }
 
           // 팝업창 없이 1열(또는 1행)을 시각적으로 강조
           this.highlightActiveLine(mode);
@@ -202,6 +258,24 @@ class MatrixCubeApp {
   }
 
   private bindControls() {
+    // 공모전 소개 모달 버튼
+    document.getElementById('btn-about')?.addEventListener('click', () => {
+      soundEngine.playTap();
+      showAboutModal();
+    });
+
+    // 조작 가이드 인디케이터 토글 버튼
+    const btnGuide = document.getElementById('btn-toggle-guide');
+    if (btnGuide) {
+      btnGuide.classList.toggle('active', this.isGuideActive);
+      btnGuide.addEventListener('click', () => {
+        this.isGuideActive = !this.isGuideActive;
+        btnGuide.classList.toggle('active', this.isGuideActive);
+        this.boardGrid.classList.toggle('show-guide', this.isGuideActive);
+        soundEngine.playTap();
+      });
+    }
+
     document.getElementById('btn-toggle-bgm')?.addEventListener('click', (e) => {
       const on = soundEngine.toggleBgm();
       (e.target as HTMLElement).innerText = on ? '🎵 BGM' : '🔇 BGM';
@@ -237,6 +311,7 @@ class MatrixCubeApp {
         target.classList.add('active');
 
         this.updateStatusInfo();
+        this.updateBestRecordBadge();
         this.scrambleBoard();
       });
     });
@@ -262,16 +337,37 @@ class MatrixCubeApp {
     document.getElementById('btn-set-d4')?.addEventListener('click', () => this.switchGroup('D4'));
   }
 
+  private updateBestRecordBadge() {
+    const badge = document.getElementById('badge-best-record');
+    if (!badge) return;
+    const rec = recordManager.getRecord(this.boardSize, this.scrambleMoves);
+    if (rec && (rec.bestTimeMs !== null || rec.bestMoves !== null)) {
+      const timeStr = rec.bestTimeMs !== null ? formatTime(rec.bestTimeMs) : '-';
+      const moveStr = rec.bestMoves !== null ? `${rec.bestMoves}회` : '-';
+      badge.innerText = `🏆 ${timeStr} / ${moveStr}`;
+      badge.title = `최고 기록: ${timeStr} (${moveStr})`;
+    } else {
+      badge.innerText = '🏆 BEST: -';
+      badge.title = '아직 클리어 기록이 없습니다';
+    }
+  }
+
   private setBoardSize(newSize: number) {
     this.boardSize = newSize;
     this.initBoardOps();
     this.rebuildBoardDOM();
     this.gestureRecognizer.setBoardSize(newSize);
 
+    this.isGameStarted = false;
+    recordManager.resetTimer();
+    const timerEl = document.getElementById('label-timer');
+    if (timerEl) timerEl.innerText = '00:00.0';
+
     this.moveHistory = [];
     this.movesCount = 0;
     this.updateMovesLabel();
     this.updateStatusInfo();
+    this.updateBestRecordBadge();
 
     soundEngine.playTap();
     this.scrambleBoard();
@@ -366,6 +462,15 @@ class MatrixCubeApp {
         this.currentOps = applyLineMoveGeneric(this.currentOps, lineCells, op);
 
         if (recordHistory) {
+          // 첫 조작 시 초시계 시작
+          if (!this.isGameStarted) {
+            this.isGameStarted = true;
+            recordManager.startTimer((formatted) => {
+              const timerEl = document.getElementById('label-timer');
+              if (timerEl) timerEl.innerText = formatted;
+            });
+          }
+
           this.moveHistory.push({ lineId, op, prevOps });
           this.movesCount++;
           this.updateMovesLabel();
@@ -411,6 +516,11 @@ class MatrixCubeApp {
   }
 
   private scrambleBoard() {
+    this.isGameStarted = false;
+    recordManager.resetTimer();
+    const timerEl = document.getElementById('label-timer');
+    if (timerEl) timerEl.innerText = '00:00.0';
+
     const lines = generateLines(this.boardSize);
     const lineCellsList = generateLineCells(this.boardSize);
     const groupDef = SYMMETRY_GROUPS[this.currentGroup];
@@ -428,6 +538,7 @@ class MatrixCubeApp {
     this.moveHistory = [];
     this.movesCount = 0;
     this.updateMovesLabel();
+    this.updateBestRecordBadge();
     soundEngine.playTap();
     this.updateBoard();
   }
@@ -497,12 +608,19 @@ class MatrixCubeApp {
   private checkWinCondition() {
     const isWin = this.currentOps.every(op => op === D4.ID);
     if (isWin) {
-      // 1. 신나는 다성부 승리 팡파르 + 마법 차임벨 사운드
+      // 1. 타이머 정지 및 기록 저장 & 최고 기록 갱신 여부 판정
+      this.isGameStarted = false;
+      const elapsedMs = recordManager.stopTimer();
+      const timeFormatted = recordManager.getFormattedTime();
+      const saveResult = recordManager.saveRecord(this.boardSize, this.scrambleMoves, elapsedMs, this.movesCount);
+      this.updateBestRecordBadge();
+
+      // 2. 신나는 다성부 승리 팡파르 + 마법 차임벨 사운드
       soundEngine.playWin();
 
       const stars = campaignManager.completeStage(1, this.movesCount);
 
-      // 2. 보드의 모든 타일들이 순차적으로 파도타듯 춤추는 축하 댄스 애니메이션
+      // 3. 보드의 모든 타일들이 순차적으로 파도타듯 춤추는 축하 댄스 애니메이션
       const total = this.boardSize * this.boardSize;
       for (let i = 0; i < total; i++) {
         const box = this.boardGrid.children[i] as HTMLElement;
@@ -513,10 +631,21 @@ class MatrixCubeApp {
         }
       }
 
-      // 3. 화려한 전면 컨페티 폭죽 파티클 및 세련된 승리 축하 배너 발사 (글자 alert 대화상자 완전 대체)
-      victoryManager.launchVictory(this.movesCount, stars, () => {
-        this.scrambleBoard();
-      });
+      // 4. 화려한 전면 컨페티 폭죽 파티클 및 NEW BEST 뱃지가 연동된 세련된 승리 축하 배너
+      victoryManager.launchVictory(
+        this.movesCount,
+        stars,
+        {
+          timeFormatted,
+          isNewBestTime: saveResult.isNewBestTime,
+          isNewBestMoves: saveResult.isNewBestMoves,
+          bestTimeFormatted: formatTime(saveResult.bestTimeMs),
+          bestMoves: saveResult.bestMoves
+        },
+        () => {
+          this.scrambleBoard();
+        }
+      );
 
       // 4초 후 타일 축하 댄스 클래스 정리
       setTimeout(() => {
@@ -530,7 +659,7 @@ class MatrixCubeApp {
 
   private updateMovesLabel() {
     const lbl = document.getElementById('label-moves');
-    if (lbl) lbl.innerText = `${this.movesCount} 회 조작`;
+    if (lbl) lbl.innerText = `${this.movesCount} 회`;
   }
 
   // 각 성분의 상태 뱃지 텍스트 반환 (0, 1, 2, 3 및 대칭 기호)

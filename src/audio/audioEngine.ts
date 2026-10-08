@@ -7,18 +7,22 @@ class SoundEngine {
   private bgmEnabled = false;
 
   constructor() {
-    // 배경음악 객체 초기화
-    this.bgmAudio = new Audio('/assets/bgm.mp3');
-    this.bgmAudio.loop = true;
-    this.bgmAudio.volume = 0.35;
+    // 배경음악 객체 초기화 (브라우저 환경 지원)
+    if (typeof Audio !== 'undefined') {
+      this.bgmAudio = new Audio('/assets/bgm.mp3');
+      this.bgmAudio.loop = true;
+      this.bgmAudio.volume = 0.35;
+    }
   }
 
   private initCtx() {
     if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtx();
+      const AudioCtx = (typeof window !== 'undefined' ? (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext) : (globalThis as unknown as { AudioContext: typeof AudioContext }).AudioContext);
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
     }
-    if (this.ctx.state === 'suspended') {
+    if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume();
     }
   }
@@ -44,25 +48,59 @@ class SoundEngine {
     osc.stop(this.ctx.currentTime + 0.05);
   }
 
+  // 콤보 피치 음계: 도(C4) - 레(D4) - 미(E4) - 파(F4) - 솔(G4) - 라(A4) - 도(C5)
+  private readonly comboScale = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 523.25];
+  private lastFlipTime = 0;
+  private comboIndex = 0;
+
+  /**
+   * 현재 콤보 단계 반환 (0 ~ 6)
+   */
+  public getComboIndex(): number {
+    return this.comboIndex;
+  }
+
+  /**
+   * 콤보 단계 리셋
+   */
+  public resetCombo() {
+    this.comboIndex = 0;
+    this.lastFlipTime = 0;
+  }
+
   public playFlip() {
     if (!this.sfxEnabled) return;
     this.initCtx();
     if (!this.ctx) return;
 
+    const now = Date.now();
+    // 1.2초(1200ms) 이내 연속 조작 시 피치 단계 상승
+    if (this.lastFlipTime > 0 && now - this.lastFlipTime <= 1200) {
+      this.comboIndex = Math.min(this.comboIndex + 1, this.comboScale.length - 1);
+    } else {
+      this.comboIndex = 0;
+    }
+    this.lastFlipTime = now;
+
+    const baseFreq = this.comboScale[this.comboIndex];
+    const endFreq = baseFreq * 0.58; // 기분 좋은 플립 타격감과 여운
+
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(320, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.12);
+    osc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(50, endFreq), this.ctx.currentTime + 0.13);
 
-    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+    // 콤보가 높을수록 살짝 더 경쾌하게 볼륨 조절
+    const baseGain = 0.28 + this.comboIndex * 0.02;
+    gain.gain.setValueAtTime(baseGain, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.13);
 
     osc.connect(gain);
     gain.connect(this.ctx.destination);
 
     osc.start();
-    osc.stop(this.ctx.currentTime + 0.12);
+    osc.stop(this.ctx.currentTime + 0.13);
   }
 
   public playWin() {
