@@ -26,7 +26,7 @@ describe('D4 대칭군 수학 코어 테스트', () => {
     // 1행에 R90 적용
     const startCode = applyMoveInt(0, 0, OP_TO_INT[D4.R90]);
     const startOps = decodeBoardOps(startCode);
-    const solution = solveBoard(startOps, 'D4', true);
+    const solution = solveBoard(startOps, 3, 'D4');
 
     expect(solution.length).toBe(1);
     expect(solution[0].lineId).toBe(0); // 1행
@@ -38,7 +38,7 @@ describe('D4 대칭군 수학 코어 테스트', () => {
     let code = applyMoveInt(0, 0, OP_TO_INT[D4.R180]);
     code = applyMoveInt(code, 4, OP_TO_INT[D4.MX]);
     const startOps = decodeBoardOps(code);
-    const solution = solveBoard(startOps, 'D4', true);
+    const solution = solveBoard(startOps, 3, 'D4');
 
     expect(solution.length).toBeLessThanOrEqual(2);
   });

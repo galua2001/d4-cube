@@ -1,5 +1,5 @@
 import { D4Op, INT_TO_OP, OP_TO_INT, SYMMETRY_GROUPS, SymmetryGroupKey } from './group';
-import { applyInvMoveInt, applyMoveInt, encodeBoardOps, LINES_3X3, LineTarget } from './board';
+import { applyInvMoveInt, applyMoveInt, encodeBoardOps, generateLines, generateLineCells, LineTarget, applyLineMoveGeneric } from './board';
 
 export interface MoveStep {
   lineId: number;
@@ -8,10 +8,12 @@ export interface MoveStep {
   opInt: number;
 }
 
-export function solveBoard(curOps: D4Op[], groupKey: SymmetryGroupKey = 'D4', allowDiagonal: boolean = true): MoveStep[] {
+// 3x3 양방향 BFS 고속 솔버
+export function solveBoard3x3(curOps: D4Op[], groupKey: SymmetryGroupKey = 'D4', allowDiagonal: boolean = true): MoveStep[] {
   const startCode = encodeBoardOps(curOps);
   if (startCode === 0) return [];
 
+  const lines = generateLines(3);
   const groupDef = SYMMETRY_GROUPS[groupKey] || SYMMETRY_GROUPS.D4;
   const groupOps = groupDef.ops.filter(op => op !== 'ID');
   const groupOpsInt = groupOps.map(op => OP_TO_INT[op]).filter(v => v !== undefined && v > 0);
@@ -112,8 +114,73 @@ export function solveBoard(curOps: D4Op[], groupKey: SymmetryGroupKey = 'D4', al
 
   return allMoves.map(m => ({
     lineId: m.lineId,
-    line: LINES_3X3[m.lineId],
+    line: lines[m.lineId],
     op: INT_TO_OP[m.opInt],
     opInt: m.opInt
   }));
+}
+
+// 4x4, 5x5 등 임의 크기 보드를 위한 범용 BFS 솔버 (최대 5수까지 빠른 탐색)
+export function solveBoardGeneric(curOps: D4Op[], size: number, groupKey: SymmetryGroupKey = 'D4', maxDepth = 4): MoveStep[] {
+  if (size === 3) {
+    return solveBoard3x3(curOps, groupKey, true);
+  }
+
+  const isSolved = (ops: D4Op[]) => ops.every(o => o === 'ID');
+  if (isSolved(curOps)) return [];
+
+  const lines = generateLines(size);
+  const lineCells = generateLineCells(size);
+  const groupDef = SYMMETRY_GROUPS[groupKey] || SYMMETRY_GROUPS.D4;
+  const groupOps = groupDef.ops.filter(op => op !== 'ID');
+
+  interface StateNode {
+    ops: D4Op[];
+    path: MoveStep[];
+  }
+
+  const visited = new Set<string>();
+  const encodeKey = (ops: D4Op[]) => ops.join(',');
+
+  visited.add(encodeKey(curOps));
+  let queue: StateNode[] = [{ ops: curOps, path: [] }];
+
+  for (let depth = 0; depth < maxDepth; depth++) {
+    const nextQueue: StateNode[] = [];
+    for (const node of queue) {
+      for (let lineId = 0; lineId < lines.length; lineId++) {
+        for (const op of groupOps) {
+          const nextOps = applyLineMoveGeneric(node.ops, lineCells[lineId], op);
+          const nextStep: MoveStep = {
+            lineId,
+            line: lines[lineId],
+            op,
+            opInt: OP_TO_INT[op]
+          };
+          const nextPath = [...node.path, nextStep];
+
+          if (isSolved(nextOps)) {
+            return nextPath;
+          }
+
+          const key = encodeKey(nextOps);
+          if (!visited.has(key)) {
+            visited.add(key);
+            nextQueue.push({ ops: nextOps, path: nextPath });
+          }
+        }
+      }
+    }
+    queue = nextQueue;
+    if (queue.length === 0 || queue.length > 25000) break; // 메모리 안전 가드
+  }
+
+  return [];
+}
+
+export function solveBoard(curOps: D4Op[], size: number, groupKey: SymmetryGroupKey = 'D4'): MoveStep[] {
+  if (size === 3) {
+    return solveBoard3x3(curOps, groupKey, true);
+  }
+  return solveBoardGeneric(curOps, size, groupKey, 4);
 }

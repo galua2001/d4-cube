@@ -1,19 +1,20 @@
 import './styles/main.css';
-import { D4Op, D4, SymmetryGroupKey, SYMMETRY_GROUPS, OP_TO_INT, COMPOSE_TABLE, INT_TO_OP } from './core/group';
-import { LINES_3X3, LINE_CELLS_3X3, LineTarget, decodeBoardOps, encodeBoardOps } from './core/board';
+import { D4Op, D4, SymmetryGroupKey, SYMMETRY_GROUPS } from './core/group';
+import { generateLines, generateLineCells, LineTarget, applyLineMoveGeneric } from './core/board';
 import { solveBoard, MoveStep } from './core/solver';
 import { soundEngine } from './audio/audioEngine';
-import { campaignManager, STAGES } from './game/campaign';
+import { campaignManager } from './game/campaign';
 import { renderDogTileCanvas } from './ui/tileRenderer';
 import { GestureRecognizer } from './ui/gesture';
 import { showSolutionModal } from './ui/solutionModal';
 
 class MatrixCubeApp {
-  private currentOps: D4Op[] = Array(9).fill(D4.ID);
+  private boardSize = 3;
+  private scrambleMoves = 3; // 기본 3수 섞기
+  private currentOps: D4Op[] = [];
   private currentGroup: SymmetryGroupKey = 'D4';
   private moveHistory: Array<{ lineId: number; op: D4Op; prevOps: D4Op[] }> = [];
   private movesCount = 0;
-  private currentStageId = 1;
   private isAnimating = false;
 
   private imgDogFront = new Image();
@@ -24,10 +25,15 @@ class MatrixCubeApp {
   private gestureRecognizer!: GestureRecognizer;
 
   constructor() {
+    this.initBoardOps();
     this.initImages();
     this.renderLayout();
     this.bindControls();
     this.updateBoard();
+  }
+
+  private initBoardOps() {
+    this.currentOps = Array(this.boardSize * this.boardSize).fill(D4.ID);
   }
 
   private initImages() {
@@ -50,9 +56,32 @@ class MatrixCubeApp {
         </div>
       </div>
 
+      <!-- 보드 크기 & 난이도 설정 패널 -->
+      <div class="settings-panel">
+        <div class="settings-row">
+          <span class="settings-label">📐 크기</span>
+          <div class="button-group" id="size-button-group">
+            <button class="btn-pill active" data-size="3">3×3</button>
+            <button class="btn-pill" data-size="4">4×4</button>
+            <button class="btn-pill" data-size="5">5×5</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">🎲 난이도</span>
+          <div class="button-group" id="moves-button-group">
+            <button class="btn-pill" data-moves="1">1수</button>
+            <button class="btn-pill" data-moves="2">2수</button>
+            <button class="btn-pill active" data-moves="3">3수</button>
+            <button class="btn-pill" data-moves="4">4수</button>
+            <button class="btn-pill" data-moves="5">5수</button>
+            <button class="btn-pill" data-moves="8">8수</button>
+          </div>
+        </div>
+      </div>
+
       <div class="status-bar">
         <span class="badge-group" id="badge-group-name">D₄ (정사면군)</span>
-        <span id="label-stage-info">스테이지 1</span>
+        <span id="label-stage-info">${this.boardSize}×${this.boardSize} (${this.scrambleMoves}수 도전)</span>
         <span id="label-moves">0 회 조작</span>
       </div>
 
@@ -71,16 +100,31 @@ class MatrixCubeApp {
       <div class="controls-panel" style="margin-top: 4px;">
         <button id="btn-set-c2" class="btn-icon" style="flex:1;">C₂ 모드</button>
         <button id="btn-set-v4" class="btn-icon" style="flex:1;">V₄ 모드</button>
-        <button id="btn-set-d4" class="btn-icon" style="flex:1; background:#0284c7;">D₄ 모드</button>
+        <button id="btn-set-d4" class="btn-icon active" style="flex:1;">D₄ 모드</button>
       </div>
     `;
 
     this.boardGrid = document.getElementById('board-grid')!;
     this.gestureCanvas = document.getElementById('gesture-canvas') as HTMLCanvasElement;
 
-    // 타일 그리드 엘리먼트 9개 생성
+    this.rebuildBoardDOM();
+
+    // 제스처 인식기 활성화
+    this.gestureRecognizer = new GestureRecognizer(
+      this.boardGrid,
+      this.gestureCanvas,
+      (target, op) => this.handleLineOperation(target, op),
+      this.boardSize
+    );
+  }
+
+  private rebuildBoardDOM() {
+    this.boardGrid.style.gridTemplateColumns = `repeat(${this.boardSize}, 1fr)`;
+    this.boardGrid.style.gridTemplateRows = `repeat(${this.boardSize}, 1fr)`;
     this.boardGrid.innerHTML = '';
-    for (let i = 0; i < 9; i++) {
+
+    const totalCells = this.boardSize * this.boardSize;
+    for (let i = 0; i < totalCells; i++) {
       const box = document.createElement('div');
       box.className = 'cell-box';
       const canvas = document.createElement('canvas');
@@ -90,13 +134,6 @@ class MatrixCubeApp {
       box.appendChild(canvas);
       this.boardGrid.appendChild(box);
     }
-
-    // 제스처 인식기 활성화
-    this.gestureRecognizer = new GestureRecognizer(
-      this.boardGrid,
-      this.gestureCanvas,
-      (target, op) => this.handleLineOperation(target, op)
-    );
   }
 
   private bindControls() {
@@ -108,6 +145,35 @@ class MatrixCubeApp {
     document.getElementById('btn-toggle-sfx')?.addEventListener('click', (e) => {
       const on = soundEngine.toggleSfx();
       (e.target as HTMLElement).innerText = on ? '🔊 SFX' : '🔈 SFX';
+    });
+
+    // 보드 크기 선택 이벤트
+    document.querySelectorAll('#size-button-group .btn-pill').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const newSize = parseInt(target.dataset.size || '3', 10);
+        if (newSize === this.boardSize) return;
+
+        document.querySelectorAll('#size-button-group .btn-pill').forEach(b => b.classList.remove('active'));
+        target.classList.add('active');
+
+        this.setBoardSize(newSize);
+      });
+    });
+
+    // 섞기 난이도(N수) 선택 이벤트
+    document.querySelectorAll('#moves-button-group .btn-pill').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const moves = parseInt(target.dataset.moves || '3', 10);
+        this.scrambleMoves = moves;
+
+        document.querySelectorAll('#moves-button-group .btn-pill').forEach(b => b.classList.remove('active'));
+        target.classList.add('active');
+
+        this.updateStatusInfo();
+        this.scrambleBoard();
+      });
     });
 
     document.getElementById('btn-scramble')?.addEventListener('click', () => {
@@ -131,6 +197,28 @@ class MatrixCubeApp {
     document.getElementById('btn-set-d4')?.addEventListener('click', () => this.switchGroup('D4'));
   }
 
+  private setBoardSize(newSize: number) {
+    this.boardSize = newSize;
+    this.initBoardOps();
+    this.rebuildBoardDOM();
+    this.gestureRecognizer.setBoardSize(newSize);
+
+    this.moveHistory = [];
+    this.movesCount = 0;
+    this.updateMovesLabel();
+    this.updateStatusInfo();
+
+    soundEngine.playTap();
+    this.scrambleBoard();
+  }
+
+  private updateStatusInfo() {
+    const lbl = document.getElementById('label-stage-info');
+    if (lbl) {
+      lbl.innerText = `${this.boardSize}×${this.boardSize} (${this.scrambleMoves}수 도전)`;
+    }
+  }
+
   private switchGroup(grp: SymmetryGroupKey) {
     this.currentGroup = grp;
     const badge = document.getElementById('badge-group-name');
@@ -138,7 +226,9 @@ class MatrixCubeApp {
 
     ['btn-set-c2', 'btn-set-v4', 'btn-set-d4'].forEach(id => {
       const btn = document.getElementById(id);
-      if (btn) btn.style.background = id.endsWith(grp.toLowerCase()) ? '#0284c7' : '#334155';
+      if (btn) {
+        btn.classList.toggle('active', id.endsWith(grp.toLowerCase()));
+      }
     });
 
     this.scrambleBoard();
@@ -157,8 +247,8 @@ class MatrixCubeApp {
       else if (rawOp === D4.MAD) validOp = D4.MX;
     }
 
-    // 타겟 라인 ID 찾기
-    const lineId = LINES_3X3.findIndex(l => l.type === target.type && l.idx === target.idx);
+    const lines = generateLines(this.boardSize);
+    const lineId = lines.findIndex(l => l.type === target.type && l.idx === target.idx);
     if (lineId === -1) return;
 
     this.applyMove(lineId, validOp);
@@ -171,24 +261,20 @@ class MatrixCubeApp {
 
     soundEngine.playFlip();
 
-    const lineCells = LINE_CELLS_3X3[lineId];
+    const lineCellsList = generateLineCells(this.boardSize);
+    const lineCells = lineCellsList[lineId] || [];
 
     // 3D 스냅 애니메이션 적용
     lineCells.forEach(cellIdx => {
       const box = this.boardGrid.children[cellIdx] as HTMLElement;
-      box.style.transform = 'scale(0.92) rotateY(180deg)';
+      if (box) box.style.transform = 'scale(0.92) rotateY(180deg)';
     });
 
     setTimeout(() => {
       const prevOps = [...this.currentOps];
 
       // 대수적 라인 연산 적용
-      for (const c of lineCells) {
-        const curInt = OP_TO_INT[this.currentOps[c]];
-        const opInt = OP_TO_INT[op];
-        const nextInt = COMPOSE_TABLE[curInt * 8 + opInt];
-        this.currentOps[c] = INT_TO_OP[nextInt];
-      }
+      this.currentOps = applyLineMoveGeneric(this.currentOps, lineCells, op);
 
       if (recordHistory) {
         this.moveHistory.push({ lineId, op, prevOps });
@@ -198,7 +284,7 @@ class MatrixCubeApp {
 
       lineCells.forEach(cellIdx => {
         const box = this.boardGrid.children[cellIdx] as HTMLElement;
-        box.style.transform = '';
+        if (box) box.style.transform = '';
       });
 
       this.updateBoard();
@@ -220,26 +306,20 @@ class MatrixCubeApp {
   }
 
   private scrambleBoard() {
-    const stage = STAGES.find(s => s.id === this.currentStageId) || STAGES[0];
-    const moves = stage.scrambleMoves || 3;
-
-    let code = 0;
+    const lines = generateLines(this.boardSize);
+    const lineCellsList = generateLineCells(this.boardSize);
     const groupDef = SYMMETRY_GROUPS[this.currentGroup];
     const validOps = groupDef.ops.filter(o => o !== D4.ID);
 
-    for (let i = 0; i < moves; i++) {
-      const lineId = Math.floor(Math.random() * 8);
+    let ops = Array(this.boardSize * this.boardSize).fill(D4.ID);
+
+    for (let i = 0; i < this.scrambleMoves; i++) {
+      const lineId = Math.floor(Math.random() * lines.length);
       const randOp = validOps[Math.floor(Math.random() * validOps.length)];
-      const cells = LINE_CELLS_3X3[lineId];
-      const curOps = decodeBoardOps(code);
-      for (const c of cells) {
-        const next = COMPOSE_TABLE[OP_TO_INT[curOps[c]] * 8 + OP_TO_INT[randOp]];
-        curOps[c] = INT_TO_OP[next];
-      }
-      code = encodeBoardOps(curOps);
+      ops = applyLineMoveGeneric(ops, lineCellsList[lineId], randOp);
     }
 
-    this.currentOps = decodeBoardOps(code);
+    this.currentOps = ops;
     this.moveHistory = [];
     this.movesCount = 0;
     this.updateMovesLabel();
@@ -248,9 +328,9 @@ class MatrixCubeApp {
   }
 
   private giveHint() {
-    const steps = solveBoard(this.currentOps, this.currentGroup, true);
+    const steps = solveBoard(this.currentOps, this.boardSize, this.currentGroup);
     if (steps.length === 0) {
-      alert('이미 완성된 상태입니다!');
+      alert(this.currentOps.every(o => o === D4.ID) ? '이미 완성된 상태입니다!' : '탐색 가능한 최단 해법을 계산 중입니다.');
       return;
     }
     const first = steps[0];
@@ -258,7 +338,7 @@ class MatrixCubeApp {
   }
 
   private openSolution() {
-    const steps = solveBoard(this.currentOps, this.currentGroup, true);
+    const steps = solveBoard(this.currentOps, this.boardSize, this.currentGroup);
     showSolutionModal(
       steps,
       () => this.runAutoSolve(steps),
@@ -268,7 +348,7 @@ class MatrixCubeApp {
 
   private async runAutoSolve(steps: MoveStep[]) {
     for (const step of steps) {
-      if (encodeBoardOps(this.currentOps) === 0) break;
+      if (this.currentOps.every(o => o === D4.ID)) break;
       await new Promise<void>(res => {
         this.applyMove(step.lineId, step.op, true);
         setTimeout(res, 520);
@@ -280,9 +360,9 @@ class MatrixCubeApp {
     const isWin = this.currentOps.every(op => op === D4.ID);
     if (isWin) {
       soundEngine.playWin();
-      const stars = campaignManager.completeStage(this.currentStageId, this.movesCount);
+      const stars = campaignManager.completeStage(1, this.movesCount);
       setTimeout(() => {
-        alert(`🎉 축하합니다! 퍼즐을 완벽하게 맞추셨습니다!\n별점: ${'⭐'.repeat(stars)}`);
+        alert(`🎉 축하합니다! ${this.boardSize}×${this.boardSize} 퍼즐을 완벽하게 맞추셨습니다!\n별점: ${'⭐'.repeat(stars)}`);
       }, 350);
     }
   }
@@ -293,7 +373,8 @@ class MatrixCubeApp {
   }
 
   private updateBoard() {
-    for (let i = 0; i < 9; i++) {
+    const total = this.boardSize * this.boardSize;
+    for (let i = 0; i < total; i++) {
       const box = this.boardGrid.children[i];
       if (!box) continue;
       const canvas = box.querySelector('canvas') as HTMLCanvasElement;

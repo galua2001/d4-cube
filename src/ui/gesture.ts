@@ -1,5 +1,5 @@
 import { D4Op } from '../core/group';
-import { LineTarget } from '../core/board';
+import { LineTarget, generateLines } from '../core/board';
 
 export interface GestureCallback {
   (target: LineTarget, op: D4Op): void;
@@ -14,16 +14,22 @@ export class GestureRecognizer {
   private isPointerDown = false;
   private startCell: { r: number; c: number; target: LineTarget } | null = null;
   private isLocked = false;
+  private boardSize = 3;
 
-  constructor(boardEl: HTMLElement, trailCanvas: HTMLCanvasElement, onAction: GestureCallback) {
+  constructor(boardEl: HTMLElement, trailCanvas: HTMLCanvasElement, onAction: GestureCallback, boardSize = 3) {
     this.boardEl = boardEl;
     this.trailCanvas = trailCanvas;
     this.ctx = trailCanvas.getContext('2d');
     this.onAction = onAction;
+    this.boardSize = boardSize;
 
     this.bindEvents();
     this.syncCanvasSize();
     window.addEventListener('resize', () => this.syncCanvasSize());
+  }
+
+  public setBoardSize(size: number) {
+    this.boardSize = size;
   }
 
   public setLocked(locked: boolean) {
@@ -37,15 +43,29 @@ export class GestureRecognizer {
   }
 
   private getLineForCell(r: number, c: number): LineTarget | null {
-    if (r === 0 && c === 0) return { type: 'row', idx: 0, label: '1행' };
-    if (r === 1 && c === 0) return { type: 'row', idx: 1, label: '2행' };
-    if (r === 2 && c === 0) return { type: 'row', idx: 2, label: '3행' };
-    if (r === 1 && c === 1) return { type: 'col', idx: 0, label: '1열' };
-    if (r === 0 && c === 1) return { type: 'col', idx: 1, label: '2열' };
-    if (r === 0 && c === 2) return { type: 'col', idx: 2, label: '3열' };
-    if (r === 1 && c === 2) return { type: 'diag', idx: 'anti', label: '↗ 부대각선' };
-    if (r === 2 && c === 2) return { type: 'diag', idx: 'main', label: '↖ 주대각선' };
-    return null;
+    const sz = this.boardSize;
+    const lines = generateLines(sz);
+
+    // 1. 대각선 (모서리 칸 우선 매핑)
+    if (r === sz - 1 && c === sz - 1) {
+      return lines.find(l => l.type === 'diag' && l.idx === 'main') || null;
+    }
+    if (r === 1 && c === sz - 1) {
+      return lines.find(l => l.type === 'diag' && l.idx === 'anti') || null;
+    }
+
+    // 2. 가장자리 행 (첫 번째 열을 행 컨트롤러로 매핑)
+    if (c === 0 && r < sz) {
+      return lines.find(l => l.type === 'row' && l.idx === r) || null;
+    }
+
+    // 3. 가장자리 열 (첫 번째 행을 열 컨트롤러로 매핑)
+    if (r === 0 && c < sz) {
+      return lines.find(l => l.type === 'col' && l.idx === c) || null;
+    }
+
+    // 4. 내부 칸 터치 시 해당 행/열 자동 매핑 (대각선 제외)
+    return lines.find(l => l.type === 'row' && l.idx === r) || null;
   }
 
   private bindEvents() {
@@ -55,8 +75,8 @@ export class GestureRecognizer {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      const cellW = rect.width / 3;
-      const cellH = rect.height / 3;
+      const cellW = rect.width / this.boardSize;
+      const cellH = rect.height / this.boardSize;
       const c = Math.floor(x / cellW);
       const r = Math.floor(y / cellH);
 

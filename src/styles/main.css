@@ -32,11 +32,11 @@ body {
 
 #app {
   width: 100%;
-  max-width: 480px;
+  max-width: 520px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 /* Header */
@@ -72,12 +72,76 @@ body {
   padding: 6px 10px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   transition: all 0.2s;
 }
 
 .btn-icon:hover {
   background: #475569;
+}
+
+.btn-icon.active {
+  background: #0284c7;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+/* Settings Bar (Size & Difficulty) */
+.settings-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.settings-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 65px;
+}
+
+.button-group {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.btn-pill {
+  flex: 1;
+  padding: 6px 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #0f172a;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.btn-pill:hover {
+  color: white;
+  border-color: var(--accent-color);
+}
+
+.btn-pill.active {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: white;
+  font-weight: 700;
 }
 
 /* Status Info */
@@ -86,8 +150,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 12px;
-  font-size: 0.9rem;
+  padding: 4px 8px;
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 
@@ -103,17 +167,15 @@ body {
 /* Board Wrapper */
 .board-container {
   position: relative;
-  width: 320px;
-  height: 320px;
-  margin: 10px auto;
+  width: 330px;
+  height: 330px;
+  margin: 6px auto;
   perspective: 1000px;
 }
 
 .board-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 6px;
+  gap: 4px;
   width: 100%;
   height: 100%;
   background: #090d16;
@@ -128,7 +190,7 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
   background: #1e293b;
   display: flex;
@@ -162,23 +224,23 @@ body {
   display: flex;
   justify-content: space-around;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .btn-action {
   flex: 1;
-  padding: 10px 12px;
+  padding: 10px 8px;
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   color: white;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   border-radius: 10px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   transition: all 0.2s;
 }
 
