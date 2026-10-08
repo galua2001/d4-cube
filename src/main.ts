@@ -432,13 +432,46 @@ class MatrixCubeApp {
   }
 
   private giveHint() {
-    const steps = solveBoard(this.currentOps, this.boardSize, this.currentGroup);
-    if (steps.length === 0) {
-      alert(this.currentOps.every(o => o === D4.ID) ? '이미 완성된 상태입니다!' : '탐색 가능한 최단 해법을 계산 중입니다.');
+    if (this.currentOps.every(o => o === D4.ID)) {
+      soundEngine.playWin();
       return;
     }
+
+    const steps = solveBoard(this.currentOps, this.boardSize, this.currentGroup);
+    if (steps.length === 0) return;
+
     const first = steps[0];
-    alert(`💡 힌트: ${first.line.label}을 ${first.op} 방향으로 회전/반전해보세요! (남은 최소 수: ${steps.length}수)`);
+    soundEngine.playTap();
+
+    // 기존 하이라이트 초기화
+    const total = this.boardSize * this.boardSize;
+    for (let i = 0; i < total; i++) {
+      const b = this.boardGrid.children[i] as HTMLElement;
+      if (b) {
+        b.classList.remove('highlight-hint', 'highlight-col', 'highlight-row');
+      }
+    }
+
+    // 힌트 대상 행/열/대각선의 셀들 강조
+    const lineCellsList = generateLineCells(this.boardSize);
+    const targetCells = lineCellsList[first.lineId] || [];
+
+    targetCells.forEach(cellIdx => {
+      const b = this.boardGrid.children[cellIdx] as HTMLElement;
+      if (b) {
+        b.classList.add('highlight-hint');
+      }
+    });
+
+    // 2.5초 후 자연스럽게 힌트 강조 해제
+    setTimeout(() => {
+      targetCells.forEach(cellIdx => {
+        const b = this.boardGrid.children[cellIdx] as HTMLElement;
+        if (b) {
+          b.classList.remove('highlight-hint');
+        }
+      });
+    }, 2500);
   }
 
   private openSolution() {
