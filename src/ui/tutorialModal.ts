@@ -597,8 +597,12 @@ export class TutorialModalController {
   public applyStepState(step: number): void {
     switch (step) {
       case 1:
-        // 1단계: 뒤섞인 타일 상태
-        this.boardOps = [D4.MX, D4.R90, D4.MY, D4.ID, D4.R180, D4.MX, D4.MY, D4.ID, D4.R90];
+        // 1단계: 가운데(idx 4)가 0번(ID) 정위치 강아지이고, 나머지는 난이도에 따라 뒤섞인 타일
+        this.boardOps = [
+          D4.MX,   D4.R90,  D4.MY,
+          D4.R270, D4.ID,   D4.MX,
+          D4.MY,   D4.R180, D4.MD
+        ];
         break;
       case 2:
         // 2단계: 1행 가로 반사(MX)
@@ -665,19 +669,17 @@ export class TutorialModalController {
 
     switch (step) {
       case 1:
-        // STEP 1: 모든 강아지를 0번으로! (중앙 안내)
-        hand.style.top = '36%';
-        hand.style.left = '40%';
-        hand.classList.add('hand-anim-tap');
-        icon.textContent = '👆';
-        bubble.textContent = '모두 0번 앞면으로!';
+        // STEP 1: 가운데 0번(ID) 강아지 정위치 지칭 (손가락이 0번 강아지를 정확히 가리킴)
+        hand.classList.add('hand-anim-point-0');
+        icon.textContent = '👇';
+        bubble.textContent = '이 0번 강아지로 맞추기!';
         break;
 
       case 2:
-        // STEP 2: 1행 가로 밀기 시연 (1행 1열에서 쓱 스와이프)
-        hand.classList.add('hand-anim-swipe-h');
+        // STEP 2: 각 행과 열의 '첫 성분' 한가운데에서 회전(클릭) 및 반사(살짝 밀기)
+        hand.classList.add('hand-anim-first-cell-action');
         icon.textContent = '👆';
-        bubble.textContent = '가로로 쓱 밀기 (↔)';
+        bubble.textContent = '첫 성분 가운데 클릭 & 밀기';
         break;
 
       case 3:
@@ -974,26 +976,26 @@ export class TutorialModalController {
     switch (step) {
       case 1:
         stepNameEl.textContent = 'STEP 1. 퍼즐 목표 & 행렬 구조';
-        mainTextEl.textContent = '모든 강아지를 바른 앞면(0번)으로 맞추면 성공!';
-        subTextEl.textContent = '뒤섞인 타일을 모두 정위치 앞면(0번)으로 정렬해 보세요.';
+        mainTextEl.textContent = '난이도에 따라 뒤섞인 모든 강아지를 바른 앞면(0번)으로 맞추면 성공이에요!';
+        subTextEl.textContent = '손가락이 가리키는 0번 강아지처럼 모든 타일을 바르게 세워보세요.';
         if (btnActionText) btnActionText.textContent = '다음 (1/7) ➔';
-        soundEngine.speak('뒤섞인 강아지들을 모두 바르게 세워 0번으로 맞추면 성공이에요!');
+        soundEngine.speak('난이도에 따라 뒤섞인 모든 강아지를 바른 앞면 0번으로 맞추면 성공이에요!');
         this.updateHandDemo(1);
         break;
 
       case 2:
-        stepNameEl.textContent = 'STEP 2. 성분별 변환 & 손동작 조작';
-        mainTextEl.textContent = '1행 타일을 ↔ 가로로 밀면 1행 전체가 뒤집혀요';
-        subTextEl.textContent = '스위치 칩([↔1행|↕1열])을 누르면 1열 모드로 전환돼요.';
+        stepNameEl.textContent = 'STEP 2. 첫 성분 조작 & 행렬 변환 원리';
+        mainTextEl.textContent = '각 행과 열의 첫 성분에 회전(가운데 클릭)과 반사를 주면 해당되는 행과 열이 같은 변환을 해요';
+        subTextEl.textContent = '행 전체를 그을 필요 없이, 맨 앞 첫 성분의 가운데만 조작하면 행 전체가 한 번에 변환돼요!';
         this.highlightCells([0, 1, 2], 'highlight-row');
         if (formulaCard) {
           formulaCard.style.display = 'block';
-          if (formulaBadge) formulaBadge.textContent = '💡 1행 가로 반사';
-          if (formulaText) formulaText.textContent = '↔ 가로 밀기 (MX)';
-          if (formulaDesc) formulaDesc.textContent = '1행 전체가 뒤로 휙 뒤집혀요.';
+          if (formulaBadge) formulaBadge.textContent = '💡 첫 성분 중심 조작';
+          if (formulaText) formulaText.textContent = '첫 성분 가운데 클릭(회전) & 밀기(반사)';
+          if (formulaDesc) formulaDesc.textContent = '첫 성분을 조작하면 해당 행이나 열 전체가 일제히 변환돼요.';
         }
         if (btnActionText) btnActionText.textContent = '다음 (2/7) ➔';
-        soundEngine.speak('1행 타일을 옆으로 쓱 밀면, 1행 강아지들이 모두 뒤로 휙 뒤집혀요.');
+        soundEngine.speak('각 행과 열의 첫 성분에 회전과 반사를 주면 해당되는 행과 열이 같은 변환을 해요.');
         this.updateHandDemo(2);
         break;
 

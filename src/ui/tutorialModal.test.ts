@@ -198,7 +198,7 @@ describe('TutorialModal & Group Theory Core Logic (7단계 슬라이드 및 실�
       expect(ctrl.isOpen).toBe(true);
       expect(ctrl.currentStep).toBe(1);
       expect(ctrl.boardOps[0]).toBe(D4.MX);
-      expect(ctrl.boardOps[4]).toBe(D4.R180);
+      expect(ctrl.boardOps[4]).toBe(D4.ID);
     });
 
     it('2단계 진입 시 1행 가로 반사(MX) 변환 상태가 자동 시연되어야 함', () => {
@@ -368,13 +368,13 @@ describe('TutorialModal & Group Theory Core Logic (7단계 슬라이드 및 실�
       expect(iconEl).not.toBeNull();
       expect(bubbleEl).not.toBeNull();
 
-      // 1단계: 탭 안내
-      expect(handEl?.classList.contains('hand-anim-tap')).toBe(true);
+      // 1단계: 0번 강아지 정위치 포인팅
+      expect(handEl?.classList.contains('hand-anim-point-0')).toBe(true);
 
-      // 2단계: 가로 밀기 스와이프
+      // 2단계: 첫 성분 중심 조작 (회전 및 반사)
       ctrl.goToStep(2);
-      expect(handEl?.classList.contains('hand-anim-swipe-h')).toBe(true);
-      expect(bubbleEl?.textContent).toContain('가로');
+      expect(handEl?.classList.contains('hand-anim-first-cell-action')).toBe(true);
+      expect(bubbleEl?.textContent).toContain('첫 성분');
 
       // 3단계: 세로 밀기 스와이프
       ctrl.goToStep(3);
@@ -407,10 +407,10 @@ describe('TutorialModal & Group Theory Core Logic (7단계 슬라이드 및 실�
       ctrl.open(1);
 
       const mainTextEl = document.getElementById('tut-main-text');
-      expect(mainTextEl?.textContent).toBe('모든 강아지를 바른 앞면(0번)으로 맞추면 성공!');
+      expect(mainTextEl?.textContent).toBe('난이도에 따라 뒤섞인 모든 강아지를 바른 앞면(0번)으로 맞추면 성공이에요!');
 
       ctrl.goToStep(2);
-      expect(mainTextEl?.textContent).toBe('1행 타일을 ↔ 가로로 밀면 1행 전체가 뒤집혀요');
+      expect(mainTextEl?.textContent).toBe('각 행과 열의 첫 성분에 회전(가운데 클릭)과 반사를 주면 해당되는 행과 열이 같은 변환을 해요');
 
       ctrl.goToStep(3);
       expect(mainTextEl?.textContent).toContain('180° 회전이 돼요');
