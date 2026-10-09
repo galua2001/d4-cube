@@ -12,7 +12,7 @@ import {
 } from './tutorialModal';
 import { D4, composeOps } from '../core/group';
 
-describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실전 예제)', () => {
+describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실전 예제)', () => {
   beforeEach(() => {
     const store: Record<string, string> = {};
     const mockStorage = {
@@ -172,7 +172,7 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
     });
   });
 
-  describe('[STEP 4] D4 정이면체군 5수 묘수 풀이 수학적 완전 검증', () => {
+  describe('[STEP 3] D4 정이면체군 5수 묘수 풀이 수학적 완전 검증', () => {
     it('D4_EXAMPLE_STEPS의 각 단계(0~5수)가 정확한 보드 상태를 가지며 5수 후 모든 타일이 ID여야 함', () => {
       expect(D4_EXAMPLE_STEPS.length).toBe(6);
 
@@ -216,7 +216,7 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
     });
   });
 
-  describe('TutorialModalController 총 5단계 슬라이드 뷰어 네비게이션 & 실전 수 조작', () => {
+  describe('TutorialModalController 총 3단계 슬라이드 뷰어 네비게이션 & 실전 수 조작', () => {
     it('open(1) 호출 시 1단계(퍼즐 목표 & 행렬 변환 실전 시연)부터 시작해야 하며 STEP1_SUB_DEMOS가 4개 탑재되어야 함', () => {
       const ctrl = new TutorialModalController();
       ctrl.open(1);
@@ -246,7 +246,7 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
       expect(STEP1_SUB_DEMOS[3].highlightCells).toEqual([3, 4, 5]);
     });
 
-    it('open(2) 호출 시 2단계([V4 실전] V4 4수 마스터) 진입 및 V4 초기 보드 상태 로드와 goToV4SubStep(1~4) 서브 스텝 탐색이 원활히 동작해야 함', () => {
+    it('open(2) 호출 시 2단계([V4 실전] V4 4수 최단 풀이) 진입 및 V4 초기 보드 상태 로드와 goToV4SubStep(1~4) 서브 스텝 탐색이 원활히 동작해야 함', () => {
       vi.useFakeTimers();
       const ctrl = new TutorialModalController();
       ctrl.open(2);
@@ -280,43 +280,29 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
       vi.useRealTimers();
     });
 
-    it('3단계 진입 시 완전한 대칭 군 D4 원리 8가지 원소 예시 보드가 시연되어야 함', () => {
+    it('open(3) 호출 시 3단계([D4 실전] 8차 정이면체군 D4 5수 묘수 풀이) 진입 및 D4 초기 상태 로드와 goToD4SubStep 서브 스텝 탐색이 가능해야 함', () => {
+      vi.useFakeTimers();
       const ctrl = new TutorialModalController();
       ctrl.open(3);
       expect(ctrl.currentStep).toBe(3);
-      expect(ctrl.boardOps[1]).toBe(D4.R90);
-      expect(ctrl.boardOps[2]).toBe(D4.R180);
-      expect(ctrl.boardOps[3]).toBe(D4.R270);
-      expect(ctrl.boardOps[4]).toBe(D4.MX);
-      expect(ctrl.boardOps[5]).toBe(D4.MY);
-    });
-
-    it('4단계 진입 시 D4 실전 예제 초기 상태가 로드되고 goToD4SubStep으로 서브 스텝 탐색이 가능해야 함', () => {
-      const ctrl = new TutorialModalController();
-      ctrl.open(4);
-      expect(ctrl.currentStep).toBe(4);
       expect(ctrl.d4SubStep).toBe(0);
       expect(ctrl.boardOps).toEqual(D4_EXAMPLE_STEPS[0].boardOps);
 
       // 2수로 변경
       ctrl.goToD4SubStep(2);
       expect(ctrl.d4SubStep).toBe(2);
+      vi.advanceTimersByTime(1100);
       expect(ctrl.boardOps).toEqual(D4_EXAMPLE_STEPS[2].boardOps);
 
       // 5수(완성)로 변경
       ctrl.goToD4SubStep(5);
       expect(ctrl.d4SubStep).toBe(5);
+      vi.advanceTimersByTime(1100);
       expect(ctrl.boardOps.every(op => op === D4.ID)).toBe(true);
+      vi.useRealTimers();
     });
 
-    it('5단계 진입 시 모든 타일이 0번(ID) 상태이며 마스터 카드가 준비되어야 함', () => {
-      const ctrl = new TutorialModalController();
-      ctrl.open(5);
-      expect(ctrl.currentStep).toBe(5);
-      expect(ctrl.boardOps.every(op => op === D4.ID)).toBe(true);
-    });
-
-    it('nextStep() 및 prevStep()으로 1단계부터 5단계까지 부드럽게 순회되어야 함', () => {
+    it('nextStep() 및 prevStep()으로 1단계부터 3단계까지 순회되고 3단계에서 다음 누르면 completeTutorial()이 호출되어 완료 처리되어야 함', () => {
       const ctrl = new TutorialModalController();
       ctrl.open(1);
 
@@ -326,31 +312,37 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
       ctrl.nextStep(); // 2 -> 3
       expect(ctrl.currentStep).toBe(3);
 
-      ctrl.nextStep(); // 3 -> 4
-      expect(ctrl.currentStep).toBe(4);
+      ctrl.prevStep(); // 3 -> 2
+      expect(ctrl.currentStep).toBe(2);
 
-      ctrl.nextStep(); // 4 -> 5
-      expect(ctrl.currentStep).toBe(5);
+      ctrl.prevStep(); // 2 -> 1
+      expect(ctrl.currentStep).toBe(1);
 
-      ctrl.prevStep(); // 5 -> 4
-      expect(ctrl.currentStep).toBe(4);
-
-      ctrl.prevStep(); // 4 -> 3
+      // 1 -> 2 -> 3 재이동 후 3단계에서 다음 누르면 completeTutorial 호출되어 닫힘
+      ctrl.nextStep(); // 1 -> 2
+      ctrl.nextStep(); // 2 -> 3
       expect(ctrl.currentStep).toBe(3);
+
+      ctrl.nextStep(); // 3단계에서 다음 누르면 완료!
+      expect(ctrl.isOpen).toBe(false);
+      expect(isTutorialCompleted()).toBe(true);
     });
 
-    it('goToStep(s)으로 1~5 범위를 안전하게 클램핑하며 점프해야 함', () => {
+    it('goToStep(s)으로 1~3 범위를 안전하게 클램핑하며 점프해야 함', () => {
       const ctrl = new TutorialModalController();
       ctrl.open(1);
+
+      ctrl.goToStep(2);
+      expect(ctrl.currentStep).toBe(2);
 
       ctrl.goToStep(3);
       expect(ctrl.currentStep).toBe(3);
 
       ctrl.goToStep(10);
-      expect(ctrl.currentStep).toBe(5);
+      expect(ctrl.currentStep).toBe(3); // 3으로 클램핑
 
       ctrl.goToStep(-2);
-      expect(ctrl.currentStep).toBe(1);
+      expect(ctrl.currentStep).toBe(1); // 1로 클램핑
     });
 
     it('1행 1열 점 클릭 시 행 모드와 열 모드가 자유롭게 토글되어야 함', () => {
@@ -409,14 +401,6 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
       });
     });
 
-    it('5단계에서 nextStep 또는 completeTutorial 호출 시 튜토리얼 완료 처리되어야 함', () => {
-      const ctrl = new TutorialModalController();
-      ctrl.open(5);
-      ctrl.nextStep(); // 5단계에서 다음 누르면 completeTutorial 실행
-      expect(ctrl.isOpen).toBe(false);
-      expect(isTutorialCompleted()).toBe(true);
-    });
-
     it('skip() 호출 시 튜토리얼이 즉시 닫히고 완료 처리되어야 함', () => {
       const ctrl = new TutorialModalController();
       ctrl.open(1);
@@ -433,6 +417,13 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
       ctrl.toggleAutoPlay();
       expect(ctrl.isAutoPlaying).toBe(true);
 
+      ctrl.stopAutoPlay();
+      expect(ctrl.isAutoPlaying).toBe(false);
+
+      // 3단계에서도 토글 가능
+      ctrl.goToStep(3);
+      ctrl.toggleAutoPlay();
+      expect(ctrl.isAutoPlaying).toBe(true);
       ctrl.stopAutoPlay();
       expect(ctrl.isAutoPlaying).toBe(false);
     });
@@ -497,21 +488,25 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
       expect(handEl?.style.left).toBe('16.7%');
       expect(handEl?.style.top).toBe('16.7%');
 
-      // 3단계: D4 8차 대칭군 안내
+      // 3단계: [D4 실전] 8차 정이면체군 D4 5수 묘수 풀이 서브 스텝별 손동작
       ctrl.goToStep(3);
+      ctrl.goToD4SubStep(0); // 0수: 상단 [▶ 한 수씩 보기] 버튼 포인팅
+      expect(handEl?.classList.contains('hand-anim-point-up')).toBe(true);
+
+      ctrl.goToD4SubStep(1); // 1수: 11 1회 탭
       expect(handEl?.classList.contains('hand-anim-tap')).toBe(true);
 
-      // 4단계: D4 서브 스텝별 손동작
-      ctrl.goToStep(4);
-      ctrl.goToD4SubStep(1); // 1수: 1행 1회 탭
-      expect(handEl?.classList.contains('hand-anim-tap')).toBe(true);
+      ctrl.goToD4SubStep(2); // 2수: 31 두 번 클릭
+      expect(handEl?.classList.contains('hand-anim-single-double-tap')).toBe(true);
 
-      ctrl.goToD4SubStep(4); // 4수: 대각선 밀기
-      expect(handEl?.classList.contains('hand-anim-swipe-diag')).toBe(true);
+      ctrl.goToD4SubStep(3); // 3수: 13 세로 쓱
+      expect(handEl?.classList.contains('hand-anim-cell-swipe-v')).toBe(true);
 
-      // 5단계: 완료 시 보드 및 손가락 숨김
-      ctrl.goToStep(5);
-      expect(handEl?.style.display).toBe('none');
+      ctrl.goToD4SubStep(4); // 4수: 대각선 쓱
+      expect(handEl?.classList.contains('hand-anim-cell-diag-main')).toBe(true);
+
+      ctrl.goToD4SubStep(5); // 5수: 12 가로 쓱
+      expect(handEl?.classList.contains('hand-anim-cell-swipe-h')).toBe(true);
     });
 
     it('1단계 서브 시연 이동 시 실시간 보드 변환 및 타일 플립 애니메이션 클래스가 올바르게 부여되어야 함', () => {
@@ -618,7 +613,7 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
       vi.useRealTimers();
     });
 
-    it('설명글과 하단 버튼 텍스트가 5단계 공식 규격에 완벽히 부합해야 함', () => {
+    it('설명글과 하단 버튼 텍스트가 3단계 공식 규격에 완벽히 부합해야 함', () => {
       const ctrl = new TutorialModalController();
       ctrl.open(1);
 
@@ -626,23 +621,99 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
       const btnActionText = document.getElementById('tut-btn-action-text');
 
       expect(mainTextEl?.textContent).toBe('난이도와 모드에 따라 행과 열의 회전과 반사로 뒤섞인 모든 강아지들을, 행과 열 변환만으로 모두 처음의 강아지로 만드는 것이 목적이에요');
-      expect(btnActionText?.textContent).toBe('다음 (1/5) ➔');
+      expect(btnActionText?.textContent).toBe('다음 (1/3) ➔');
 
       ctrl.goToStep(2);
       expect(mainTextEl?.textContent).toContain('0, 180');
-      expect(btnActionText?.textContent).toBe('다음 (2/5) ➔');
+      expect(btnActionText?.textContent).toBe('다음 (2/3) ➔');
 
       ctrl.goToStep(3);
-      expect(mainTextEl?.textContent).toContain('8차 대칭군 D4');
-      expect(btnActionText?.textContent).toBe('다음 (3/5) ➔');
-
-      ctrl.goToStep(4);
-      expect(mainTextEl?.textContent).toContain('D4 실전 예제');
-      expect(btnActionText?.textContent).toBe('다음 (4/5) ➔');
-
-      ctrl.goToStep(5);
-      expect(mainTextEl?.textContent).toBe('준비 완료! 이제 실전 퍼즐에 도전해 보세요');
+      expect(mainTextEl?.textContent).toContain('D4 모드는 회전 4종');
       expect(btnActionText?.textContent).toBe('🎮 실전 퍼즐 시작하기');
+    });
+
+    it('3단계 D4 실전 5수 풀이 시 손가락 모션(약 0.8s)과 타일 3D 플립 애니메이션이 정밀 동기화되어야 함', () => {
+      vi.useFakeTimers();
+      const ctrl = new TutorialModalController();
+      ctrl.open(3);
+
+      // 1수: 11 성분 1회 탭 -> 1행 90° 회전
+      ctrl.goToD4SubStep(1);
+      vi.advanceTimersByTime(200);
+      const cell0 = document.getElementById('tut-cell-0');
+      const cell1 = document.getElementById('tut-cell-1');
+      const cell2 = document.getElementById('tut-cell-2');
+      expect(cell0?.classList.contains('tut-cell-rotating-90')).toBe(true);
+      expect(ctrl.boardOps[0]).toBe(D4.MD);
+
+      vi.advanceTimersByTime(400); // 600ms 시점
+      expect(cell0?.classList.contains('tut-cell-rotating-90')).toBe(false);
+
+      // 2수: 31 성분 두 번 톡톡 -> 3행 180° 회전 (각 90°씩 순차 회전)
+      ctrl.goToD4SubStep(2);
+      const cell6 = document.getElementById('tut-cell-6');
+      vi.advanceTimersByTime(200);
+      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(true);
+      vi.advanceTimersByTime(320); // 520ms 시점
+      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(false);
+      vi.advanceTimersByTime(100); // 620ms 시점: 2회차 톡
+      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(true);
+      expect(ctrl.boardOps[6]).toBe(D4.ID);
+      vi.advanceTimersByTime(360); // 980ms 시점
+      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(false);
+
+      // 3수: 13 성분 세로 쓱 그을 때 ➔ 3열 전체([2, 5, 8]) 손가락 이동 속도(0.8s)에 맞춰 천천히 세로 플립
+      ctrl.goToD4SubStep(3);
+      vi.advanceTimersByTime(80);
+      const cell5 = document.getElementById('tut-cell-5');
+      const cell8 = document.getElementById('tut-cell-8');
+      expect(cell2?.classList.contains('tut-cell-flipping-v')).toBe(true);
+      expect(cell5?.classList.contains('tut-cell-flipping-v')).toBe(true);
+      expect(cell8?.classList.contains('tut-cell-flipping-v')).toBe(true);
+
+      vi.advanceTimersByTime(320); // 400ms 시점: 보드 상태 갱신
+      expect(ctrl.boardOps[2]).toBe(D4.ID);
+      expect(ctrl.boardOps[5]).toBe(D4.ID);
+
+      vi.advanceTimersByTime(480); // 880ms 시점: 플립 클래스 제거
+      expect(cell2?.classList.contains('tut-cell-flipping-v')).toBe(false);
+      expect(cell5?.classList.contains('tut-cell-flipping-v')).toBe(false);
+
+      // 4수: 주대각(idx 8) 대각선 쓱 그을 때 ➔ 주대각([0, 4, 8]) 손가락 이동 속도(0.8s)에 맞춰 천천히 대각 플립
+      ctrl.goToD4SubStep(4);
+      vi.advanceTimersByTime(80);
+      const cell4 = document.getElementById('tut-cell-4');
+      expect(cell0?.classList.contains('tut-cell-flipping-diag')).toBe(true);
+      expect(cell4?.classList.contains('tut-cell-flipping-diag')).toBe(true);
+      expect(cell8?.classList.contains('tut-cell-flipping-diag')).toBe(true);
+
+      vi.advanceTimersByTime(320); // 400ms 시점
+      expect(ctrl.boardOps[0]).toBe(D4.ID);
+      expect(ctrl.boardOps[4]).toBe(D4.MX);
+      expect(ctrl.boardOps[8]).toBe(D4.ID);
+
+      vi.advanceTimersByTime(480); // 880ms 시점
+      expect(cell0?.classList.contains('tut-cell-flipping-diag')).toBe(false);
+
+      // 5수: 12 성분 가로 쓱 밀 때 ➔ 2열 전체([1, 4, 7]) 손가락 이동 속도(0.8s)에 맞춰 천천히 가로 플립 및 완성
+      ctrl.goToD4SubStep(5);
+      vi.advanceTimersByTime(80);
+      const cell7 = document.getElementById('tut-cell-7');
+      expect(cell1?.classList.contains('tut-cell-flipping-h')).toBe(true);
+      expect(cell4?.classList.contains('tut-cell-flipping-h')).toBe(true);
+      expect(cell7?.classList.contains('tut-cell-flipping-h')).toBe(true);
+
+      vi.advanceTimersByTime(320); // 400ms 시점: 전체 0번 완성!
+      expect(ctrl.boardOps.every(op => op === D4.ID)).toBe(true);
+      const btnAction = document.getElementById('tut-btn-action-text');
+      expect(btnAction?.textContent).toBe('🎮 실전 퍼즐 시작하기');
+
+      vi.advanceTimersByTime(480); // 880ms 시점: 플립 클래스 제거
+      expect(cell1?.classList.contains('tut-cell-flipping-h')).toBe(false);
+      expect(cell4?.classList.contains('tut-cell-flipping-h')).toBe(false);
+      expect(cell7?.classList.contains('tut-cell-flipping-h')).toBe(false);
+
+      vi.useRealTimers();
     });
   });
 });

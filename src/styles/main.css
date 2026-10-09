@@ -1274,7 +1274,7 @@ body {
 
 /* 실전 퍼즐 3D 타일 플립 및 회전 트랜지션 애니메이션 */
 .tut-cell-box.tut-cell-flipping-h {
-  animation: tutCellFlipH 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: tutCellFlipH 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes tutCellFlipH {
@@ -1293,7 +1293,7 @@ body {
 }
 
 .tut-cell-box.tut-cell-flipping-v {
-  animation: tutCellFlipV 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: tutCellFlipV 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes tutCellFlipV {
@@ -1312,7 +1312,7 @@ body {
 }
 
 .tut-cell-box.tut-cell-flipping-v-r180 {
-  animation: tutCellFlipVR180 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: tutCellFlipVR180 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes tutCellFlipVR180 {
@@ -1331,7 +1331,7 @@ body {
 }
 
 .tut-cell-box.tut-cell-flipping-diag {
-  animation: tutCellFlipDiag 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: tutCellFlipDiag 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes tutCellFlipDiag {
