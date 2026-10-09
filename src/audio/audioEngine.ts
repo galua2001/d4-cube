@@ -9,7 +9,7 @@ class SoundEngine {
   constructor() {
     // 배경음악 객체 초기화 (브라우저 환경 지원)
     if (typeof Audio !== 'undefined') {
-      this.bgmAudio = new Audio('/assets/bgm.mp3');
+      this.bgmAudio = new Audio('assets/bgm.mp3');
       this.bgmAudio.loop = true;
       this.bgmAudio.volume = 0.35;
     }
