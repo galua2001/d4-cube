@@ -157,60 +157,51 @@ class MatrixCubeApp {
       const r = Math.floor(i / this.boardSize);
       const c = i % this.boardSize;
 
-      // 컨트롤러 조작 가이드 안내 태그 배지 (.controller-guide-label) 생성
-      let guideText = '';
-      let guideClass = '';
-
-      if (r === 0 && c === 0) {
-        const mode = this.gestureRecognizer ? this.gestureRecognizer.getCell11Mode() : 'row';
-        guideText = mode === 'col' ? '1열' : '1행';
-        guideClass = mode === 'col' ? 'guide-col' : 'guide-row';
-      } else if (c === 0 && r > 0) {
-        guideText = `${r + 1}행`;
-        guideClass = 'guide-row';
-      } else if (r === 0 && c > 0) {
-        guideText = `${c + 1}열`;
-        guideClass = 'guide-col';
-      } else if (r === this.boardSize - 1 && c === this.boardSize - 1) {
-        guideText = '↖대각';
-        guideClass = 'guide-diag';
-      } else if (r === 1 && c === this.boardSize - 1) {
-        guideText = '↗대각';
-        guideClass = 'guide-diag';
-      }
-
-      if (guideText) {
-        const guideTag = document.createElement('div');
-        guideTag.className = `controller-guide-label ${guideClass}`;
-        guideTag.innerText = guideText;
-        if (r === 0 && c === 0) {
-          guideTag.id = 'guide-label-11';
-        }
-        box.appendChild(guideTag);
-      }
-
-      // 1행 1열 (i === 0)일 때만 오른쪽 중간에 보라색 토글 점 부착
+      // 1행 1열 (i === 0)일 때는 세련된 듀얼 모드 스위치 칩([ ↔ 1행 | ↕ 1열 ]) 부착
       if (i === 0) {
-        const dot = document.createElement('div');
-        dot.className = 'dot-toggle-11';
-        dot.title = '클릭하여 1행 / 1열 변환 모드 전환';
-        dot.addEventListener('click', (e) => {
+        const mode = this.gestureRecognizer ? this.gestureRecognizer.getCell11Mode() : 'row';
+        const switch11 = document.createElement('div');
+        switch11.className = `dual-switch-11 ${mode === 'col' ? 'mode-col' : 'mode-row'}`;
+        switch11.id = 'dual-switch-11';
+        switch11.title = '탭하여 1행 / 1열 변환 모드 전환';
+        switch11.innerHTML = `
+          <span class="switch-opt switch-row">↔ 1행</span>
+          <span class="switch-divider">|</span>
+          <span class="switch-opt switch-col">↕ 1열</span>
+        `;
+        switch11.addEventListener('click', (e) => {
           e.stopPropagation();
-          const mode = this.gestureRecognizer.toggleCell11Mode();
-          dot.classList.toggle('col-mode', mode === 'col');
+          const newMode = this.gestureRecognizer.toggleCell11Mode();
+          switch11.className = `dual-switch-11 ${newMode === 'col' ? 'mode-col' : 'mode-row'}`;
           soundEngine.playTap();
-
-          // 가이드 태그 동적 변경 (1행 <-> 1열)
-          const tag11 = document.getElementById('guide-label-11');
-          if (tag11) {
-            tag11.innerText = mode === 'col' ? '1열' : '1행';
-            tag11.className = `controller-guide-label ${mode === 'col' ? 'guide-col' : 'guide-row'}`;
-          }
-
-          // 팝업창 없이 1열(또는 1행)을 시각적으로 강조
-          this.highlightActiveLine(mode);
+          this.highlightActiveLine(newMode);
         });
-        box.appendChild(dot);
+        box.appendChild(switch11);
+      } else {
+        // 컨트롤러 조작 가이드 안내 태그 배지 (.controller-guide-label) 생성
+        let guideText = '';
+        let guideClass = '';
+
+        if (c === 0 && r > 0) {
+          guideText = `${r + 1}행`;
+          guideClass = 'guide-row';
+        } else if (r === 0 && c > 0) {
+          guideText = `${c + 1}열`;
+          guideClass = 'guide-col';
+        } else if (r === this.boardSize - 1 && c === this.boardSize - 1) {
+          guideText = '↖대각';
+          guideClass = 'guide-diag';
+        } else if (r === 1 && c === this.boardSize - 1) {
+          guideText = '↗대각';
+          guideClass = 'guide-diag';
+        }
+
+        if (guideText) {
+          const guideTag = document.createElement('div');
+          guideTag.className = `controller-guide-label ${guideClass}`;
+          guideTag.innerText = guideText;
+          box.appendChild(guideTag);
+        }
       }
 
       // 각 성분 오른쪽 하단 조그마한 상태 뱃지 (0, 1, 2, 3 및 대칭 기호)
@@ -316,21 +307,8 @@ class MatrixCubeApp {
       });
     });
 
-    // 섞기 난이도(N수) 선택 이벤트
-    document.querySelectorAll('#moves-button-group .btn-pill').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const target = e.currentTarget as HTMLElement;
-        const moves = parseInt(target.dataset.moves || '3', 10);
-        this.scrambleMoves = moves;
-
-        document.querySelectorAll('#moves-button-group .btn-pill').forEach(b => b.classList.remove('active'));
-        target.classList.add('active');
-
-        this.updateStatusInfo();
-        this.updateBestRecordBadge();
-        this.scrambleBoard();
-      });
-    });
+    // 난이도(N수) 버튼 목록 초기 렌더링
+    this.renderDifficultyButtons();
 
     document.getElementById('btn-scramble')?.addEventListener('click', () => {
       this.scrambleBoard();
@@ -396,6 +374,45 @@ class MatrixCubeApp {
     }
   }
 
+  /**
+   * 대칭군 모드에 따라 난이도(N수) 버튼 목록을 동적으로 구성 (V4: 2~4수, D4: 3~8수, C2: 2~3수)
+   */
+  private renderDifficultyButtons() {
+    const groupEl = document.getElementById('moves-button-group');
+    if (!groupEl) return;
+
+    let movesList: number[] = [3, 4, 5, 6, 7, 8];
+    if (this.currentGroup === 'V4') {
+      movesList = [2, 3, 4]; // V4 모드 난이도: 2~4수
+    } else if (this.currentGroup === 'C2') {
+      movesList = [2, 3];
+    }
+
+    if (!movesList.includes(this.scrambleMoves)) {
+      this.scrambleMoves = movesList[0];
+    }
+
+    groupEl.innerHTML = '';
+    movesList.forEach(m => {
+      const btn = document.createElement('button');
+      btn.className = `btn-pill ${m === this.scrambleMoves ? 'active' : ''}`;
+      btn.dataset.moves = String(m);
+      btn.innerText = `${m}수`;
+      btn.addEventListener('click', () => {
+        this.scrambleMoves = m;
+        groupEl.querySelectorAll('.btn-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.updateStatusInfo();
+        this.updateBestRecordBadge();
+        this.scrambleBoard();
+      });
+      groupEl.appendChild(btn);
+    });
+
+    this.updateStatusInfo();
+    this.updateBestRecordBadge();
+  }
+
   private switchGroup(grp: SymmetryGroupKey) {
     this.currentGroup = grp;
     const badge = document.getElementById('badge-group-name');
@@ -408,6 +425,8 @@ class MatrixCubeApp {
       }
     });
 
+    // 대칭군 변경 시 해당 군에 맞는 난이도 버튼 목록 즉시 갱신 (V4: 2~4수)
+    this.renderDifficultyButtons();
     this.scrambleBoard();
   }
 

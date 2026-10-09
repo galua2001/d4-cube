@@ -103,9 +103,9 @@ export class GestureRecognizer {
     this.boardEl.addEventListener('pointerdown', (e) => {
       if (this.isLocked) return;
 
-      // 보라색 점 클릭 감지 시 제스처 무시
+      // 1행 1열 듀얼 스위치 클릭 감지 시 제스처 무시
       const targetElem = e.target as HTMLElement;
-      if (targetElem && targetElem.classList.contains('dot-toggle-11')) {
+      if (targetElem && (targetElem.classList.contains('dot-toggle-11') || targetElem.closest('.dual-switch-11') || targetElem.classList.contains('dual-switch-11'))) {
         return;
       }
 

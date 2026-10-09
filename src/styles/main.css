@@ -208,35 +208,78 @@ body {
   pointer-events: none;
 }
 
-/* 1행 1열 모드 토글 색점 (우측 하단으로 이동, 연하고 투명하게 기호와 조화) */
-.dot-toggle-11 {
+/* 1행 1열 혁신적인 듀얼 모드 스위치 칩 ([ ↔ 1행 | ↕ 1열 ]) */
+.dual-switch-11 {
   position: absolute;
-  right: 4px;
-  bottom: 3px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(168, 85, 247, 0.4);
-  border: 1.5px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 6px rgba(168, 85, 247, 0.4);
-  cursor: pointer;
-  z-index: 12;
-  transition: all 0.25s ease;
-  display: flex;
+  top: 4px;
+  left: 4px;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1.5px solid rgba(168, 85, 247, 0.7);
+  border-radius: 12px;
+  padding: 2px 4px;
+  gap: 3px;
+  cursor: pointer;
+  z-index: 20;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 10px rgba(168, 85, 247, 0.4);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.dot-toggle-11:hover {
-  background: rgba(192, 132, 252, 0.65);
-  border-color: #ffffff;
-  transform: scale(1.1);
+.dual-switch-11:hover {
+  transform: scale(1.04);
 }
 
-.dot-toggle-11.col-mode {
-  background: rgba(6, 182, 212, 0.4);
-  border-color: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 0 6px rgba(6, 182, 212, 0.4);
+.dual-switch-11:active {
+  transform: scale(0.95);
+}
+
+.dual-switch-11 .switch-opt {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 8px;
+  line-height: 1.1;
+  transition: all 0.2s ease;
+}
+
+.dual-switch-11 .switch-divider {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.65rem;
+}
+
+/* 1행 모드 활성화 시 (보라색 네온) */
+.dual-switch-11.mode-row {
+  border-color: rgba(168, 85, 247, 0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(168, 85, 247, 0.5);
+}
+
+.dual-switch-11.mode-row .switch-row {
+  background: linear-gradient(135deg, #a855f7, #c084fc);
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(168, 85, 247, 0.6);
+}
+
+.dual-switch-11.mode-row .switch-col {
+  color: #64748b;
+}
+
+/* 1열 모드 활성화 시 (하늘색 네온) */
+.dual-switch-11.mode-col {
+  border-color: rgba(6, 182, 212, 0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(6, 182, 212, 0.5);
+}
+
+.dual-switch-11.mode-col .switch-col {
+  background: linear-gradient(135deg, #06b6d4, #38bdf8);
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(6, 182, 212, 0.6);
+}
+
+.dual-switch-11.mode-col .switch-row {
+  color: #64748b;
 }
 
 /* 11 토글 시 1열 / 1행 강조 하이라이트 효과 */
@@ -1032,12 +1075,12 @@ body {
 
 /* 5. 튜토리얼 메인 본문 */
 .tutorial-body {
-  padding: 12px 18px;
+  padding: 8px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow-y: auto;
-  gap: 12px;
+  gap: 8px;
 }
 
 /* 가이드 텍스트 박스 */
@@ -1047,12 +1090,12 @@ body {
   background: rgba(30, 41, 59, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 10px 14px;
+  padding: 8px 12px;
   box-sizing: border-box;
 }
 
 .tut-guide-step-name {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #38bdf8;
   text-transform: uppercase;
@@ -1061,26 +1104,26 @@ body {
 }
 
 .tut-guide-main-text {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1.35;
 }
 
 .tut-guide-sub-text {
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   color: #94a3b8;
-  margin-top: 5px;
-  line-height: 1.45;
+  margin-top: 4px;
+  line-height: 1.4;
   white-space: pre-line;
 }
 
-/* 6. 인터랙티브 튜토리얼 3x3 보드 래퍼 */
+/* 6. 인터랙티브 튜토리얼 3x3 보드 래퍼 (시원하고 큼직하게 대폭 확대) */
 .tut-board-wrapper {
   position: relative;
-  width: 250px;
-  height: 250px;
-  margin: 4px auto;
+  width: min(320px, 86vw);
+  height: min(320px, 86vw);
+  margin: 2px auto;
   background: #090d16;
   border-radius: 16px;
   padding: 6px;
@@ -1152,81 +1195,137 @@ body {
   pointer-events: none;
 }
 
-/* 7. 제스처 안내 오버레이 (화살표 & 손가락 가이드) */
-.tut-gesture-layer {
+/* 7. 가상 손가락 애니메이션 (.tut-hand-demo) */
+.tut-hand-demo {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  z-index: 35;
   pointer-events: none;
-  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
-/* 스와이프 손가락 애니메이션 */
-.tut-finger {
-  position: absolute;
-  font-size: 2rem;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
-  z-index: 20;
-  pointer-events: none;
+.tut-hand-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  display: inline-block;
+  transform-origin: bottom center;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
 }
 
-/* 가로 스와이프 애니메이션 (Step 1) */
-.tut-finger-swipe-x {
-  top: 14%;
-  left: 15%;
-  animation: fingerSwipeH 1.8s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+.tut-hand-bubble {
+  background: rgba(15, 23, 42, 0.92);
+  color: #facc15;
+  border: 1.5px solid rgba(250, 204, 21, 0.7);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+  margin-top: 2px;
+  letter-spacing: -0.2px;
 }
 
-@keyframes fingerSwipeH {
-  0% { left: 15%; opacity: 0; transform: scale(0.8); }
-  20% { opacity: 1; transform: scale(1.1); }
-  70% { left: 70%; opacity: 1; transform: scale(1.0); }
-  90% { left: 75%; opacity: 0; transform: scale(0.8); }
-  100% { left: 15%; opacity: 0; }
+/* 2단계: 가로 밀기 애니메이션 (1행 1열 -> 1행 3열 ↔ 쓱 스와이프) */
+.tut-hand-demo.hand-anim-swipe-h {
+  top: 6%;
+  left: 8%;
+  animation: handSwipeH 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 세로 스와이프 애니메이션 (Step 2) */
-.tut-finger-swipe-y {
-  top: 10%;
-  left: 42%;
-  animation: fingerSwipeV 1.8s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+@keyframes handSwipeH {
+  0% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+  15% { transform: translate(0, 0) scale(1.15); opacity: 1; }
+  25% { transform: translate(0, 0) scale(1.0); opacity: 1; }
+  65% { transform: translate(170px, 0) scale(1.0); opacity: 1; }
+  80% { transform: translate(190px, 0) scale(0.85); opacity: 0; }
+  100% { transform: translate(0, 0) scale(0.85); opacity: 0; }
 }
 
-@keyframes fingerSwipeV {
-  0% { top: 10%; opacity: 0; transform: scale(0.8); }
-  20% { opacity: 1; transform: scale(1.1); }
-  70% { top: 40%; opacity: 1; transform: scale(1.0); }
-  90% { top: 45%; opacity: 0; transform: scale(0.8); }
-  100% { top: 10%; opacity: 0; }
+/* 3단계: 세로 밀기 애니메이션 (1행 1열 -> 3행 1열 ↕ 쓱 스와이프) */
+.tut-hand-demo.hand-anim-swipe-v {
+  top: 6%;
+  left: 8%;
+  animation: handSwipeV 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 대각선 스와이프 애니메이션 (Step 3) */
-.tut-finger-swipe-diag {
-  top: 12%;
-  left: 15%;
-  animation: fingerSwipeD 2s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+@keyframes handSwipeV {
+  0% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+  15% { transform: translate(0, 0) scale(1.15); opacity: 1; }
+  25% { transform: translate(0, 0) scale(1.0); opacity: 1; }
+  65% { transform: translate(0, 170px) scale(1.0); opacity: 1; }
+  80% { transform: translate(0, 190px) scale(0.85); opacity: 0; }
+  100% { transform: translate(0, 0) scale(0.85); opacity: 0; }
 }
 
-@keyframes fingerSwipeD {
-  0% { top: 12%; left: 15%; opacity: 0; transform: scale(0.8); }
-  20% { opacity: 1; transform: scale(1.1); }
-  70% { top: 68%; left: 70%; opacity: 1; transform: scale(1.0); }
-  90% { top: 72%; left: 74%; opacity: 0; transform: scale(0.8); }
-  100% { top: 12%; left: 15%; opacity: 0; }
+/* 1회 탭 제스처 애니메이션 (👆) */
+.tut-hand-demo.hand-anim-tap {
+  animation: handTapAnim 1.6s infinite ease-in-out;
 }
 
-/* 탭 핑거 애니메이션 (Step 4) */
-.tut-finger-tap {
-  top: 40%;
-  left: 45%;
-  animation: fingerTapPulse 1.4s infinite ease-in-out;
+@keyframes handTapAnim {
+  0%, 100% { transform: scale(0.88) translateY(0); opacity: 0.85; }
+  40% { transform: scale(1.22) translateY(-6px); opacity: 1; }
+  55% { transform: scale(0.92) translateY(2px); opacity: 1; }
+  70% { transform: scale(1.05) translateY(-2px); opacity: 1; }
 }
 
-@keyframes fingerTapPulse {
-  0%, 100% { transform: scale(0.9) translate(0, 0); opacity: 0.8; }
-  50% { transform: scale(1.25) translate(-4px, -4px); opacity: 1; }
+/* 더블 탭 제스처 애니메이션 (👆👆) */
+.tut-hand-demo.hand-anim-double-tap {
+  animation: handDoubleTapAnim 1.8s infinite ease-in-out;
+}
+
+@keyframes handDoubleTapAnim {
+  0%, 100% { transform: scale(0.88) translateY(0); opacity: 0.85; }
+  25% { transform: scale(1.25) translateY(-6px); opacity: 1; }
+  38% { transform: scale(0.92) translateY(2px); opacity: 1; }
+  52% { transform: scale(1.25) translateY(-6px); opacity: 1; }
+  68% { transform: scale(0.92) translateY(2px); opacity: 1; }
+}
+
+/* 대각선 밀기 제스처 애니메이션 (↘) */
+.tut-hand-demo.hand-anim-swipe-diag {
+  animation: handSwipeDiag 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes handSwipeDiag {
+  0% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+  15% { transform: translate(0, 0) scale(1.15); opacity: 1; }
+  25% { transform: translate(0, 0) scale(1.0); opacity: 1; }
+  65% { transform: translate(120px, 120px) scale(1.0); opacity: 1; }
+  80% { transform: translate(140px, 140px) scale(0.85); opacity: 0; }
+  100% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+}
+
+/* 3열 세로 밀기 애니메이션 (3열 타일에서 세로 스와이프) */
+.tut-hand-demo.hand-anim-swipe-col3 {
+  animation: handSwipeCol3 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes handSwipeCol3 {
+  0% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+  15% { transform: translate(0, 0) scale(1.15); opacity: 1; }
+  25% { transform: translate(0, 0) scale(1.0); opacity: 1; }
+  65% { transform: translate(0, 160px) scale(1.0); opacity: 1; }
+  80% { transform: translate(0, 180px) scale(0.85); opacity: 0; }
+  100% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+}
+
+/* 2열 가로 밀기 애니메이션 (2열 타일에서 가로 스와이프) */
+.tut-hand-demo.hand-anim-swipe-row2 {
+  animation: handSwipeRow2 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes handSwipeRow2 {
+  0% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+  15% { transform: translate(0, 0) scale(1.15); opacity: 1; }
+  25% { transform: translate(0, 0) scale(1.0); opacity: 1; }
+  65% { transform: translate(120px, 0) scale(1.0); opacity: 1; }
+  80% { transform: translate(140px, 0) scale(0.85); opacity: 0; }
+  100% { transform: translate(0, 0) scale(0.85); opacity: 0; }
 }
 
 /* 8. 공식 발견 팝업 카드 (Formula Card) */

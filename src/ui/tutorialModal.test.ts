@@ -20,6 +20,46 @@ describe('TutorialModal & Group Theory Core Logic (7단계 슬라이드 및 실�
       clear: () => { Object.keys(store).forEach(k => delete store[k]); }
     };
     vi.stubGlobal('localStorage', mockStorage);
+
+    // 가상 Document Mock
+    const elements: Record<string, any> = {};
+    const getOrCreateEl = (id: string) => {
+      if (!elements[id]) {
+        elements[id] = {
+          id,
+          style: {},
+          classList: {
+            classes: new Set<string>(),
+            add(c: string) { this.classes.add(c); },
+            remove(c: string) { this.classes.delete(c); },
+            contains(c: string) { return this.classes.has(c); },
+            toggle(c: string, force?: boolean) {
+              if (force === true) this.classes.add(c);
+              else if (force === false) this.classes.delete(c);
+              else if (this.classes.has(c)) this.classes.delete(c);
+              else this.classes.add(c);
+            }
+          },
+          dataset: {},
+          textContent: '',
+          innerText: '',
+          querySelector: vi.fn(),
+          appendChild: vi.fn(),
+          remove: vi.fn(),
+          addEventListener: vi.fn()
+        };
+      }
+      return elements[id];
+    };
+
+    const mockDocument = {
+      getElementById: (id: string) => getOrCreateEl(id),
+      querySelectorAll: (_sel: string) => [],
+      createElement: (tag: string) => getOrCreateEl(`gen-${tag}-${Math.random()}`),
+      body: { appendChild: vi.fn() }
+    };
+    vi.stubGlobal('document', mockDocument);
+
     vi.restoreAllMocks();
   });
 
@@ -315,6 +355,68 @@ describe('TutorialModal & Group Theory Core Logic (7단계 슬라이드 및 실�
 
       ctrl.stopAutoPlay();
       expect(ctrl.isAutoPlaying).toBe(false);
+    });
+
+    it('가상 손가락 애니메이션 요소가 DOM에 생성되고 단계별 제스처 클래스가 올바르게 부여되어야 함', () => {
+      const ctrl = new TutorialModalController();
+      ctrl.open(1);
+
+      const handEl = document.getElementById('tut-hand-demo');
+      const iconEl = document.getElementById('tut-hand-icon');
+      const bubbleEl = document.getElementById('tut-hand-bubble');
+      expect(handEl).not.toBeNull();
+      expect(iconEl).not.toBeNull();
+      expect(bubbleEl).not.toBeNull();
+
+      // 1단계: 탭 안내
+      expect(handEl?.classList.contains('hand-anim-tap')).toBe(true);
+
+      // 2단계: 가로 밀기 스와이프
+      ctrl.goToStep(2);
+      expect(handEl?.classList.contains('hand-anim-swipe-h')).toBe(true);
+      expect(bubbleEl?.textContent).toContain('가로');
+
+      // 3단계: 세로 밀기 스와이프
+      ctrl.goToStep(3);
+      expect(handEl?.classList.contains('hand-anim-swipe-v')).toBe(true);
+      expect(bubbleEl?.textContent).toContain('세로');
+
+      // 5단계 V4 서브 스텝별 손동작
+      ctrl.goToStep(5);
+      ctrl.goToV4SubStep(1); // 1수: 3행 더블탭
+      expect(handEl?.classList.contains('hand-anim-double-tap')).toBe(true);
+
+      ctrl.goToV4SubStep(2); // 2수: 3열 세로 밀기
+      expect(handEl?.classList.contains('hand-anim-swipe-col3')).toBe(true);
+
+      // 6단계 D4 서브 스텝별 손동작
+      ctrl.goToStep(6);
+      ctrl.goToD4SubStep(1); // 1수: 1행 1회 탭
+      expect(handEl?.classList.contains('hand-anim-tap')).toBe(true);
+
+      ctrl.goToD4SubStep(4); // 4수: 대각선 밀기
+      expect(handEl?.classList.contains('hand-anim-swipe-diag')).toBe(true);
+
+      // 7단계: 완료 시 보드 및 손가락 숨김
+      ctrl.goToStep(7);
+      expect(handEl?.style.display).toBe('none');
+    });
+
+    it('설명글이 직관적이고 간결한 핵심 문장으로 반영되어야 함', () => {
+      const ctrl = new TutorialModalController();
+      ctrl.open(1);
+
+      const mainTextEl = document.getElementById('tut-main-text');
+      expect(mainTextEl?.textContent).toBe('모든 강아지를 바른 앞면(0번)으로 맞추면 성공!');
+
+      ctrl.goToStep(2);
+      expect(mainTextEl?.textContent).toBe('1행 타일을 ↔ 가로로 밀면 1행 전체가 뒤집혀요');
+
+      ctrl.goToStep(3);
+      expect(mainTextEl?.textContent).toContain('180° 회전이 돼요');
+
+      ctrl.goToStep(7);
+      expect(mainTextEl?.textContent).toBe('준비 완료! 이제 실전 퍼즐에 도전해 보세요');
     });
   });
 });

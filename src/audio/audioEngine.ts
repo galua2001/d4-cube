@@ -233,7 +233,7 @@ class SoundEngine {
   }
 
   /**
-   * 튜토리얼 친절한 한국어 음성(TTS) 나레이션
+   * 튜토리얼 친절하고 부드러운 한국어 음성(TTS) 나레이션
    */
   public speak(text: string) {
     if (!this.sfxEnabled) return;
@@ -243,14 +243,19 @@ class SoundEngine {
       window.speechSynthesis.cancel(); // 이전 음성 중단
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = 'ko-KR';
-      utter.rate = 1.05; // 30초 튜토리얼에 맞춘 경쾌하고 산뜻한 템포
-      utter.pitch = 1.08; // 친절하고 명랑한 톤
+      utter.rate = 0.93; // 너무 빠르지 않고 나긋나긋하며 부드러운 속도
+      utter.pitch = 1.0; // 자연스러운 억양
 
-      // 한국어 음성 선호 매핑
+      // 자연스러운 한국어 여성/Google/Heami/Natural 음성 우선 탐색 로직
       const voices = window.speechSynthesis.getVoices();
-      const koVoice = voices.find(v => v.lang.startsWith('ko'));
-      if (koVoice) {
-        utter.voice = koVoice;
+      const koVoices = voices.filter(v => v.lang.startsWith('ko') || v.lang.replace('_', '-').includes('ko-KR'));
+      const preferredVoice = koVoices.find(v => /natural/i.test(v.name))
+        || koVoices.find(v => /google/i.test(v.name))
+        || koVoices.find(v => /heami|sunhi|yuna|female/i.test(v.name))
+        || koVoices[0];
+
+      if (preferredVoice) {
+        utter.voice = preferredVoice;
       }
 
       window.speechSynthesis.speak(utter);
