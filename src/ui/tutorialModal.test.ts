@@ -5,6 +5,7 @@ import {
   getBadgeText,
   TutorialModalController,
   TUTORIAL_STORAGE_KEY,
+  STEP2_SUB_DEMOS,
   V4_EXAMPLE_STEPS,
   D4_EXAMPLE_STEPS
 } from './tutorialModal';
@@ -201,14 +202,14 @@ describe('TutorialModal & Group Theory Core Logic (7단계 슬라이드 및 실�
       expect(ctrl.boardOps[4]).toBe(D4.ID);
     });
 
-    it('2단계 진입 시 1행 가로 반사(MX) 변환 상태가 자동 시연되어야 함', () => {
+    it('2단계 진입 시 1행 가로 반사(MX) 변환 상태 및 서브 시연이 준비되어야 함', () => {
       const ctrl = new TutorialModalController();
       ctrl.open(2);
       expect(ctrl.currentStep).toBe(2);
-      expect(ctrl.boardOps[0]).toBe(D4.MX);
-      expect(ctrl.boardOps[1]).toBe(D4.MX);
-      expect(ctrl.boardOps[2]).toBe(D4.MX);
-      expect(ctrl.boardOps[3]).toBe(D4.ID);
+      expect(ctrl.step2SubStep).toBe(0);
+      expect(STEP2_SUB_DEMOS[0].boardOps[0]).toBe(D4.MX);
+      expect(STEP2_SUB_DEMOS[0].boardOps[1]).toBe(D4.MX);
+      expect(STEP2_SUB_DEMOS[0].boardOps[2]).toBe(D4.MX);
     });
 
     it('3단계 진입 시 1행 1열은 반사 합성으로 R180(V4 클라인 4원군)이어야 함', () => {
@@ -371,10 +372,18 @@ describe('TutorialModal & Group Theory Core Logic (7단계 슬라이드 및 실�
       // 1단계: 0번 강아지 정위치 포인팅
       expect(handEl?.classList.contains('hand-anim-point-0')).toBe(true);
 
-      // 2단계: 첫 성분 중심 조작 (회전 및 반사)
+      // 2단계: 첫 성분 조작 서브 시연 (11 가로 밀기, 12 세로 밀기, 21 3회 클릭)
       ctrl.goToStep(2);
-      expect(handEl?.classList.contains('hand-anim-first-cell-action')).toBe(true);
-      expect(bubbleEl?.textContent).toContain('첫 성분');
+      expect(handEl?.classList.contains('hand-anim-cell-swipe-h')).toBe(true);
+      expect(bubbleEl?.textContent).toContain('11 가로');
+
+      ctrl.goToStep2SubStep(1);
+      expect(handEl?.classList.contains('hand-anim-cell-swipe-v')).toBe(true);
+      expect(bubbleEl?.textContent).toContain('12 세로');
+
+      ctrl.goToStep2SubStep(2);
+      expect(handEl?.classList.contains('hand-anim-cell-triple-tap')).toBe(true);
+      expect(bubbleEl?.textContent).toContain('21 클릭');
 
       // 3단계: 세로 밀기 스와이프
       ctrl.goToStep(3);

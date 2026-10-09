@@ -43,6 +43,54 @@ export interface ExampleMoveStep {
 }
 
 /**
+ * STEP 2. 각 행과 열의 첫 성분 조작에 따른 행/열 변환 3가지 핵심 예시
+ * 1) 11 성분 가로 쓱 밀기 ➔ 1행 전체 가로 반사(MX)
+ * 2) 12 성분 세로 쓱 밀기 ➔ 12 타일 0번 복원
+ * 3) 21 성분 가운데 클릭 ➔ 클릭할 때마다 90°씩 순차 회전
+ */
+export const STEP2_SUB_DEMOS: ExampleMoveStep[] = [
+  {
+    subStep: 0,
+    label: '① 11 가로 밀기',
+    boardOps: [
+      D4.MX, D4.MX, D4.MX,
+      D4.ID, D4.ID, D4.ID,
+      D4.ID, D4.ID, D4.ID
+    ],
+    highlightCells: [0, 1, 2],
+    formulaBadge: '💡 [11] 1행 첫 성분',
+    formulaText: '11 가로 쓱 밀기 ➔ 1행 전체 가로 반사(MX)',
+    formulaDesc: '1행의 첫 성분 11을 가로로 쓱 밀면 1행 전체가 일제히 뒤태(X 뱃지)로 뒤집혀요!'
+  },
+  {
+    subStep: 1,
+    label: '② 12 세로 밀기',
+    boardOps: [
+      D4.MX, D4.ID, D4.MX,
+      D4.ID, D4.MY, D4.ID,
+      D4.ID, D4.MY, D4.ID
+    ],
+    highlightCells: [1, 4, 7],
+    formulaBadge: '✨ [12] 2열 첫 성분',
+    formulaText: '12 세로 쓱 밀기 ➔ 12 타일 0번 복원!',
+    formulaDesc: '2열의 첫 성분 12를 세로로 쓱 밀면 12 타일이 다시 똑바른 0번 앞면으로 돌아와요!'
+  },
+  {
+    subStep: 2,
+    label: '③ 21 3회 클릭',
+    boardOps: [
+      D4.MX,   D4.ID,   D4.MX,
+      D4.R270, D4.R270, D4.R270,
+      D4.ID,   D4.MY,   D4.ID
+    ],
+    highlightCells: [3, 4, 5],
+    formulaBadge: '↻ [21] 2행 첫 성분',
+    formulaText: '21 가운데 클릭 ➔ 90°씩 순차 회전!',
+    formulaDesc: '2행의 첫 성분 21 가운데를 누르면 누를 때마다 90° ➔ 180° ➔ 270°로 회전해요!'
+  }
+];
+
+/**
  * STEP 5. V4 클라인 4원군 4수 최단 해법 데이터
  * 초기 상태: [R180, R180, MX / MY, MY, ID / R180, R180, MX]
  * 1수: 3행 R180 (3행 1열 타일 더블 탭 👆👆)
@@ -221,6 +269,7 @@ export const D4_EXAMPLE_STEPS: ExampleMoveStep[] = [
 export class TutorialModalController {
   public isOpen = false;
   public currentStep = 1; // 1 ~ 7
+  public step2SubStep = 0; // 0 ~ 2 (11 가로 밀기, 12 세로 밀기, 21 3회 클릭)
   public v4SubStep = 0;   // 0 ~ 4
   public d4SubStep = 0;   // 0 ~ 5
   public boardOps: D4Op[] = Array(9).fill(D4.ID);
@@ -229,6 +278,8 @@ export class TutorialModalController {
   private imgDogFront: HTMLImageElement | null = null;
   private imgDogBack: HTMLImageElement | null = null;
   private autoPlayTimer: any = null;
+  private step2Timer: any = null;
+  private step2AnimTimers: any[] = [];
   public isAutoPlaying = false;
 
   constructor() {
@@ -258,6 +309,7 @@ export class TutorialModalController {
   }
 
   public close(): void {
+    this.stopStep2DemoLoop();
     this.stopAutoPlay();
     this.isOpen = false;
     if (typeof document !== 'undefined') {
@@ -291,10 +343,13 @@ export class TutorialModalController {
   }
 
   public goToStep(step: number, playSound = true): void {
+    this.stopStep2DemoLoop();
     this.stopAutoPlay();
     this.currentStep = Math.max(1, Math.min(7, step));
 
-    if (this.currentStep === 5) {
+    if (this.currentStep === 2) {
+      this.step2SubStep = 0;
+    } else if (this.currentStep === 5) {
       this.v4SubStep = 0;
     } else if (this.currentStep === 6) {
       this.d4SubStep = 0;
@@ -652,6 +707,39 @@ export class TutorialModalController {
   }
 
   /**
+   * 3x3 보드 상의 특정 타일 인덱스(0~8) 정중앙으로 손가락 안내 요소를 정밀 위치시킴
+   */
+  public positionHandAtCell(cellIdx: number): void {
+    if (typeof document === 'undefined') return;
+    const hand = document.getElementById('tut-hand-demo');
+    if (!hand) return;
+
+    const row = Math.floor(cellIdx / 3);
+    const col = cellIdx % 3;
+
+    // 1순위: 실제 렌더링된 DOM 좌표 기준 계산
+    const cell = document.getElementById(`tut-cell-${cellIdx}`);
+    const wrapper = document.getElementById('tut-board-wrapper');
+    if (cell && wrapper && typeof cell.getBoundingClientRect === 'function' && typeof wrapper.getBoundingClientRect === 'function') {
+      const cRect = cell.getBoundingClientRect();
+      const wRect = wrapper.getBoundingClientRect();
+      if (wRect.width > 0 && cRect.width > 0) {
+        const cx = (cRect.left + cRect.width / 2) - wRect.left;
+        const cy = (cRect.top + cRect.height / 2) - wRect.top;
+        hand.style.left = `${cx}px`;
+        hand.style.top = `${cy}px`;
+        return;
+      }
+    }
+
+    // 2순위 fallback: 3x3 균등 그리드 정중앙 퍼센티지
+    const leftPercent = ((col * 2 + 1) / 6) * 100;
+    const topPercent = ((row * 2 + 1) / 6) * 100;
+    hand.style.left = `${leftPercent.toFixed(1)}%`;
+    hand.style.top = `${topPercent.toFixed(1)}%`;
+  }
+
+  /**
    * 가상 손가락 애니메이션 (.tut-hand-demo) 동적 갱신
    */
   public updateHandDemo(step: number, subStep = 0): void {
@@ -669,17 +757,34 @@ export class TutorialModalController {
 
     switch (step) {
       case 1:
-        // STEP 1: 가운데 0번(ID) 강아지 정위치 지칭 (손가락이 0번 강아지를 정확히 가리킴)
+        // STEP 1: 가운데 0번(ID) 강아지(idx 4) 정위치 정확히 지칭
+        this.positionHandAtCell(4);
         hand.classList.add('hand-anim-point-0');
         icon.textContent = '👇';
         bubble.textContent = '이 0번 강아지로 맞추기!';
         break;
 
       case 2:
-        // STEP 2: 각 행과 열의 '첫 성분' 한가운데에서 회전(클릭) 및 반사(살짝 밀기)
-        hand.classList.add('hand-anim-first-cell-action');
-        icon.textContent = '👆';
-        bubble.textContent = '첫 성분 가운데 클릭 & 밀기';
+        // STEP 2: 서브 시연별(11 가로, 12 세로, 21 3회 클릭) 해당 첫 성분 타일 중심에 정밀 위치
+        {
+          const demoIdx = subStep || this.step2SubStep;
+          if (demoIdx === 0) {
+            this.positionHandAtCell(0); // 11 (1행 1열) 타일 중심
+            hand.classList.add('hand-anim-cell-swipe-h');
+            icon.textContent = '👆';
+            bubble.textContent = '11 가로 쓱 밀기 (↔)';
+          } else if (demoIdx === 1) {
+            this.positionHandAtCell(1); // 12 (1행 2열, 2열 첫 성분) 타일 중심
+            hand.classList.add('hand-anim-cell-swipe-v');
+            icon.textContent = '👆';
+            bubble.textContent = '12 세로 쓱 밀기 (↕)';
+          } else {
+            this.positionHandAtCell(3); // 21 (2행 1열, 2행 첫 성분) 타일 중심
+            hand.classList.add('hand-anim-cell-triple-tap');
+            icon.textContent = '👆';
+            bubble.textContent = '21 클릭 ➔ 90°씩 회전';
+          }
+        }
         break;
 
       case 3:
@@ -800,6 +905,149 @@ export class TutorialModalController {
         hand.style.display = 'none';
         break;
     }
+  }
+
+  private clearStep2AnimTimers(): void {
+    if (this.step2AnimTimers && this.step2AnimTimers.length > 0) {
+      this.step2AnimTimers.forEach((t) => clearTimeout(t));
+      this.step2AnimTimers = [];
+    }
+  }
+
+  /**
+   * STEP 2. 서브 시연 변경 (① 11 가로 밀기, ② 12 세로 밀기, ③ 21 3회 클릭)
+   * 실시간 손동작 타이밍에 맞춰 보드 상태가 드라마틱하게 변환됨
+   */
+  public goToStep2SubStep(subStep: number, playSound = true): void {
+    this.clearStep2AnimTimers();
+    this.step2SubStep = Math.max(0, Math.min(STEP2_SUB_DEMOS.length - 1, subStep));
+    const stepData = STEP2_SUB_DEMOS[this.step2SubStep];
+
+    this.clearCellHighlights();
+    if (stepData.highlightCells.length > 0) {
+      this.highlightCells(stepData.highlightCells, 'highlight-row');
+    }
+
+    if (typeof document !== 'undefined') {
+      const formulaCard = document.getElementById('tut-formula-card');
+      const formulaBadge = document.getElementById('tut-formula-badge');
+      const formulaText = document.getElementById('tut-formula-text');
+      const formulaDesc = document.getElementById('tut-formula-desc');
+      if (formulaCard) formulaCard.style.display = 'block';
+      if (formulaBadge) formulaBadge.textContent = stepData.formulaBadge;
+      if (formulaText) formulaText.textContent = stepData.formulaText;
+      if (formulaDesc) formulaDesc.textContent = stepData.formulaDesc;
+
+      this.updateMovePillsActive(this.step2SubStep);
+      this.updateHandDemo(2, this.step2SubStep);
+    }
+
+    // [핵심 인터랙션] 손동작 타이밍에 맞춘 실시간 보드 변환 연출
+    if (this.step2SubStep === 0) {
+      // ① 11 가로 밀기: 시작 시 정위치 ➔ 손가락으로 쓱 밀며 500ms 후 1행 전체가 MX(뒷면)로 일제히 뒤집힘!
+      this.boardOps = [
+        D4.ID, D4.ID, D4.ID,
+        D4.ID, D4.ID, D4.ID,
+        D4.ID, D4.ID, D4.ID
+      ];
+      this.renderBoard();
+
+      const t = setTimeout(() => {
+        if (this.currentStep === 2 && this.step2SubStep === 0) {
+          this.boardOps = [...stepData.boardOps];
+          this.renderBoard();
+          soundEngine.playFlip();
+        }
+      }, 500);
+      this.step2AnimTimers.push(t);
+
+    } else if (this.step2SubStep === 1) {
+      // ② 12 세로 밀기: 12 타일이 MX(뒷면)인 상태에서 손가락이 세로로 쓱 밀린 뒤 12 타일이 0번(ID)으로 복원!
+      this.boardOps = [
+        D4.MX, D4.MX, D4.MX,
+        D4.ID, D4.ID, D4.ID,
+        D4.ID, D4.ID, D4.ID
+      ];
+      this.renderBoard();
+
+      const t = setTimeout(() => {
+        if (this.currentStep === 2 && this.step2SubStep === 1) {
+          this.boardOps = [...stepData.boardOps];
+          this.renderBoard();
+          soundEngine.playFlip();
+        }
+      }, 500);
+      this.step2AnimTimers.push(t);
+
+    } else if (this.step2SubStep === 2) {
+      // ③ 21 3회 클릭: 손으로 가운데 누를 때마다 90°씩 순차 회전! (R90 ➔ R180 ➔ R270)
+      this.boardOps = [
+        D4.MX, D4.ID, D4.MX,
+        D4.ID, D4.ID, D4.ID,
+        D4.ID, D4.MY, D4.ID
+      ];
+      this.renderBoard();
+
+      // 1회 탭 시점 (약 450ms): 90° 회전
+      const t1 = setTimeout(() => {
+        if (this.currentStep === 2 && this.step2SubStep === 2) {
+          this.boardOps[3] = D4.R90;
+          this.boardOps[4] = D4.R90;
+          this.boardOps[5] = D4.R90;
+          this.renderBoard();
+          soundEngine.playTap();
+        }
+      }, 450);
+
+      // 2회 탭 시점 (약 1150ms): 180° 회전
+      const t2 = setTimeout(() => {
+        if (this.currentStep === 2 && this.step2SubStep === 2) {
+          this.boardOps[3] = D4.R180;
+          this.boardOps[4] = D4.R180;
+          this.boardOps[5] = D4.R180;
+          this.renderBoard();
+          soundEngine.playTap();
+        }
+      }, 1150);
+
+      // 3회 탭 시점 (약 1850ms): 270° 회전 (최종)
+      const t3 = setTimeout(() => {
+        if (this.currentStep === 2 && this.step2SubStep === 2) {
+          this.boardOps[3] = D4.R270;
+          this.boardOps[4] = D4.R270;
+          this.boardOps[5] = D4.R270;
+          this.renderBoard();
+          soundEngine.playTap();
+        }
+      }, 1850);
+
+      this.step2AnimTimers.push(t1, t2, t3);
+    } else {
+      this.boardOps = [...stepData.boardOps];
+      this.renderBoard();
+    }
+
+    if (playSound) soundEngine.playTap();
+  }
+
+  public startStep2DemoLoop(): void {
+    this.stopStep2DemoLoop();
+    this.step2Timer = setInterval(() => {
+      if (this.currentStep === 2) {
+        const nextSub = (this.step2SubStep + 1) % STEP2_SUB_DEMOS.length;
+        this.goToStep2SubStep(nextSub, false);
+      } else {
+        this.stopStep2DemoLoop();
+      }
+    }, 2800);
+  }
+
+  public stopStep2DemoLoop(): void {
+    if (this.step2Timer) {
+      clearInterval(this.step2Timer);
+      this.step2Timer = null;
+    }
+    this.clearStep2AnimTimers();
   }
 
   /**
@@ -968,6 +1216,8 @@ export class TutorialModalController {
 
     // 기본 가시성 세팅
     if (moveController) moveController.style.display = 'none';
+    const btnAuto = document.getElementById('btn-tut-autoplay');
+    if (btnAuto) btnAuto.style.display = 'block';
     if (formulaCard) formulaCard.style.display = 'none';
     if (gestureCard) gestureCard.style.display = 'none';
     if (masterCard) masterCard.style.display = 'none';
@@ -986,17 +1236,19 @@ export class TutorialModalController {
       case 2:
         stepNameEl.textContent = 'STEP 2. 첫 성분 조작 & 행렬 변환 원리';
         mainTextEl.textContent = '각 행과 열의 첫 성분에 회전(가운데 클릭)과 반사를 주면 해당되는 행과 열이 같은 변환을 해요';
-        subTextEl.textContent = '행 전체를 그을 필요 없이, 맨 앞 첫 성분의 가운데만 조작하면 행 전체가 한 번에 변환돼요!';
-        this.highlightCells([0, 1, 2], 'highlight-row');
-        if (formulaCard) {
-          formulaCard.style.display = 'block';
-          if (formulaBadge) formulaBadge.textContent = '💡 첫 성분 중심 조작';
-          if (formulaText) formulaText.textContent = '첫 성분 가운데 클릭(회전) & 밀기(반사)';
-          if (formulaDesc) formulaDesc.textContent = '첫 성분을 조작하면 해당 행이나 열 전체가 일제히 변환돼요.';
+        subTextEl.textContent = '① 11 가로 쓱(1행 반사) ➔ ② 12 세로 쓱(12번 복원) ➔ ③ 21 3회 클릭(90°씩 순차 회전)';
+        if (moveController) {
+          moveController.style.display = 'flex';
+          if (btnAuto) btnAuto.style.display = 'none';
         }
+        this.renderMovePills(STEP2_SUB_DEMOS, this.step2SubStep, (idx) => {
+          this.stopStep2DemoLoop();
+          this.goToStep2SubStep(idx);
+        });
+        this.goToStep2SubStep(this.step2SubStep, false);
+        this.startStep2DemoLoop();
         if (btnActionText) btnActionText.textContent = '다음 (2/7) ➔';
         soundEngine.speak('각 행과 열의 첫 성분에 회전과 반사를 주면 해당되는 행과 열이 같은 변환을 해요.');
-        this.updateHandDemo(2);
         break;
 
       case 3:

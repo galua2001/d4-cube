@@ -1203,8 +1203,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  transform: translate(-50%, -50%);
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: top 0.3s cubic-bezier(0.16, 1, 0.3, 1), left 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
 }
 
 .tut-hand-icon {
@@ -1216,77 +1217,83 @@ body {
 }
 
 .tut-hand-bubble {
-  background: rgba(15, 23, 42, 0.92);
+  background: rgba(15, 23, 42, 0.95);
   color: #facc15;
-  border: 1.5px solid rgba(250, 204, 21, 0.7);
+  border: 1.5px solid rgba(250, 204, 21, 0.8);
   border-radius: 12px;
-  padding: 2px 8px;
+  padding: 3px 9px;
   font-size: 0.72rem;
   font-weight: 800;
   white-space: nowrap;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
-  margin-top: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+  margin-top: 3px;
   letter-spacing: -0.2px;
 }
 
-/* 1단계: 0번 강아지 정위치 포인팅 애니메이션 (가운데 타일 정밀 지칭) */
+/* 1단계: 0번 강아지 정위치 포인팅 (중앙 타일 지칭) */
 .tut-hand-demo.hand-anim-point-0 {
-  top: 42%;
-  left: 42%;
   animation: handPoint0Anim 1.6s infinite ease-in-out;
 }
 
 @keyframes handPoint0Anim {
-  0%, 100% { transform: scale(1.0) translateY(0); opacity: 0.95; }
-  50% { transform: scale(1.15) translateY(-8px); opacity: 1; }
+  0%, 100% { transform: translate(-50%, -50%) scale(1.0); opacity: 0.95; }
+  50% { transform: translate(-50%, -50%) scale(1.18) translateY(-8px); opacity: 1; }
 }
 
-/* 2단계: 각 행과 열의 첫 성분 가운데에서 회전(클릭) 및 반사(살짝 밀기) 조작 애니메이션 */
-.tut-hand-demo.hand-anim-first-cell-action {
-  top: 10%;
-  left: 10%;
-  animation: handFirstCellAction 2.2s infinite ease-in-out;
+/* 2단계 시연 A: 11 성분 가운데 가로 쓱 밀기 (1행 전체 MX 변환) */
+.tut-hand-demo.hand-anim-cell-swipe-h {
+  animation: handCellSwipeH 2.2s infinite ease-in-out;
 }
 
-@keyframes handFirstCellAction {
-  0% { transform: translate(0, 0) scale(0.85); opacity: 0; }
-  15% { transform: translate(0, 0) scale(1.15); opacity: 1; }
-  28% { transform: translate(0, 0) scale(0.88); opacity: 1; } /* 가운데 콕 탭 클릭(회전) */
-  42% { transform: translate(0, 0) scale(1.08); opacity: 1; }
-  58% { transform: translate(0, 0) scale(1.0); opacity: 1; }
-  72% { transform: translate(24px, 0) scale(1.0); opacity: 1; } /* 성분 내부 살짝 가로 밀기(반사) */
-  85% { transform: translate(26px, 0) scale(0.85); opacity: 0; }
-  100% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+@keyframes handCellSwipeH {
+  0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+  15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  25% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
+  55% { transform: translate(calc(-50% + 24px), -50%) scale(1.0); opacity: 1; }
+  75% { transform: translate(calc(-50% + 26px), -50%) scale(0.85); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
 }
 
-/* 3단계: 세로 밀기 애니메이션 (1열 첫 성분 안에서 ↕ 살짝 스와이프) */
-.tut-hand-demo.hand-anim-swipe-v {
-  top: 10%;
-  left: 10%;
-  animation: handSwipeV 2.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+/* 2단계 시연 B: 12 성분 가운데 세로 쓱 밀기 (12 타일 0번 복원) */
+.tut-hand-demo.hand-anim-cell-swipe-v {
+  animation: handCellSwipeV 2.2s infinite ease-in-out;
 }
 
-@keyframes handSwipeV {
-  0% { transform: translate(0, 0) scale(0.85); opacity: 0; }
-  15% { transform: translate(0, 0) scale(1.15); opacity: 1; }
-  28% { transform: translate(0, 0) scale(0.88); opacity: 1; }
-  42% { transform: translate(0, 0) scale(1.08); opacity: 1; }
-  58% { transform: translate(0, 0) scale(1.0); opacity: 1; }
-  72% { transform: translate(0, 24px) scale(1.0); opacity: 1; } /* 성분 내부 살짝 세로 밀기 */
-  85% { transform: translate(0, 26px) scale(0.85); opacity: 0; }
-  100% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+@keyframes handCellSwipeV {
+  0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+  15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  25% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
+  55% { transform: translate(-50%, calc(-50% + 24px)) scale(1.0); opacity: 1; }
+  75% { transform: translate(-50%, calc(-50% + 26px)) scale(0.85); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
 }
 
-/* 1회 탭 제스처 애니메이션 (👆) */
+/* 2단계 시연 C: 21 성분 가운데 3번 클릭 회전 (클릭할 때마다 90°씩 순차 회전) */
+.tut-hand-demo.hand-anim-cell-triple-tap {
+  animation: handCellTripleTap 2.4s infinite ease-in-out;
+}
+
+@keyframes handCellTripleTap {
+  0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+  12% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  22% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; } /* 1회 탭 (90°) */
+  42% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  52% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; } /* 2회 탭 (180°) */
+  72% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  82% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; } /* 3회 탭 (270°) */
+  100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+}
+
+/* 기본 탭 제스처 애니메이션 (👆) */
 .tut-hand-demo.hand-anim-tap {
   animation: handTapAnim 1.6s infinite ease-in-out;
 }
 
 @keyframes handTapAnim {
-  0%, 100% { transform: scale(0.88) translateY(0); opacity: 0.85; }
-  40% { transform: scale(1.22) translateY(-6px); opacity: 1; }
-  55% { transform: scale(0.92) translateY(2px); opacity: 1; }
-  70% { transform: scale(1.05) translateY(-2px); opacity: 1; }
+  0%, 100% { transform: translate(-50%, -50%) scale(0.88); opacity: 0.85; }
+  40% { transform: translate(-50%, -50%) scale(1.22) translateY(-6px); opacity: 1; }
+  55% { transform: translate(-50%, -50%) scale(0.92) translateY(2px); opacity: 1; }
+  70% { transform: translate(-50%, -50%) scale(1.05) translateY(-2px); opacity: 1; }
 }
 
 /* 더블 탭 제스처 애니메이션 (👆👆) */
@@ -1295,11 +1302,11 @@ body {
 }
 
 @keyframes handDoubleTapAnim {
-  0%, 100% { transform: scale(0.88) translateY(0); opacity: 0.85; }
-  25% { transform: scale(1.25) translateY(-6px); opacity: 1; }
-  38% { transform: scale(0.92) translateY(2px); opacity: 1; }
-  52% { transform: scale(1.25) translateY(-6px); opacity: 1; }
-  68% { transform: scale(0.92) translateY(2px); opacity: 1; }
+  0%, 100% { transform: translate(-50%, -50%) scale(0.88); opacity: 0.85; }
+  25% { transform: translate(-50%, -50%) scale(1.25) translateY(-6px); opacity: 1; }
+  38% { transform: translate(-50%, -50%) scale(0.92) translateY(2px); opacity: 1; }
+  52% { transform: translate(-50%, -50%) scale(1.25) translateY(-6px); opacity: 1; }
+  68% { transform: translate(-50%, -50%) scale(0.92) translateY(2px); opacity: 1; }
 }
 
 /* 대각선 밀기 제스처 애니메이션 (↘) */
@@ -1308,40 +1315,40 @@ body {
 }
 
 @keyframes handSwipeDiag {
-  0% { transform: translate(0, 0) scale(0.85); opacity: 0; }
-  15% { transform: translate(0, 0) scale(1.15); opacity: 1; }
-  25% { transform: translate(0, 0) scale(1.0); opacity: 1; }
-  65% { transform: translate(120px, 120px) scale(1.0); opacity: 1; }
-  80% { transform: translate(140px, 140px) scale(0.85); opacity: 0; }
-  100% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+  0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+  15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  25% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
+  65% { transform: translate(calc(-50% + 24px), calc(-50% + 24px)) scale(1.0); opacity: 1; }
+  80% { transform: translate(calc(-50% + 26px), calc(-50% + 26px)) scale(0.85); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
 }
 
-/* 3열 세로 밀기 애니메이션 (3열 타일에서 세로 스와이프) */
+/* 3열 세로 밀기 애니메이션 */
 .tut-hand-demo.hand-anim-swipe-col3 {
   animation: handSwipeCol3 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes handSwipeCol3 {
-  0% { transform: translate(0, 0) scale(0.85); opacity: 0; }
-  15% { transform: translate(0, 0) scale(1.15); opacity: 1; }
-  25% { transform: translate(0, 0) scale(1.0); opacity: 1; }
-  65% { transform: translate(0, 160px) scale(1.0); opacity: 1; }
-  80% { transform: translate(0, 180px) scale(0.85); opacity: 0; }
-  100% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+  0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+  15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  25% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
+  65% { transform: translate(-50%, calc(-50% + 24px)) scale(1.0); opacity: 1; }
+  80% { transform: translate(-50%, calc(-50% + 26px)) scale(0.85); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
 }
 
-/* 2열 가로 밀기 애니메이션 (2열 타일에서 가로 스와이프) */
+/* 2열 가로 밀기 애니메이션 */
 .tut-hand-demo.hand-anim-swipe-row2 {
   animation: handSwipeRow2 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes handSwipeRow2 {
-  0% { transform: translate(0, 0) scale(0.85); opacity: 0; }
-  15% { transform: translate(0, 0) scale(1.15); opacity: 1; }
-  25% { transform: translate(0, 0) scale(1.0); opacity: 1; }
-  65% { transform: translate(120px, 0) scale(1.0); opacity: 1; }
-  80% { transform: translate(140px, 0) scale(0.85); opacity: 0; }
-  100% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+  0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+  15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  25% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
+  65% { transform: translate(calc(-50% + 24px), -50%) scale(1.0); opacity: 1; }
+  80% { transform: translate(calc(-50% + 26px), -50%) scale(0.85); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
 }
 
 /* 8. 공식 발견 팝업 카드 (Formula Card) */
