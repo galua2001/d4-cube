@@ -1,4 +1,6 @@
-// 표준 PWA Service Worker (유니테스 검증 구조)
+// 표준 PWA Service Worker (v20261009_1018)
+const CACHE_NAME = 'd4-cube-v20261009_1018';
+
 self.addEventListener('install', (e) => {
   self.skipWaiting();
 });
