@@ -1571,17 +1571,27 @@ body {
 
 /* 손가락 1개로 두 번 톡! 톡! 클릭 애니메이션 (각 클릭 90°씩 총 180° 회전) */
 .tut-hand-demo.hand-anim-single-double-tap {
-  animation: handSingleDoubleTapAnim 1.6s ease-in-out forwards;
+  animation: handSingleDoubleTapAnim 1.4s ease-in-out forwards;
 }
 
 @keyframes handSingleDoubleTapAnim {
   0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
   10% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-  22% { transform: translate(-50%, -50%) scale(0.9) translateY(3px); opacity: 1; } /* 1회 톡 (90°) */
-  45% { transform: translate(-50%, -50%) scale(1.12) translateY(-4px); opacity: 1; }
-  58% { transform: translate(-50%, -50%) scale(0.9) translateY(3px); opacity: 1; } /* 2회 톡 (180°) */
+  20% { transform: translate(-50%, -50%) scale(0.9) translateY(3px); opacity: 1; } /* 1회 톡 (90°) */
+  42% { transform: translate(-50%, -50%) scale(1.12) translateY(-4px); opacity: 1; }
+  56% { transform: translate(-50%, -50%) scale(0.9) translateY(3px); opacity: 1; } /* 2회 톡 (180°) */
   85% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+}
+
+/* 상단 버튼(한 수씩 보기) 포인팅 제스처 (👆 위쪽으로 콕콕) */
+.tut-hand-demo.hand-anim-point-up {
+  animation: handPointUpAnim 1.4s infinite ease-in-out;
+}
+
+@keyframes handPointUpAnim {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0) scale(1.0); opacity: 0.95; }
+  50% { transform: translate(-50%, -50%) translateY(-10px) scale(1.18); opacity: 1; }
 }
 
 /* 대각선 밀기 제스처 애니메이션 (↘) */

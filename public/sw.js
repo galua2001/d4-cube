@@ -1,5 +1,5 @@
-// 표준 PWA Service Worker (v20261009_2035)
-const CACHE_NAME = 'd4-cube-v20261009_2035';
+// 표준 PWA Service Worker (v20261009_2045)
+const CACHE_NAME = 'd4-cube-v20261009_2045';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

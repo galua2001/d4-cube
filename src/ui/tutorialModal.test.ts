@@ -472,8 +472,8 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
 
       // 2단계: V4 서브 스텝별 손동작 및 positionHandAtCell 연동
       ctrl.goToStep(2);
-      ctrl.goToV4SubStep(0); // 0수: 중앙 타일 (idx 4)
-      expect(handEl?.classList.contains('hand-anim-tap')).toBe(true);
+      ctrl.goToV4SubStep(0); // 0수: 상단 [▶ 한 수씩 보기] 버튼 포인팅
+      expect(handEl?.classList.contains('hand-anim-point-up')).toBe(true);
 
       ctrl.goToV4SubStep(1); // 1수: 3행 1열 (idx 6) 손가락 1개로 두 번 클릭
       expect(handEl?.classList.contains('hand-anim-single-double-tap')).toBe(true);
