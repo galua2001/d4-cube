@@ -197,79 +197,79 @@ export const D4_EXAMPLE_STEPS: ExampleMoveStep[] = [
     subStep: 0,
     label: '초기',
     boardOps: [
-      D4.MX,   D4.MAD, D4.MD,
-      D4.ID,   D4.R90, D4.MY,
-      D4.R180, D4.MY,  D4.R270
+      D4.R270, D4.MAD, D4.MD,
+      D4.MD,   D4.R90, D4.R90,
+      D4.R180, D4.MY,  D4.MX
     ],
     highlightCells: [],
     formulaBadge: '🧩 D4 묘수 문제',
     formulaText: 'D4 복합 스크램블 (초기)',
-    formulaDesc: '대각선 반사와 회전을 결합한 5수 최단 해법!'
+    formulaDesc: '90° 회전과 대각선 대칭이 포함된 기본 행·열 5수 최단 해법!'
   },
   {
     subStep: 1,
     label: '1수',
     boardOps: [
-      D4.MD,   D4.MX,  D4.MY,
-      D4.ID,   D4.R90, D4.MY,
-      D4.R180, D4.MY,  D4.R270
+      D4.ID,   D4.MX,  D4.MY,
+      D4.MD,   D4.R90, D4.R90,
+      D4.R180, D4.MY,  D4.MX
     ],
     highlightCells: [0, 1, 2],
     formulaBadge: '⚡ 1수: 1행 90° 회전',
-    formulaText: '1행 1회 탭 👆 (R90)',
-    formulaDesc: '1행 타일들이 시계 방향 90° 회전돼요.'
+    formulaText: '1행 1열(11) 1회 탭 👆 (R90)',
+    formulaDesc: '1행이 시계 방향 90° 회전되어 첫 번째 타일(1행 1열)이 0번 정위치 완성!'
   },
   {
     subStep: 2,
     label: '2수',
     boardOps: [
-      D4.MD,   D4.MX,  D4.MY,
-      D4.ID,   D4.R90, D4.MY,
-      D4.ID,   D4.MX,  D4.R90
+      D4.ID,   D4.MX,  D4.MY,
+      D4.MD,   D4.R90, D4.R90,
+      D4.ID,   D4.MX,  D4.MY
     ],
     highlightCells: [6, 7, 8],
     formulaBadge: '⚡ 2수: 3행 180° 회전',
-    formulaText: '3행 더블 탭 👆👆 (R180)',
-    formulaDesc: '3행의 R180이 0번으로 상쇄되고 타일들이 재정렬돼요.'
+    formulaText: '3행 1열(31) 더블 탭 👆👆 (R180)',
+    formulaDesc: '3행에 180° 회전을 적용하여 3행 첫 번째 타일(3행 1열)이 0번으로 상쇄!'
   },
   {
     subStep: 3,
     label: '3수',
     boardOps: [
-      D4.MD,   D4.MX,  D4.ID,
-      D4.ID,   D4.R90, D4.ID,
-      D4.ID,   D4.MX,  D4.MD
+      D4.ID,   D4.MX,  D4.ID,
+      D4.MD,   D4.R90, D4.MD,
+      D4.ID,   D4.MX,  D4.ID
     ],
     highlightCells: [2, 5, 8],
     formulaBadge: '⚡ 3수: 3열 세로 반사',
-    formulaText: '3열 세로 밀기 ↕ (MY)',
-    formulaDesc: '3열의 1·2행 타일들이 0번으로 상쇄돼요.'
+    formulaText: '1행 3열(13) 세로 밀기 ↕ (MY)',
+    formulaDesc: '3열에 세로 반사를 적용하여 3열의 양 끝 타일(1행·3행)이 일제히 0번 완성!'
   },
   {
     subStep: 4,
     label: '4수',
     boardOps: [
-      D4.ID, D4.MX, D4.ID,
-      D4.ID, D4.MX, D4.ID,
-      D4.ID, D4.MX, D4.ID
+      D4.ID,   D4.MX,  D4.ID,
+      D4.ID,   D4.MX,  D4.ID,
+      D4.ID,   D4.MX,  D4.ID
     ],
-    highlightCells: [0, 4, 8],
-    formulaBadge: '⚡ 4수: 대각선 반사',
-    formulaText: '대각선 밀기 ↘ (MD)',
-    formulaDesc: '양 끝의 MD가 상쇄되고 2열이 MX로 정렬돼요.'
+    highlightCells: [3, 4, 5],
+    formulaBadge: '⚡ 4수: 2행 주대각 대칭',
+    formulaText: '2행 1열(21) ↖➔↘ 대각선 긋기 (MD)',
+    formulaDesc: '21 성분에서 대각선으로 쓱 그으면 2행 전체가 주대각 대칭(MD)되어 양 끝 타일이 0번 상쇄!'
   },
   {
     subStep: 5,
     label: '5수 (완성)',
     boardOps: [
-      D4.ID, D4.ID, D4.ID,
-      D4.ID, D4.ID, D4.ID,
-      D4.ID, D4.ID, D4.ID
+      D4.ID,   D4.ID,  D4.ID,
+      D4.ID,   D4.ID,  D4.ID,
+      D4.ID,   D4.ID,  D4.ID
     ],
     highlightCells: [1, 4, 7],
-    formulaBadge: '🎉 5수: 2열 가로 반사',
-    formulaText: '2열 가로 밀기 ↔ (MX)',
-    formulaDesc: '2열의 모든 MX가 상쇄되어 5수 만에 전체 완성!'
+    formulaBadge: '🎉 5수: 2열 가로 반사 - 완성!',
+    formulaText: '1행 2열(12) 가로 밀기 ↔ (MX)',
+    formulaDesc: '12 성분에서 가로로 쓱 밀면 2열의 모든 MX 타일이 상쇄되어 5수 만에 전체 0번 완성!'
   }
 ];
 
@@ -859,10 +859,10 @@ export class TutorialModalController {
             bubble.textContent = '13 천천히 세로 쓱 (3열 세로 반사 ↕)';
             break;
           case 4:
-            // 4수: 주대각선 컨트롤러(idx 8) 천천히 대각선 쓱 그어 주대각 변환
-            this.positionHandAtCell(8);
+            // 4수: 2행 1열(21, idx 3) 천천히 ↖➔↘ 대각선 쓱 그어 2행 주대각 변환
+            this.positionHandAtCell(3);
             hand.classList.add('hand-anim-cell-diag-main');
-            bubble.textContent = '↘ 대각선 천천히 쓱 (주대각선 반사)';
+            bubble.textContent = '21 천천히 대각선 쓱 (2행 주대각 대칭)';
             break;
           case 5:
             // 5수: 1행 2열(12, idx 1) 천천히 가로 쓱 밀어 2열 변환 (완성!)
@@ -955,13 +955,13 @@ export class TutorialModalController {
       ];
       this.renderBoard();
 
-      // 손가락이 11 타일 왼쪽 중간에서 오른쪽 중간으로 쓱 이동하는 순간 동시에 1행 타일들(idx 0, 1, 2) 3D 가로 플립 시작!
+      // 손가락이 11 타일 좌측 안착 후 오른쪽으로 쓱 긋기 시작하는 시점(t = 380ms)에 1행 타일들 3D 가로 플립 시작!
       const t1 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 0) {
           this.addCellAnimClass([0, 1, 2], 'tut-cell-flipping-h');
           soundEngine.playFlip();
         }
-      }, 50);
+      }, 380);
 
       // 플립 중간 90도 회전 시점: 1행 타일들이 일제히 가로 반사(MX, 뒷면)로 뒤집힘
       const t2 = setTimeout(() => {
@@ -969,12 +969,12 @@ export class TutorialModalController {
           this.boardOps = [...stepData.boardOps];
           this.renderBoard();
         }
-      }, 350);
+      }, 780);
 
       // 플립 완료 시점: 플립 클래스 제거
       const t3 = setTimeout(() => {
         this.removeCellAnimClass([0, 1, 2], 'tut-cell-flipping-h');
-      }, 750);
+      }, 1200);
 
       this.step1AnimTimers.push(t1, t2, t3);
 
@@ -1118,7 +1118,7 @@ export class TutorialModalController {
       // [1단계: 주대각선] t = 450ms: 손가락이 왼쪽 상단에서 오른쪽 하단으로 쓱 그을 때 (↖ ➔ ↘ MD)
       const t1 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
-          this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag');
+          this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
           this.boardOps[3] = D4.MD;
           this.boardOps[4] = D4.MD;
           this.boardOps[5] = D4.MD;
@@ -1136,7 +1136,7 @@ export class TutorialModalController {
 
       const t2 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
-          this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag');
+          this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
         }
       }, 1000);
 
@@ -1145,7 +1145,7 @@ export class TutorialModalController {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
           this.clearCellHighlights();
           this.highlightCells([3, 4, 5], 'highlight-row'); // 2행 전체 하이라이트!
-          this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag');
+          this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-anti');
           this.boardOps[3] = D4.MAD;
           this.boardOps[4] = D4.MAD;
           this.boardOps[5] = D4.MAD;
@@ -1165,7 +1165,7 @@ export class TutorialModalController {
 
       const t4 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
-          this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag');
+          this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-anti');
         }
       }, 2250);
 
@@ -1523,19 +1523,19 @@ export class TutorialModalController {
       this.d4AnimTimers.push(t1, t2, t3);
 
     } else if (this.d4SubStep === 4) {
-      // 4수: 주대각(idx 8) 대각선 쓱 그을 때 손가락 이동 속도에 맞춰 천천히 주대각([0, 4, 8]) 대각 반사 플립!
+      // 4수: 2행 1열(21, idx 3) ↖➔↘ 대각선 쓱 그을 때 손가락 이동 속도에 맞춰 천천히 2행([3, 4, 5]) 주대각 반사 플립!
       this.boardOps = [...D4_EXAMPLE_STEPS[3].boardOps];
       this.renderBoard();
 
-      // 손가락이 ↖에서 ↘로 대각선으로 내려가기 시작하는 시점(t = 250ms)에 주대각 3D 플립 발동
+      // 손가락이 21에서 ↖➔↘로 대각선으로 내려가기 시작하는 시점(t = 250ms)에 2행 3D 주대각 플립 발동
       const t1 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 4) {
-          this.addCellAnimClass([0, 4, 8], 'tut-cell-flipping-diag');
+          this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
           soundEngine.playFlip();
         }
       }, 250);
 
-      // 손가락 이동 중간 시점(t = 650ms): 주대각 타일들이 대각 반사로 갱신
+      // 손가락 이동 중간 시점(t = 650ms): 2행 타일들이 주대각 반사로 갱신
       const t2 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 4) {
           this.boardOps = [...D4_EXAMPLE_STEPS[4].boardOps];
@@ -1546,7 +1546,7 @@ export class TutorialModalController {
       // 플립 완료 시점(t = 1100ms)
       const t3 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 4) {
-          this.removeCellAnimClass([0, 4, 8], 'tut-cell-flipping-diag');
+          this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
         }
       }, 1100);
 

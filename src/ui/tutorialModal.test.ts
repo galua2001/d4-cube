@@ -178,33 +178,33 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
 
       // 0수 (초기)
       expect(D4_EXAMPLE_STEPS[0].boardOps).toEqual([
-        D4.MX,   D4.MAD, D4.MD,
-        D4.ID,   D4.R90, D4.MY,
-        D4.R180, D4.MY,  D4.R270
+        D4.R270, D4.MAD, D4.MD,
+        D4.MD,   D4.R90, D4.R90,
+        D4.R180, D4.MY,  D4.MX
       ]);
 
       // 1수 (1행 R90 적용)
       expect(D4_EXAMPLE_STEPS[1].boardOps).toEqual([
-        D4.MD,   D4.MX,  D4.MY,
-        D4.ID,   D4.R90, D4.MY,
-        D4.R180, D4.MY,  D4.R270
+        D4.ID,   D4.MX,  D4.MY,
+        D4.MD,   D4.R90, D4.R90,
+        D4.R180, D4.MY,  D4.MX
       ]);
 
       // 2수 (3행 R180 적용)
       expect(D4_EXAMPLE_STEPS[2].boardOps).toEqual([
-        D4.MD,   D4.MX,  D4.MY,
-        D4.ID,   D4.R90, D4.MY,
-        D4.ID,   D4.MX,  D4.R90
+        D4.ID,   D4.MX,  D4.MY,
+        D4.MD,   D4.R90, D4.R90,
+        D4.ID,   D4.MX,  D4.MY
       ]);
 
       // 3수 (3열 MY 적용)
       expect(D4_EXAMPLE_STEPS[3].boardOps).toEqual([
-        D4.MD,   D4.MX,  D4.ID,
-        D4.ID,   D4.R90, D4.ID,
-        D4.ID,   D4.MX,  D4.MD
+        D4.ID,   D4.MX,  D4.ID,
+        D4.MD,   D4.R90, D4.MD,
+        D4.ID,   D4.MX,  D4.ID
       ]);
 
-      // 4수 (↖ 주대각선 MD 적용)
+      // 4수 (2행 MD 적용)
       expect(D4_EXAMPLE_STEPS[4].boardOps).toEqual([
         D4.ID, D4.MX, D4.ID,
         D4.ID, D4.MX, D4.ID,
@@ -517,14 +517,14 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
 
       // 11 가로 밀기 플립 애니메이션
       ctrl.goToStep1SubStep(0);
-      vi.advanceTimersByTime(350);
+      vi.advanceTimersByTime(380);
       const cell0 = document.getElementById('tut-cell-0');
       expect(cell0?.classList.contains('tut-cell-flipping-h')).toBe(true);
 
-      vi.advanceTimersByTime(300); // 650ms 시점
+      vi.advanceTimersByTime(400); // 780ms 시점
       expect(ctrl.boardOps[0]).toBe(D4.MX);
 
-      vi.advanceTimersByTime(500); // 1150ms 시점 (애니메이션 완료 후 제거)
+      vi.advanceTimersByTime(450); // 1230ms 시점 (애니메이션 완료 후 제거)
       expect(cell0?.classList.contains('tut-cell-flipping-h')).toBe(false);
 
       // 12 세로 밀기 플립 애니메이션
@@ -586,29 +586,29 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
       const cell4 = document.getElementById('tut-cell-4');
       const cell5 = document.getElementById('tut-cell-5');
 
-      // 1) 주대각 변환 (t = 450ms): 2행 [3, 4, 5] MD 변환 및 플립 클래스 부여
+      // 1) 주대각 변환 (t = 450ms): 2행 [3, 4, 5] MD 변환 및 주대각 플립 클래스 부여
       vi.advanceTimersByTime(450);
-      expect(cell3?.classList.contains('tut-cell-flipping-diag')).toBe(true);
-      expect(cell4?.classList.contains('tut-cell-flipping-diag')).toBe(true);
-      expect(cell5?.classList.contains('tut-cell-flipping-diag')).toBe(true);
+      expect(cell3?.classList.contains('tut-cell-flipping-diag-main')).toBe(true);
+      expect(cell4?.classList.contains('tut-cell-flipping-diag-main')).toBe(true);
+      expect(cell5?.classList.contains('tut-cell-flipping-diag-main')).toBe(true);
       expect(ctrl.boardOps[3]).toBe(D4.MD);
       expect(ctrl.boardOps[4]).toBe(D4.MD);
       expect(ctrl.boardOps[5]).toBe(D4.MD);
 
       // t = 1000ms: 1단계 플립 클래스 제거
       vi.advanceTimersByTime(550);
-      expect(cell3?.classList.contains('tut-cell-flipping-diag')).toBe(false);
+      expect(cell3?.classList.contains('tut-cell-flipping-diag-main')).toBe(false);
 
-      // 2) 부대각 변환 (t = 1700ms): 누적 700ms 추가(총 1700ms) 시 2행 [3, 4, 5] MAD 변환
+      // 2) 부대각 변환 (t = 1700ms): 누적 700ms 추가(총 1700ms) 시 2행 [3, 4, 5] MAD 변환 및 부대각 플립 클래스 부여
       vi.advanceTimersByTime(700);
-      expect(cell3?.classList.contains('tut-cell-flipping-diag')).toBe(true);
+      expect(cell3?.classList.contains('tut-cell-flipping-diag-anti')).toBe(true);
       expect(ctrl.boardOps[3]).toBe(D4.MAD);
       expect(ctrl.boardOps[4]).toBe(D4.MAD);
       expect(ctrl.boardOps[5]).toBe(D4.MAD);
 
       // t = 2250ms: 2단계 플립 클래스 제거
       vi.advanceTimersByTime(550);
-      expect(cell3?.classList.contains('tut-cell-flipping-diag')).toBe(false);
+      expect(cell3?.classList.contains('tut-cell-flipping-diag-anti')).toBe(false);
 
       vi.useRealTimers();
     });
@@ -644,7 +644,7 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
       const cell1 = document.getElementById('tut-cell-1');
       const cell2 = document.getElementById('tut-cell-2');
       expect(cell0?.classList.contains('tut-cell-rotating-90')).toBe(true);
-      expect(ctrl.boardOps[0]).toBe(D4.MD);
+      expect(ctrl.boardOps[0]).toBe(D4.ID);
 
       vi.advanceTimersByTime(400); // 600ms 시점
       expect(cell0?.classList.contains('tut-cell-rotating-90')).toBe(false);
@@ -673,27 +673,29 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
 
       vi.advanceTimersByTime(400); // 650ms 시점: 보드 상태 갱신
       expect(ctrl.boardOps[2]).toBe(D4.ID);
-      expect(ctrl.boardOps[5]).toBe(D4.ID);
+      expect(ctrl.boardOps[5]).toBe(D4.MD);
+      expect(ctrl.boardOps[8]).toBe(D4.ID);
 
       vi.advanceTimersByTime(450); // 1100ms 시점: 플립 클래스 제거
       expect(cell2?.classList.contains('tut-cell-flipping-v')).toBe(false);
       expect(cell5?.classList.contains('tut-cell-flipping-v')).toBe(false);
 
-      // 4수: 주대각(idx 8) 대각선 쓱 그을 때 ➔ 주대각([0, 4, 8]) 손가락 이동 속도에 맞춰 천천히 대각 플립
+      // 4수: 21 성분(idx 3) ↖➔↘ 대각선 쓱 그을 때 ➔ 2행 전체([3, 4, 5]) 손가락 이동 속도에 맞춰 천천히 2행 주대각 플립
       ctrl.goToD4SubStep(4);
       vi.advanceTimersByTime(250);
+      const cell3 = document.getElementById('tut-cell-3');
       const cell4 = document.getElementById('tut-cell-4');
-      expect(cell0?.classList.contains('tut-cell-flipping-diag')).toBe(true);
-      expect(cell4?.classList.contains('tut-cell-flipping-diag')).toBe(true);
-      expect(cell8?.classList.contains('tut-cell-flipping-diag')).toBe(true);
+      expect(cell3?.classList.contains('tut-cell-flipping-diag-main')).toBe(true);
+      expect(cell4?.classList.contains('tut-cell-flipping-diag-main')).toBe(true);
+      expect(cell5?.classList.contains('tut-cell-flipping-diag-main')).toBe(true);
 
       vi.advanceTimersByTime(400); // 650ms 시점
-      expect(ctrl.boardOps[0]).toBe(D4.ID);
+      expect(ctrl.boardOps[3]).toBe(D4.ID);
       expect(ctrl.boardOps[4]).toBe(D4.MX);
-      expect(ctrl.boardOps[8]).toBe(D4.ID);
+      expect(ctrl.boardOps[5]).toBe(D4.ID);
 
       vi.advanceTimersByTime(450); // 1100ms 시점
-      expect(cell0?.classList.contains('tut-cell-flipping-diag')).toBe(false);
+      expect(cell3?.classList.contains('tut-cell-flipping-diag-main')).toBe(false);
 
       // 5수: 12 성분 가로 쓱 밀 때 ➔ 2열 전체([1, 4, 7]) 손가락 이동 속도에 맞춰 천천히 가로 플립 및 완성
       ctrl.goToD4SubStep(5);
