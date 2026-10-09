@@ -87,6 +87,19 @@ export const STEP1_SUB_DEMOS: ExampleMoveStep[] = [
     formulaBadge: '↻ [31] 3행 첫 성분 (3행 전체 변환)',
     formulaText: '31 3회 클릭 ➔ 3행 전체 90°씩 3회 순차 회전!',
     formulaDesc: '3행의 첫 성분 31을 누르면 클릭할 때마다 3행 전체가 90° ➔ 180° ➔ 270°로 3번 회전해요!'
+  },
+  {
+    subStep: 3,
+    label: '④ 21 대각선 변환',
+    boardOps: [
+      D4.MD,   D4.R180, D4.MAD,
+      D4.ID,   D4.MD,   D4.ID,
+      D4.MAD,  D4.MY,   D4.MD
+    ],
+    highlightCells: [0, 4, 8],
+    formulaBadge: '⚡ [21] 2행 첫 성분 대각선 변환',
+    formulaText: '21 대각선 밀기 ➔ 주대각선(MD) & 부대각선(MAD)',
+    formulaDesc: '21 성분을 대각선으로 밀면 주대각선(MD)과 부대각선(MAD) 대각 대칭 변환이 일어납니다!'
   }
 ];
 
@@ -532,6 +545,24 @@ export class TutorialModalController {
 
     document.body.appendChild(overlay);
 
+    // 보드 좌측 세로형 1행/1열 변환 토글 스위치 (.tut-side-switch-11) 생성
+    const boardWrapper = document.getElementById('tut-board-wrapper');
+    if (boardWrapper) {
+      const sideSwitch = document.createElement('div');
+      sideSwitch.className = `side-switch-11 tut-side-switch-11 ${this.cell11Mode === 'col' ? 'mode-col' : 'mode-row'}`;
+      sideSwitch.id = 'tut-side-switch-11';
+      sideSwitch.title = '탭하여 1행 / 1열 변환 모드 전환';
+      sideSwitch.innerHTML = `
+        <span class="side-switch-opt opt-row">↔ 1행</span>
+        <span class="side-switch-opt opt-col">↕ 1열</span>
+      `;
+      sideSwitch.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.handleDotClick();
+      });
+      boardWrapper.appendChild(sideSwitch);
+    }
+
     // 3x3 타일 셀 및 각 성분별 컨트롤러 가이드 라벨 생성
     const grid = document.getElementById('tut-board-grid');
     if (grid) {
@@ -549,28 +580,13 @@ export class TutorialModalController {
         cell.appendChild(canvas);
 
         // 각 성분 위치별 컨트롤러 역할 가이드 라벨
-        // 0: (0,0) [↔ 1행 | ↕ 1열] 스위치
+        // 0번 타일(1행 1열, i === 0)은 스위치를 튜토리얼 보드 좌측 외부(.tut-side-switch-11)로 이동하여 강아지 그림과 뱃지가 깨끗하게 100% 보입니다.
         // 1: (0,1) 2열
         // 2: (0,2) 3열
         // 3: (1,0) 2행
         // 6: (2,0) 3행
         // 4번(22), 5번(23), 7번(32), 8번(33)은 기본 행·열 컨트롤러가 아니므로 라벨을 일체 표시하지 않음
-        if (i === 0) {
-          const switch11 = document.createElement('div');
-          switch11.className = `dual-switch-11 ${this.cell11Mode === 'col' ? 'mode-col' : 'mode-row'}`;
-          switch11.id = 'tut-switch-11';
-          switch11.title = '탭하여 1행 / 1열 모드 전환';
-          switch11.innerHTML = `
-            <span class="switch-opt switch-row">↔ 1행</span>
-            <span class="switch-divider">|</span>
-            <span class="switch-opt switch-col">↕ 1열</span>
-          `;
-          switch11.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.handleDotClick();
-          });
-          cell.appendChild(switch11);
-        } else if (i === 1 || i === 2) {
+        if (i === 1 || i === 2) {
           const guideTag = document.createElement('div');
           guideTag.className = 'controller-guide-label guide-col';
           guideTag.innerText = `${i + 1}열`;
@@ -597,9 +613,9 @@ export class TutorialModalController {
   public handleDotClick(): void {
     this.cell11Mode = this.cell11Mode === 'row' ? 'col' : 'row';
     if (typeof document !== 'undefined') {
-      const sw = document.getElementById('tut-switch-11');
+      const sw = document.getElementById('tut-side-switch-11') || document.getElementById('tut-switch-11');
       if (sw) {
-        sw.className = `dual-switch-11 ${this.cell11Mode === 'col' ? 'mode-col' : 'mode-row'}`;
+        sw.className = `side-switch-11 tut-side-switch-11 ${this.cell11Mode === 'col' ? 'mode-col' : 'mode-row'}`;
       }
       const tag = document.getElementById('tut-guide-tag-11');
       if (tag) {
@@ -616,6 +632,14 @@ export class TutorialModalController {
     const btnPrev = document.getElementById('btn-tut-prev');
     const btnAction = document.getElementById('btn-tut-action');
     const btnAutoPlay = document.getElementById('btn-tut-autoplay');
+    const tutSideSwitch = document.getElementById('tut-side-switch-11');
+
+    if (tutSideSwitch) {
+      tutSideSwitch.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.handleDotClick();
+      });
+    }
 
     if (btnClose) btnClose.addEventListener('click', () => this.close());
     if (btnSkip) btnSkip.addEventListener('click', () => this.skip());
@@ -746,11 +770,16 @@ export class TutorialModalController {
             hand.classList.add('hand-anim-cell-swipe-v');
             icon.textContent = '👆';
             bubble.textContent = '12 세로 쓱 밀기 (↕)';
-          } else {
+          } else if (demoIdx === 2) {
             this.positionHandAtCell(6); // 31 (3행 1열, idx 6) 타일 정중앙
             hand.classList.add('hand-anim-cell-triple-tap');
             icon.textContent = '👆';
             bubble.textContent = '31 가운데 3회 클릭 (3행)';
+          } else {
+            this.positionHandAtCell(3); // 21 (2행 1열, idx 3) 타일 정중앙
+            hand.classList.add('hand-anim-cell-diag-combo');
+            icon.textContent = '👆';
+            bubble.textContent = '21 대각선 밀기 (↘➔↗)';
           }
         }
         break;
@@ -1085,6 +1114,72 @@ export class TutorialModalController {
       }, 2650);
 
       this.step1AnimTimers.push(t1, t2, t3, t4, t5, t6);
+    } else if (this.step1SubStep === 3) {
+      // ④ 21 대각선 변환: 21 성분에서 주대각선(MD) ➔ 부대각선(MAD) 순차 변환
+      this.boardOps = [
+        D4.MX,   D4.R180, D4.MX,
+        D4.ID,   D4.MY,   D4.ID,
+        D4.R270, D4.R270, D4.R270
+      ];
+      this.clearCellHighlights();
+      this.highlightCells([0, 4, 8], 'highlight-diag'); // 주대각선 하이라이트
+      this.renderBoard();
+
+      // [1단계] 주대각선 변환 (↘ MD): t = 450ms
+      const t1 = setTimeout(() => {
+        if (this.currentStep === 1 && this.step1SubStep === 3) {
+          this.addCellAnimClass([0, 4, 8], 'tut-cell-flipping-diag');
+          this.boardOps[0] = D4.MD;
+          this.boardOps[4] = D4.MD;
+          this.boardOps[8] = D4.MD;
+          this.renderBoard();
+          soundEngine.playFlip();
+
+          const bubble = document.getElementById('tut-hand-bubble');
+          if (bubble) bubble.textContent = '1) 주대각선 변환 (↘ MD)';
+          const fBadge = document.getElementById('tut-formula-badge');
+          const fText = document.getElementById('tut-formula-text');
+          if (fBadge) fBadge.textContent = '↘ [21] 주대각선 반사 (MD)';
+          if (fText) fText.textContent = '1) 21 주대각선 밀기 ➔ 주대각선 반사 (MD)';
+        }
+      }, 450);
+
+      const t2 = setTimeout(() => {
+        if (this.currentStep === 1 && this.step1SubStep === 3) {
+          this.removeCellAnimClass([0, 4, 8], 'tut-cell-flipping-diag');
+        }
+      }, 950);
+
+      // [2단계] 부대각선 변환 (↙ MAD): t = 1450ms
+      const t3 = setTimeout(() => {
+        if (this.currentStep === 1 && this.step1SubStep === 3) {
+          this.clearCellHighlights();
+          this.highlightCells([2, 4, 6], 'highlight-diag'); // 부대각선 하이라이트
+          this.addCellAnimClass([2, 4, 6], 'tut-cell-flipping-diag');
+          this.boardOps[2] = D4.MAD;
+          this.boardOps[4] = D4.MAD;
+          this.boardOps[6] = D4.MAD;
+          this.renderBoard();
+          soundEngine.playFlip();
+
+          const bubble = document.getElementById('tut-hand-bubble');
+          if (bubble) bubble.textContent = '2) 부대각선 변환 (↙ MAD)';
+          const fBadge = document.getElementById('tut-formula-badge');
+          const fText = document.getElementById('tut-formula-text');
+          const fDesc = document.getElementById('tut-formula-desc');
+          if (fBadge) fBadge.textContent = '↙ [21] 부대각선 반사 (MAD)';
+          if (fText) fText.textContent = '2) 이어서 부대각선 밀기 ➔ 부대각선 반사 (MAD)';
+          if (fDesc) fDesc.textContent = '21 성분을 대각선으로 밀면 주대각선(MD)과 부대각선(MAD)의 대각 대칭 변환이 완성돼요!';
+        }
+      }, 1450);
+
+      const t4 = setTimeout(() => {
+        if (this.currentStep === 1 && this.step1SubStep === 3) {
+          this.removeCellAnimClass([2, 4, 6], 'tut-cell-flipping-diag');
+        }
+      }, 1950);
+
+      this.step1AnimTimers.push(t1, t2, t3, t4);
     } else {
       this.boardOps = [...stepData.boardOps];
       this.renderBoard();

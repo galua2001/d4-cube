@@ -97,6 +97,11 @@ class MatrixCubeApp {
       </div>
 
       <div class="board-container">
+        <!-- 보드 좌측 세로형 1행/1열 변환 토글 스위치 -->
+        <div class="side-switch-11 mode-row" id="side-switch-11" title="탭하여 1행 / 1열 변환 모드 전환">
+          <span class="side-switch-opt opt-row">↔ 1행</span>
+          <span class="side-switch-opt opt-col">↕ 1열</span>
+        </div>
         <div class="board-grid" id="board-grid"></div>
         <canvas id="gesture-canvas"></canvas>
       </div>
@@ -129,7 +134,27 @@ class MatrixCubeApp {
     );
     this.gestureRecognizer.setAllowDiagonal(this.isDiagonalEnabled);
 
+    // 세로형 11 스위치 클릭 이벤트 바인딩
+    const sideSwitch = document.getElementById('side-switch-11');
+    if (sideSwitch) {
+      sideSwitch.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const newMode = this.gestureRecognizer.toggleCell11Mode();
+        this.updateSideSwitch11();
+        soundEngine.playTap();
+        this.highlightActiveLine(newMode);
+      });
+    }
+
     this.rebuildBoardDOM();
+  }
+
+  // 좌측 세로형 11 스위치 모드 클래스 실시간 동기화
+  private updateSideSwitch11() {
+    const sideSwitch = document.getElementById('side-switch-11');
+    if (!sideSwitch || !this.gestureRecognizer) return;
+    const mode = this.gestureRecognizer.getCell11Mode();
+    sideSwitch.className = `side-switch-11 ${mode === 'col' ? 'mode-col' : 'mode-row'}`;
   }
 
   private rebuildBoardDOM() {
@@ -152,27 +177,8 @@ class MatrixCubeApp {
       const r = Math.floor(i / this.boardSize);
       const c = i % this.boardSize;
 
-      // 1행 1열 (i === 0)일 때는 세련된 듀얼 모드 스위치 칩([ ↔ 1행 | ↕ 1열 ]) 부착
-      if (i === 0) {
-        const mode = this.gestureRecognizer ? this.gestureRecognizer.getCell11Mode() : 'row';
-        const switch11 = document.createElement('div');
-        switch11.className = `dual-switch-11 ${mode === 'col' ? 'mode-col' : 'mode-row'}`;
-        switch11.id = 'dual-switch-11';
-        switch11.title = '탭하여 1행 / 1열 변환 모드 전환';
-        switch11.innerHTML = `
-          <span class="switch-opt switch-row">↔ 1행</span>
-          <span class="switch-divider">|</span>
-          <span class="switch-opt switch-col">↕ 1열</span>
-        `;
-        switch11.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const newMode = this.gestureRecognizer.toggleCell11Mode();
-          switch11.className = `dual-switch-11 ${newMode === 'col' ? 'mode-col' : 'mode-row'}`;
-          soundEngine.playTap();
-          this.highlightActiveLine(newMode);
-        });
-        box.appendChild(switch11);
-      } else {
+      // 0번 타일(1행 1열, i === 0)은 스위치를 보드 좌측 외부(.side-switch-11)로 이동시켜 강아지 그림과 뱃지가 100% 온전히 보입니다.
+      if (i !== 0) {
         // 컨트롤러 조작 가이드 안내 태그 배지 (.controller-guide-label) 생성
         let guideText = '';
         let guideClass = '';
@@ -209,6 +215,8 @@ class MatrixCubeApp {
 
       this.boardGrid.appendChild(box);
     }
+
+    this.updateSideSwitch11();
   }
 
   // 11 토글 시 팝업창 없이 해당 라인(1열 또는 1행)을 시각적으로 네온 강조

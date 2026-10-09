@@ -218,11 +218,11 @@ body {
   font-size: 0.8rem;
 }
 
-/* Board Wrapper (스마트폰 화면에 시원하게 꽉 차도록 확대) */
+/* Board Wrapper (좌측 세로형 스위치 여백 확보 및 스마트폰 화면 최적화) */
 .board-container {
   position: relative;
-  width: min(96vw, 420px);
-  height: min(96vw, 420px);
+  width: min(88vw, 410px);
+  height: min(88vw, 410px);
   aspect-ratio: 1 / 1;
   margin: 6px auto;
   perspective: 1000px;
@@ -262,78 +262,102 @@ body {
   pointer-events: none;
 }
 
-/* 1행 1열 혁신적인 듀얼 모드 스위치 칩 ([ ↔ 1행 | ↕ 1열 ]) */
-.dual-switch-11 {
+/* ============================================================================
+   보드 좌측 세로형 1행 / 1열 변환 토글 스위치 (.side-switch-11 & .tut-side-switch-11)
+   타일 내부를 온전히 비워 강아지 그림과 뱃지가 100% 돋보이도록 구현
+   ============================================================================ */
+.side-switch-11,
+.tut-side-switch-11 {
   position: absolute;
-  top: 4px;
-  left: 4px;
-  display: inline-flex;
+  left: -46px;
+  top: 8px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  background: rgba(15, 23, 42, 0.92);
-  border: 1.5px solid rgba(168, 85, 247, 0.7);
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1.5px solid rgba(168, 85, 247, 0.6);
   border-radius: 12px;
-  padding: 2px 4px;
+  padding: 4px 5px;
   gap: 3px;
   cursor: pointer;
-  z-index: 20;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 10px rgba(168, 85, 247, 0.4);
+  z-index: 25;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), 0 0 12px rgba(168, 85, 247, 0.35);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.dual-switch-11:hover {
-  transform: scale(1.04);
+.side-switch-11:hover,
+.tut-side-switch-11:hover {
+  transform: scale(1.05);
 }
 
-.dual-switch-11:active {
+.side-switch-11:active,
+.tut-side-switch-11:active {
   transform: scale(0.95);
 }
 
-.dual-switch-11 .switch-opt {
+.side-switch-11 .side-switch-opt,
+.tut-side-switch-11 .side-switch-opt {
   font-size: 0.68rem;
   font-weight: 800;
-  padding: 2px 6px;
+  padding: 4px 6px;
   border-radius: 8px;
-  line-height: 1.1;
-  transition: all 0.2s ease;
+  line-height: 1.15;
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+  text-align: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #64748b;
+  display: block;
 }
 
-.dual-switch-11 .switch-divider {
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 0.65rem;
-}
-
-/* 1행 모드 활성화 시 (보라색 네온) */
-.dual-switch-11.mode-row {
+/* 1행 모드 활성화 시 (보라빛 네온 하이라이트) */
+.side-switch-11.mode-row,
+.tut-side-switch-11.mode-row {
   border-color: rgba(168, 85, 247, 0.85);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(168, 85, 247, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), 0 0 16px rgba(168, 85, 247, 0.5);
 }
 
-.dual-switch-11.mode-row .switch-row {
+.side-switch-11.mode-row .opt-row,
+.tut-side-switch-11.mode-row .opt-row {
   background: linear-gradient(135deg, #a855f7, #c084fc);
   color: #ffffff;
-  box-shadow: 0 1px 4px rgba(168, 85, 247, 0.6);
+  box-shadow: 0 2px 6px rgba(168, 85, 247, 0.6);
 }
 
-.dual-switch-11.mode-row .switch-col {
+.side-switch-11.mode-row .opt-col,
+.tut-side-switch-11.mode-row .opt-col {
   color: #64748b;
+  background: transparent;
 }
 
-/* 1열 모드 활성화 시 (하늘색 네온) */
-.dual-switch-11.mode-col {
+/* 1열 모드 활성화 시 (푸른빛 네온 하이라이트) */
+.side-switch-11.mode-col,
+.tut-side-switch-11.mode-col {
   border-color: rgba(6, 182, 212, 0.85);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(6, 182, 212, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), 0 0 16px rgba(6, 182, 212, 0.5);
 }
 
-.dual-switch-11.mode-col .switch-col {
+.side-switch-11.mode-col .opt-col,
+.tut-side-switch-11.mode-col .opt-col {
   background: linear-gradient(135deg, #06b6d4, #38bdf8);
   color: #ffffff;
-  box-shadow: 0 1px 4px rgba(6, 182, 212, 0.6);
+  box-shadow: 0 2px 6px rgba(6, 182, 212, 0.6);
 }
 
-.dual-switch-11.mode-col .switch-row {
+.side-switch-11.mode-col .opt-row,
+.tut-side-switch-11.mode-col .opt-row {
   color: #64748b;
+  background: transparent;
+}
+
+/* 하위 호환성 */
+.dual-switch-11 {
+  display: none !important;
 }
 
 /* 11 토글 시 1열 / 1행 강조 하이라이트 효과 */
@@ -993,11 +1017,25 @@ body {
   }
 
   .board-container {
-    width: calc(100vw - 10px);
-    height: calc(100vw - 10px);
-    max-width: 440px;
-    max-height: 440px;
+    width: min(calc(100vw - 64px), 380px);
+    height: min(calc(100vw - 64px), 380px);
+    max-width: 380px;
+    max-height: 380px;
     margin: 4px auto;
+  }
+
+  .side-switch-11,
+  .tut-side-switch-11 {
+    left: -40px;
+    top: 6px;
+    padding: 3px 4px;
+    gap: 2px;
+  }
+
+  .side-switch-11 .side-switch-opt,
+  .tut-side-switch-11 .side-switch-opt {
+    font-size: 0.63rem;
+    padding: 3px 5px;
   }
 
   .board-grid {
@@ -1189,12 +1227,13 @@ body {
   white-space: pre-line;
 }
 
-/* 6. 인터랙티브 튜토리얼 3x3 보드 래퍼 (시원하고 큼직하게 대폭 확대) */
+/* 6. 인터랙티브 튜토리얼 3x3 보드 래퍼 (좌측 세로형 스위치 여백 확보 및 최적화) */
 .tut-board-wrapper {
   position: relative;
-  width: min(320px, 86vw);
-  height: min(320px, 86vw);
-  margin: 2px auto;
+  width: min(300px, calc(100% - 56px));
+  height: min(300px, calc(100% - 56px));
+  aspect-ratio: 1 / 1;
+  margin: 4px auto;
   background: #090d16;
   border-radius: 16px;
   padding: 6px;
