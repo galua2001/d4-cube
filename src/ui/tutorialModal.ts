@@ -331,6 +331,7 @@ export class TutorialModalController {
 
   public close(): void {
     this.stopStep1DemoLoop();
+    this.clearStep1AnimTimers();
     this.stopAutoPlay();
     this.clearV4AnimTimers();
     this.clearD4AnimTimers();
@@ -345,6 +346,8 @@ export class TutorialModalController {
   }
 
   public skip(): void {
+    this.stopStep1DemoLoop();
+    this.clearStep1AnimTimers();
     this.stopAutoPlay();
     this.clearV4AnimTimers();
     this.clearD4AnimTimers();
@@ -775,9 +778,10 @@ export class TutorialModalController {
           if (demoIdx === 0) {
             this.positionHandAtCell(0); // 11 (1행 1열, idx 0) 타일 정중앙
             hand.classList.add('hand-anim-cell-swipe-h');
+            hand.classList.remove('playing');
             icon.textContent = '👆';
             bubble.textContent = '11 가로 쓱 밀기 (↔)';
-            hand.style.opacity = '0'; // 초기 렌더링 시 깜빡임/선출현 방지 (600ms 후 등장)
+            hand.style.opacity = '0'; // 초기 렌더링 시 깜빡임/선출현 방지 (500ms 후 등장)
           } else if (demoIdx === 1) {
             this.positionHandAtCell(1); // 12 (1행 2열, idx 1) 타일 정중앙
             hand.classList.add('hand-anim-cell-swipe-v');
@@ -957,14 +961,15 @@ export class TutorialModalController {
       ];
       this.renderBoard();
 
-      // [손가락 초기 미노출]
+      // [손가락 초기 미노출 및 대기]
       const hand = document.getElementById('tut-hand-demo');
       if (hand) {
         hand.style.opacity = '0';
+        hand.classList.remove('playing');
         hand.style.transform = 'translate(calc(-50% - 36px), -50%)';
       }
 
-      // [준비] t = 600ms: 손가락이 11 타일 좌측에 부드럽게 등장 (사용자가 충분히 인지)
+      // [준비] t = 500ms: 손가락이 11 타일 좌측에 부드럽게 등장 (사용자가 충분히 인지)
       const t0 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 0) {
           const h = document.getElementById('tut-hand-demo');
@@ -972,34 +977,32 @@ export class TutorialModalController {
             h.style.opacity = '1';
           }
         }
-      }, 600);
+      }, 500);
 
-      // [동시 발동] t = 1100ms: 손가락 긋기 시작과 1행 타일들 3D 가로 플립이 완벽히 한 타이밍에 동시 시작!
+      // [동시 발동] t = 1000ms: 손가락 긋기 시작(.playing 부착)과 1행 타일들 3D 가로 플립이 완벽히 한 타이밍에 동시 시작!
       const t1 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 0) {
           const h = document.getElementById('tut-hand-demo');
           if (h) {
-            h.classList.remove('hand-anim-cell-swipe-h');
-            void h.offsetWidth; // 리플로우 강제
-            h.classList.add('hand-anim-cell-swipe-h');
+            h.classList.add('playing'); // paused 풀리고 0초부터 우측으로 쓱 이동!
           }
           this.addCellAnimClass([0, 1, 2], 'tut-cell-flipping-h');
           soundEngine.playFlip();
         }
-      }, 1100);
+      }, 1000);
 
-      // [플립 중간 90도 회전] t = 1100 + 400 = 1500ms: 1행 타일들이 일제히 가로 반사(MX, 뒷면)로 뒤집힘
+      // [플립 중간 90도 회전] t = 1000 + 400 = 1400ms: 1행 타일들이 일제히 가로 반사(MX, 뒷면)로 뒤집힘
       const t2 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 0) {
           this.boardOps = [...stepData.boardOps];
           this.renderBoard();
         }
-      }, 1500);
+      }, 1400);
 
-      // [플립 완료] t = 1100 + 800 = 1900ms: 플립 클래스 제거
+      // [플립 완료] t = 1000 + 800 = 1800ms: 플립 클래스 제거
       const t3 = setTimeout(() => {
         this.removeCellAnimClass([0, 1, 2], 'tut-cell-flipping-h');
-      }, 1920);
+      }, 1820);
 
       this.step1AnimTimers.push(t0, t1, t2, t3);
 

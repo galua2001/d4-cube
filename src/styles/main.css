@@ -1476,6 +1476,11 @@ body {
 /* 시연 A: 11 성분 가운데 가로 쓱 밀기 (1행 전체 MX 변환) - 타일 플립과 완벽 동시 진행 (0.8s 순수 이동) */
 .tut-hand-demo.hand-anim-cell-swipe-h {
   animation: handCellSwipeH 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-play-state: paused; /* 초기에는 좌측 대기 위치에서 일시정지! */
+}
+
+.tut-hand-demo.hand-anim-cell-swipe-h.playing {
+  animation-play-state: running; /* 타일 플립 발동 시점에 완벽 동시 출발! */
 }
 
 @keyframes handCellSwipeH {
