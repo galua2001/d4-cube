@@ -62,8 +62,8 @@ export class TutorialModalController {
     if (typeof Image !== 'undefined') {
       this.imgDogFront = new Image();
       this.imgDogBack = new Image();
-      this.imgDogFront.src = '/assets/dog_front.png';
-      this.imgDogBack.src = '/assets/dog_back.png';
+      this.imgDogFront.src = 'assets/dog_front.png';
+      this.imgDogBack.src = 'assets/dog_back.png';
 
       const onImgLoad = () => {
         if (this.isOpen) {

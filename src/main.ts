@@ -46,8 +46,8 @@ class MatrixCubeApp {
   }
 
   private initImages() {
-    this.imgDogFront.src = '/assets/dog_front.png';
-    this.imgDogBack.src = '/assets/dog_back.png';
+    this.imgDogFront.src = 'assets/dog_front.png';
+    this.imgDogBack.src = 'assets/dog_back.png';
 
     const onImgLoad = () => this.updateBoard();
     this.imgDogFront.onload = onImgLoad;
