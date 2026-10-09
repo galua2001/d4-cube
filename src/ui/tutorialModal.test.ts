@@ -236,10 +236,12 @@ describe('TutorialModal & Group Theory Core Logic (6단계 슬라이드 및 실�
       expect(STEP1_SUB_DEMOS[2].label).toContain('31 3회 클릭');
       expect(STEP1_SUB_DEMOS[2].boardOps[6]).toBe(D4.R270);
       expect(STEP1_SUB_DEMOS[2].highlightCells).toEqual([6, 7, 8]);
-      // ④ 21 대각선 변환 (주대각선 MD & 부대각선 MAD)
-      expect(STEP1_SUB_DEMOS[3].label).toContain('21 대각선 변환');
-      expect(STEP1_SUB_DEMOS[3].boardOps[0]).toBe(D4.MD);
-      expect(STEP1_SUB_DEMOS[3].highlightCells).toEqual([0, 4, 8]);
+      // ④ 22 대각선 긋기 (2행 변환)
+      expect(STEP1_SUB_DEMOS[3].label).toContain('22 대각선 긋기');
+      expect(STEP1_SUB_DEMOS[3].boardOps[3]).toBe(D4.MD);
+      expect(STEP1_SUB_DEMOS[3].boardOps[4]).toBe(D4.MD);
+      expect(STEP1_SUB_DEMOS[3].boardOps[5]).toBe(D4.MD);
+      expect(STEP1_SUB_DEMOS[3].highlightCells).toEqual([3, 4, 5]);
     });
 
     it('2단계 진입 시 반사+반사=회전 원리(V4 클라인 4원군)가 시연되어야 함', () => {
@@ -348,33 +350,28 @@ describe('TutorialModal & Group Theory Core Logic (6단계 슬라이드 및 실�
     it('1행 1열 점 클릭 시 행 모드와 열 모드가 자유롭게 토글되어야 함', () => {
       const ctrl = new TutorialModalController();
       ctrl.open(1);
-      const sideSwitch = document.getElementById('tut-side-switch-11') as any;
+      const tileSwitch = document.getElementById('tut-tile-switch-11') as any;
       expect(ctrl.cell11Mode).toBe('row');
-      expect(sideSwitch?.classList.contains('mode-row')).toBe(true);
+      expect(tileSwitch?.classList.contains('mode-row')).toBe(true);
 
       ctrl.handleDotClick();
       expect(ctrl.cell11Mode).toBe('col');
-      expect(sideSwitch?.classList.contains('mode-col')).toBe(true);
+      expect(tileSwitch?.classList.contains('mode-col')).toBe(true);
 
       ctrl.handleDotClick();
       expect(ctrl.cell11Mode).toBe('row');
-      expect(sideSwitch?.classList.contains('mode-row')).toBe(true);
+      expect(tileSwitch?.classList.contains('mode-row')).toBe(true);
     });
 
     it('3×3 보드의 타일 라벨 생성 시 외곽 컨트롤러 5개만 라벨이 표시되고 내부/대각 성분(4, 5, 7, 8)에는 라벨이 없어야 함', () => {
       const ctrl = new TutorialModalController();
       ctrl.open(1);
 
-      // 0번 타일: 내부 듀얼 스위치가 제거되어 타일이 100% 온전히 보이고 깨끗함
+      // 0번 타일: 우측 세로 여백에 세로 알약형 스위치(.tut-tile-switch-11)가 배치됨
       const cell0 = document.getElementById('tut-cell-0') as any;
-      const hasSwitch0 = cell0?.children.some((c: any) => c.classList.contains('dual-switch-11') || c.classList.contains('side-switch-11'));
-      expect(hasSwitch0).toBe(false);
-
-      // 보드 좌측 외부에 세로형 스위치(.tut-side-switch-11)가 배치되어 존재함
-      const sideSwitch = document.getElementById('tut-side-switch-11') as any;
-      expect(sideSwitch).toBeDefined();
-      expect(sideSwitch?.classList.contains('tut-side-switch-11')).toBe(true);
-      expect(sideSwitch?.classList.contains('mode-row')).toBe(true);
+      const tileSwitch0 = cell0?.children.find((c: any) => c.id === 'tut-tile-switch-11' || c.classList.contains('tut-tile-switch-11'));
+      expect(tileSwitch0).toBeDefined();
+      expect(tileSwitch0?.classList.contains('mode-row')).toBe(true);
 
       // 1번 (0,1): 2열 라벨
       const cell1 = document.getElementById('tut-cell-1') as any;
@@ -459,10 +456,10 @@ describe('TutorialModal & Group Theory Core Logic (6단계 슬라이드 및 실�
       expect(handEl?.classList.contains('hand-anim-cell-triple-tap')).toBe(true);
       expect(bubbleEl?.textContent).toContain('31');
 
-      // 1단계 서브 시연 4: 21 대각선 변환 (주대각 ➔ 부대각) 시연
+      // 1단계 서브 시연 4: 22 대각선 긋기 (2행 변환) 시연
       ctrl.goToStep1SubStep(3);
       expect(handEl?.classList.contains('hand-anim-cell-diag-combo')).toBe(true);
-      expect(bubbleEl?.textContent).toContain('21 대각선');
+      expect(bubbleEl?.textContent).toContain('22 대각선');
 
       // 2단계: 세로 밀기 스와이프
       ctrl.goToStep(2);
@@ -521,39 +518,63 @@ describe('TutorialModal & Group Theory Core Logic (6단계 슬라이드 및 실�
       vi.advanceTimersByTime(300);
       expect(ctrl.boardOps[1]).toBe(D4.R180);
 
-      // 31 3회 클릭 (3행 전체 90°씩 순차 회전)
+      // 31 3회 클릭 (3행 전체 90°씩 순차 회전: 뒤집힘 없이 tut-cell-rotating-90 적용)
       ctrl.goToStep1SubStep(2);
-      // 1회 클릭 (t = 450ms): 3행 [6, 7, 8] 90° 회전 (R90)
+      const cell6 = document.getElementById('tut-cell-6');
+      const cell7 = document.getElementById('tut-cell-7');
+      const cell8 = document.getElementById('tut-cell-8');
+
+      // 1회 클릭 (t = 450ms): 3행 [6, 7, 8] 90° 회전 (R90), 회전 애니메이션 클래스 부여 (플립 아님)
       vi.advanceTimersByTime(450);
+      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(true);
+      expect(cell6?.classList.contains('tut-cell-flipping-v')).toBe(false);
+      expect(cell7?.classList.contains('tut-cell-rotating-90')).toBe(true);
+      expect(cell8?.classList.contains('tut-cell-rotating-90')).toBe(true);
       expect(ctrl.boardOps[6]).toBe(D4.R90);
       expect(ctrl.boardOps[7]).toBe(D4.R90);
       expect(ctrl.boardOps[8]).toBe(D4.R90);
 
-      // 2회 클릭 (t = 1350ms): 3행 [6, 7, 8] 180° 회전 (R180)
-      vi.advanceTimersByTime(900); // 누적 1350ms
+      // t = 850ms: 1회차 회전 애니메이션 클래스 제거
+      vi.advanceTimersByTime(400);
+      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(false);
+
+      // 2회 클릭 (t = 1350ms): 3행 [6, 7, 8] 180° 회전 (R180), 2회차 회전 애니메이션 클래스 부여
+      vi.advanceTimersByTime(500); // 누적 1350ms
+      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(true);
+      expect(cell6?.classList.contains('tut-cell-flipping-v')).toBe(false);
       expect(ctrl.boardOps[6]).toBe(D4.R180);
       expect(ctrl.boardOps[7]).toBe(D4.R180);
       expect(ctrl.boardOps[8]).toBe(D4.R180);
 
-      // 3회 클릭 (t = 2250ms): 3행 [6, 7, 8] 270° 회전 완성 (R270)
-      vi.advanceTimersByTime(900); // 누적 2250ms
+      // t = 1750ms: 2회차 회전 애니메이션 클래스 제거
+      vi.advanceTimersByTime(400);
+      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(false);
+
+      // 3회 클릭 (t = 2250ms): 3행 [6, 7, 8] 270° 회전 완성 (R270), 3회차 회전 애니메이션 클래스 부여
+      vi.advanceTimersByTime(500); // 누적 2250ms
+      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(true);
+      expect(cell6?.classList.contains('tut-cell-flipping-v')).toBe(false);
       expect(ctrl.boardOps[6]).toBe(D4.R270);
       expect(ctrl.boardOps[7]).toBe(D4.R270);
       expect(ctrl.boardOps[8]).toBe(D4.R270);
 
-      // 21 대각선 변환 (주대각 MD ➔ 부대각 MAD)
-      ctrl.goToStep1SubStep(3);
-      // 1) 주대각 변환 (t = 450ms): [0, 4, 8] MD 변환
-      vi.advanceTimersByTime(450);
-      expect(ctrl.boardOps[0]).toBe(D4.MD);
-      expect(ctrl.boardOps[4]).toBe(D4.MD);
-      expect(ctrl.boardOps[8]).toBe(D4.MD);
+      // t = 2650ms: 3회차 회전 애니메이션 클래스 제거
+      vi.advanceTimersByTime(400);
+      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(false);
 
-      // 2) 부대각 변환 (t = 1450ms): 누적 1000ms 추가 시 [2, 4, 6] MAD 변환
+      // 22 대각선 긋기: 2행의 행들([3, 4, 5])만이 대각선 반사 (MD ➔ MAD)
+      ctrl.goToStep1SubStep(3);
+      // 1) 주대각 변환 (t = 450ms): 2행 [3, 4, 5] MD 변환
+      vi.advanceTimersByTime(450);
+      expect(ctrl.boardOps[3]).toBe(D4.MD);
+      expect(ctrl.boardOps[4]).toBe(D4.MD);
+      expect(ctrl.boardOps[5]).toBe(D4.MD);
+
+      // 2) 부대각 변환 (t = 1450ms): 누적 1000ms 추가 시 2행 [3, 4, 5] MAD 변환
       vi.advanceTimersByTime(1000);
-      expect(ctrl.boardOps[2]).toBe(D4.MAD);
+      expect(ctrl.boardOps[3]).toBe(D4.MAD);
       expect(ctrl.boardOps[4]).toBe(D4.MAD);
-      expect(ctrl.boardOps[6]).toBe(D4.MAD);
+      expect(ctrl.boardOps[5]).toBe(D4.MAD);
 
       vi.useRealTimers();
     });

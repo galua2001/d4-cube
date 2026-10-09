@@ -97,11 +97,6 @@ class MatrixCubeApp {
       </div>
 
       <div class="board-container">
-        <!-- 보드 좌측 세로형 1행/1열 변환 토글 스위치 -->
-        <div class="side-switch-11 mode-row" id="side-switch-11" title="탭하여 1행 / 1열 변환 모드 전환">
-          <span class="side-switch-opt opt-row">↔ 1행</span>
-          <span class="side-switch-opt opt-col">↕ 1열</span>
-        </div>
         <div class="board-grid" id="board-grid"></div>
         <canvas id="gesture-canvas"></canvas>
       </div>
@@ -134,27 +129,19 @@ class MatrixCubeApp {
     );
     this.gestureRecognizer.setAllowDiagonal(this.isDiagonalEnabled);
 
-    // 세로형 11 스위치 클릭 이벤트 바인딩
-    const sideSwitch = document.getElementById('side-switch-11');
-    if (sideSwitch) {
-      sideSwitch.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const newMode = this.gestureRecognizer.toggleCell11Mode();
-        this.updateSideSwitch11();
-        soundEngine.playTap();
-        this.highlightActiveLine(newMode);
-      });
-    }
-
     this.rebuildBoardDOM();
   }
 
-  // 좌측 세로형 11 스위치 모드 클래스 실시간 동기화
-  private updateSideSwitch11() {
-    const sideSwitch = document.getElementById('side-switch-11');
-    if (!sideSwitch || !this.gestureRecognizer) return;
+  // 11번 타일 내부 우측 세로 스위치(.tile-switch-11) 모드 클래스 실시간 동기화
+  private updateTileSwitch11() {
+    const tileSwitch = document.getElementById('tile-switch-11');
+    if (!tileSwitch || !this.gestureRecognizer) return;
     const mode = this.gestureRecognizer.getCell11Mode();
-    sideSwitch.className = `side-switch-11 ${mode === 'col' ? 'mode-col' : 'mode-row'}`;
+    tileSwitch.className = `tile-switch-11 ${mode === 'col' ? 'mode-col' : 'mode-row'}`;
+  }
+
+  private renderBoard() {
+    this.updateBoard();
   }
 
   private rebuildBoardDOM() {
@@ -177,8 +164,27 @@ class MatrixCubeApp {
       const r = Math.floor(i / this.boardSize);
       const c = i % this.boardSize;
 
-      // 0번 타일(1행 1열, i === 0)은 스위치를 보드 좌측 외부(.side-switch-11)로 이동시켜 강아지 그림과 뱃지가 100% 온전히 보입니다.
-      if (i !== 0) {
+      // 0번 타일(1행 1열, i === 0): 우측 세로 여백에 미려한 컴팩트 알약 스위치(.tile-switch-11) 배치
+      if (i === 0) {
+        const sw = document.createElement('div');
+        const currentMode = this.gestureRecognizer ? this.gestureRecognizer.getCell11Mode() : 'row';
+        sw.className = `tile-switch-11 ${currentMode === 'col' ? 'mode-col' : 'mode-row'}`;
+        sw.id = 'tile-switch-11';
+        sw.title = '탭하여 1행 / 1열 변환 모드 전환';
+        sw.innerHTML = `
+          <span class="tile-switch-opt opt-row">1행</span>
+          <span class="tile-switch-opt opt-col">1열</span>
+        `;
+        sw.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const newMode = this.gestureRecognizer.toggleCell11Mode();
+          this.updateTileSwitch11();
+          soundEngine.playTap();
+          this.highlightActiveLine(newMode);
+          this.renderBoard();
+        });
+        box.appendChild(sw);
+      } else {
         // 컨트롤러 조작 가이드 안내 태그 배지 (.controller-guide-label) 생성
         let guideText = '';
         let guideClass = '';
@@ -216,7 +222,7 @@ class MatrixCubeApp {
       this.boardGrid.appendChild(box);
     }
 
-    this.updateSideSwitch11();
+    this.updateTileSwitch11();
   }
 
   // 11 토글 시 팝업창 없이 해당 라인(1열 또는 1행)을 시각적으로 네온 강조

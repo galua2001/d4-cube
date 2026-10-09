@@ -218,11 +218,11 @@ body {
   font-size: 0.8rem;
 }
 
-/* Board Wrapper (좌측 세로형 스위치 여백 확보 및 스마트폰 화면 최적화) */
+/* Board Wrapper (스마트폰 화면에 시원하게 꽉 차도록 확대 복원) */
 .board-container {
   position: relative;
-  width: min(88vw, 410px);
-  height: min(88vw, 410px);
+  width: min(96vw, 420px);
+  height: min(96vw, 420px);
   aspect-ratio: 1 / 1;
   margin: 6px auto;
   perspective: 1000px;
@@ -263,99 +263,105 @@ body {
 }
 
 /* ============================================================================
-   보드 좌측 세로형 1행 / 1열 변환 토글 스위치 (.side-switch-11 & .tut-side-switch-11)
-   타일 내부를 온전히 비워 강아지 그림과 뱃지가 100% 돋보이도록 구현
+   11번 타일(0,0) 내부 우측 세로 알약형 1행 / 1열 스위치 (.tile-switch-11 & .tut-tile-switch-11)
+   강아지 그림을 온전히 크게 유지하고, 오른쪽 세로 여백에 컴팩트하게 배치
    ============================================================================ */
-.side-switch-11,
-.tut-side-switch-11 {
+.tile-switch-11,
+.tut-tile-switch-11 {
   position: absolute;
-  left: -46px;
-  top: 8px;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(15, 23, 42, 0.94);
-  border: 1.5px solid rgba(168, 85, 247, 0.6);
-  border-radius: 12px;
-  padding: 4px 5px;
   gap: 3px;
+  z-index: 15;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1.5px solid rgba(168, 85, 247, 0.65);
+  border-radius: 6px;
+  padding: 3px 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 10px rgba(168, 85, 247, 0.35);
   cursor: pointer;
-  z-index: 25;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), 0 0 12px rgba(168, 85, 247, 0.35);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.side-switch-11:hover,
-.tut-side-switch-11:hover {
-  transform: scale(1.05);
+.tile-switch-11:hover,
+.tut-tile-switch-11:hover {
+  transform: translateY(-50%) scale(1.05);
 }
 
-.side-switch-11:active,
-.tut-side-switch-11:active {
-  transform: scale(0.95);
+.tile-switch-11:active,
+.tut-tile-switch-11:active {
+  transform: translateY(-50%) scale(0.95);
 }
 
-.side-switch-11 .side-switch-opt,
-.tut-side-switch-11 .side-switch-opt {
-  font-size: 0.68rem;
+.tile-switch-11 .tile-switch-opt,
+.tut-tile-switch-11 .tile-switch-opt {
+  font-size: 0.65rem;
   font-weight: 800;
-  padding: 4px 6px;
-  border-radius: 8px;
-  line-height: 1.15;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1.1;
   white-space: nowrap;
   letter-spacing: -0.3px;
   text-align: center;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   color: #64748b;
   display: block;
+  opacity: 0.6;
 }
 
 /* 1행 모드 활성화 시 (보라빛 네온 하이라이트) */
-.side-switch-11.mode-row,
-.tut-side-switch-11.mode-row {
-  border-color: rgba(168, 85, 247, 0.85);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), 0 0 16px rgba(168, 85, 247, 0.5);
+.tile-switch-11.mode-row,
+.tut-tile-switch-11.mode-row {
+  border-color: rgba(168, 85, 247, 0.9);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7), 0 0 12px rgba(168, 85, 247, 0.5);
 }
 
-.side-switch-11.mode-row .opt-row,
-.tut-side-switch-11.mode-row .opt-row {
+.tile-switch-11.mode-row .opt-row,
+.tut-tile-switch-11.mode-row .opt-row {
   background: linear-gradient(135deg, #a855f7, #c084fc);
   color: #ffffff;
-  box-shadow: 0 2px 6px rgba(168, 85, 247, 0.6);
+  opacity: 1;
+  box-shadow: 0 1px 6px rgba(168, 85, 247, 0.7);
 }
 
-.side-switch-11.mode-row .opt-col,
-.tut-side-switch-11.mode-row .opt-col {
-  color: #64748b;
+.tile-switch-11.mode-row .opt-col,
+.tut-tile-switch-11.mode-row .opt-col {
+  color: #94a3b8;
   background: transparent;
+  opacity: 0.6;
 }
 
 /* 1열 모드 활성화 시 (푸른빛 네온 하이라이트) */
-.side-switch-11.mode-col,
-.tut-side-switch-11.mode-col {
-  border-color: rgba(6, 182, 212, 0.85);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), 0 0 16px rgba(6, 182, 212, 0.5);
+.tile-switch-11.mode-col,
+.tut-tile-switch-11.mode-col {
+  border-color: rgba(6, 182, 212, 0.9);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7), 0 0 12px rgba(6, 182, 212, 0.5);
 }
 
-.side-switch-11.mode-col .opt-col,
-.tut-side-switch-11.mode-col .opt-col {
+.tile-switch-11.mode-col .opt-col,
+.tut-tile-switch-11.mode-col .opt-col {
   background: linear-gradient(135deg, #06b6d4, #38bdf8);
   color: #ffffff;
-  box-shadow: 0 2px 6px rgba(6, 182, 212, 0.6);
+  opacity: 1;
+  box-shadow: 0 1px 6px rgba(6, 182, 212, 0.7);
 }
 
-.side-switch-11.mode-col .opt-row,
-.tut-side-switch-11.mode-col .opt-row {
-  color: #64748b;
+.tile-switch-11.mode-col .opt-row,
+.tut-tile-switch-11.mode-col .opt-row {
+  color: #94a3b8;
   background: transparent;
+  opacity: 0.6;
 }
 
-/* 하위 호환성 */
+/* 구형 스위치 호환성 숨김 */
+.side-switch-11,
+.tut-side-switch-11,
 .dual-switch-11 {
   display: none !important;
 }
@@ -1017,25 +1023,24 @@ body {
   }
 
   .board-container {
-    width: min(calc(100vw - 64px), 380px);
-    height: min(calc(100vw - 64px), 380px);
-    max-width: 380px;
-    max-height: 380px;
+    width: calc(100vw - 10px);
+    height: calc(100vw - 10px);
+    max-width: 440px;
+    max-height: 440px;
     margin: 4px auto;
   }
 
-  .side-switch-11,
-  .tut-side-switch-11 {
-    left: -40px;
-    top: 6px;
-    padding: 3px 4px;
+  .tile-switch-11,
+  .tut-tile-switch-11 {
+    right: 3px;
+    padding: 2px 3px;
     gap: 2px;
   }
 
-  .side-switch-11 .side-switch-opt,
-  .tut-side-switch-11 .side-switch-opt {
-    font-size: 0.63rem;
-    padding: 3px 5px;
+  .tile-switch-11 .tile-switch-opt,
+  .tut-tile-switch-11 .tile-switch-opt {
+    font-size: 0.6rem;
+    padding: 2px 3px;
   }
 
   .board-grid {
@@ -1227,13 +1232,13 @@ body {
   white-space: pre-line;
 }
 
-/* 6. 인터랙티브 튜토리얼 3x3 보드 래퍼 (좌측 세로형 스위치 여백 확보 및 최적화) */
+/* 6. 인터랙티브 튜토리얼 3x3 보드 래퍼 (시원하고 큼직하게 대폭 확대 복원) */
 .tut-board-wrapper {
   position: relative;
-  width: min(300px, calc(100% - 56px));
-  height: min(300px, calc(100% - 56px));
+  width: min(320px, 86vw);
+  height: min(320px, 86vw);
   aspect-ratio: 1 / 1;
-  margin: 4px auto;
+  margin: 2px auto;
   background: #090d16;
   border-radius: 16px;
   padding: 6px;
@@ -1341,6 +1346,24 @@ body {
   100% {
     transform: perspective(600px) rotate3d(1, -1, 0, 0deg) scale(1);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* 31 성분 3행 90도씩 회전 애니메이션 */
+.tut-cell-rotating-90,
+.tut-cell-box.tut-cell-rotating-90 {
+  animation: tutCellRotate90 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes tutCellRotate90 {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(45deg) scale(1.08);
+  }
+  to {
+    transform: rotate(90deg) scale(1);
   }
 }
 
