@@ -33,19 +33,17 @@ export function getBadgeText(op: D4Op): string {
 }
 
 /**
- * 30초 압축 행렬 큐브 핵심 튜토리얼 (정확한 4단계):
- * STEP 1. 게임의 최종 목표: 뒤집히거나 돌아간 모든 강아지를 '0번(정위치 앞면)'으로 완성하는 것!
- * STEP 2. 행렬 변환 원리: 1행 1열을 가로로 그으면 1행 전체가 가로 대칭(MX)으로 뒤집힘!
- * STEP 3. 1행 1열 모드 전환: 1행 1열 우측하단 점을 눌러 1행과 1열 변환 모드를 자유자재로 전환!
- * STEP 4. 군론 대칭 합성의 묘미: 가로 대칭과 세로 대칭이 만나면 180도 회전 탄생! 군론 마스터 후 실전 게임 시작!
+ * 끊김 없는 슬라이드형 튜토리얼 뷰어 (수학적 4단계):
+ * STEP 1. 퍼즐의 목표 & 행렬 성분 구조
+ * STEP 2. 성분별 행렬 변환 원리 (행 변환 & 열 변환)
+ * STEP 3. 군론의 핵심 원리: 반사 + 반사 = 회전 (V4 클라인 4원군)
+ * STEP 4. 완전한 대칭 군 D4와 마스터
  */
 export class TutorialModalController {
   public isOpen = false;
   public currentStep = 1; // 1 ~ 4
   public boardOps: D4Op[] = Array(9).fill(D4.ID);
   public cell11Mode: 'row' | 'col' = 'row';
-  private dragStart: { x: number; y: number; time: number } | null = null;
-  private autoTimer: ReturnType<typeof setTimeout> | null = null;
 
   private imgDogFront: HTMLImageElement | null = null;
   private imgDogBack: HTMLImageElement | null = null;
@@ -69,22 +67,15 @@ export class TutorialModalController {
 
   public open(startStep = 1): void {
     this.isOpen = true;
-    this.currentStep = Math.max(1, Math.min(4, startStep));
     this.cell11Mode = 'row';
-    this.boardOps = [D4.MX, D4.R90, D4.MY, D4.ID, D4.R180, D4.MX, D4.MY, D4.ID, D4.R90]; // 1단계 목표 시연용 섞인 보드
-    this.clearAutoTimer();
-
     this.buildDOM();
-    this.updateStepUI();
-    this.renderBoard();
-
+    this.goToStep(Math.max(1, Math.min(4, startStep)), false);
     this.removePulse();
     soundEngine.playTap();
   }
 
   public close(): void {
     this.isOpen = false;
-    this.clearAutoTimer();
     if (typeof document !== 'undefined') {
       const overlay = document.getElementById('tutorial-modal-overlay');
       if (overlay) {
@@ -100,14 +91,27 @@ export class TutorialModalController {
     soundEngine.playTap();
   }
 
+  public prevStep(): void {
+    if (this.currentStep > 1) {
+      this.goToStep(this.currentStep - 1);
+    }
+  }
+
   public nextStep(): void {
-    this.clearAutoTimer();
     if (this.currentStep < 4) {
-      this.currentStep++;
-      this.updateStepUI();
-      soundEngine.playTap();
+      this.goToStep(this.currentStep + 1);
     } else {
       this.completeTutorial();
+    }
+  }
+
+  public goToStep(step: number, playSound = true): void {
+    this.currentStep = Math.max(1, Math.min(4, step));
+    this.applyStepState(this.currentStep);
+    this.updateStepUI();
+    this.renderBoard();
+    if (playSound) {
+      soundEngine.playTap();
     }
   }
 
@@ -115,13 +119,6 @@ export class TutorialModalController {
     markTutorialCompleted();
     this.close();
     soundEngine.playWin();
-  }
-
-  private clearAutoTimer(): void {
-    if (this.autoTimer) {
-      clearTimeout(this.autoTimer);
-      this.autoTimer = null;
-    }
   }
 
   private removePulse(): void {
@@ -147,65 +144,65 @@ export class TutorialModalController {
         <!-- 헤더 -->
         <div class="tutorial-header">
           <div class="tutorial-header-left">
-            <span class="tutorial-header-badge">30초 핵심</span>
-            <span class="tutorial-header-title">🎓 게임 목표 & 군론 행렬 변환</span>
+            <span class="tutorial-header-badge">군론 튜토리얼</span>
+            <span class="tutorial-header-title">🎓 행렬 대칭 변환 가이드</span>
           </div>
           <button id="btn-tut-close" class="tutorial-header-close" title="닫기">✕</button>
         </div>
 
-        <!-- 스텝 프로그레스 바 -->
-        <div class="tutorial-steps-bar">
-          <div class="tut-step-dot" data-step="1"></div>
-          <div class="tut-step-dot" data-step="2"></div>
-          <div class="tut-step-dot" data-step="3"></div>
-          <div class="tut-step-dot" data-step="4"></div>
+        <!-- 스텝 탭 / 프로그레스 바 -->
+        <div class="tutorial-steps-bar" id="tut-steps-bar">
+          <div class="tut-step-dot" data-step="1" title="1단계: 게임 목표 & 행렬 구조"></div>
+          <div class="tut-step-dot" data-step="2" title="2단계: 성분별 변환 원리"></div>
+          <div class="tut-step-dot" data-step="3" title="3단계: 반사+반사=회전 (V4)"></div>
+          <div class="tut-step-dot" data-step="4" title="4단계: 완전한 대칭 군 D4"></div>
         </div>
 
         <!-- 메인 본문 컨텐츠 영역 -->
         <div class="tutorial-body" id="tut-body">
           <!-- 가이드 텍스트 -->
           <div class="tut-guide-box" id="tut-guide-box">
-            <div class="tut-guide-step-name" id="tut-step-name">STEP 1. 게임의 최종 목표</div>
-            <div class="tut-guide-main-text" id="tut-main-text">모든 타일을 '0번(정위치 앞면)'으로 완성하세요!</div>
-            <div class="tut-guide-sub-text" id="tut-sub-text">뒤집히거나 회전된 강아지들을 모두 바르게 세우면 퍼즐 클리어!</div>
+            <div class="tut-guide-step-name" id="tut-step-name">STEP 1. 퍼즐의 목표 & 행렬 성분 구조</div>
+            <div class="tut-guide-main-text" id="tut-main-text">뒤섞인 모든 타일을 항등원 '0번(정위치 앞면)'으로 일치시키기</div>
+            <div class="tut-guide-sub-text" id="tut-sub-text">뒤섞인 모든 타일을 항등원 '0번(정위치 앞면)'으로 일치시키는 것이 목표입니다! 3×3 행렬의 각 성분(1~3행, 1~3열)이 해당 라인의 대칭 변환을 이끄는 컨트롤러 역할을 합니다.</div>
           </div>
 
-          <!-- 3x3 인터랙티브 보드 -->
+          <!-- 3x3 자동 시연 보드 -->
           <div class="tut-board-wrapper" id="tut-board-wrapper">
             <div class="tut-board-grid" id="tut-board-grid"></div>
-            <!-- 제스처 가이드 레이어 -->
-            <div class="tut-gesture-layer" id="tut-gesture-layer">
-              <div class="tut-finger tut-finger-swipe-x" id="tut-finger">👆</div>
-            </div>
           </div>
 
-          <!-- 공식 발견 카드 -->
+          <!-- 공식 설명 카드 -->
           <div class="tut-formula-card" id="tut-formula-card" style="display: none;">
-            <span class="tut-formula-badge" id="tut-formula-badge">💡 군론 대칭 변환</span>
-            <div class="tut-formula-text" id="tut-formula-text">1행 1열 가로 대칭 (MX)</div>
-            <div class="tut-formula-desc" id="tut-formula-desc">1행 강아지들이 모두 뒤태로 뒤집혔습니다!</div>
+            <span class="tut-formula-badge" id="tut-formula-badge">💡 성분별 대칭 변환</span>
+            <div class="tut-formula-text" id="tut-formula-text">1행 가로 반사 (MX)</div>
+            <div class="tut-formula-desc" id="tut-formula-desc">1행 성분들이 가로 반사로 일제히 뒤집힙니다.</div>
           </div>
 
           <!-- 스텝 4 최종 마스터 카드 -->
           <div class="tut-master-card" id="tut-master-card" style="display: none;">
             <div class="tut-master-badge-icon">🏆</div>
             <div class="tut-master-title">군론 행렬 퍼즐 완전 정복!</div>
-            <p style="font-size:0.88rem; color:#94a3b8; margin:0 0 10px 0;">게임의 목표와 D4 대칭군 핵심 원리를 모두 마스터하셨습니다.</p>
+            <p style="font-size:0.88rem; color:#94a3b8; margin:0 0 10px 0;">게임의 목표와 D4 정이면체군 대칭 변환 원리를 모두 마스터하셨습니다.</p>
             <div class="tut-rules-summary-list">
-              <div class="tut-rule-item"><span>🎯</span> <span><b>게임 목표</b> : 모든 타일을 <b>0번(정위치 앞면)</b>으로 일치시키기</span></div>
-              <div class="tut-rule-item"><span>📐</span> <span><b>1행 1열 컨트롤</b> : 1행을 가로·세로로 뒤집는 핵심 성분</span></div>
-              <div class="tut-rule-item"><span>🔄</span> <span><b>모드 전환 점</b> : 1행 1열의 점을 눌러 1행 ↔ 1열 전환</span></div>
-              <div class="tut-rule-item"><span>⚡</span> <span><b>군론 합성</b> : 가로 대칭(MX) + 세로 대칭(MY) = 180° 회전</span></div>
+              <div class="tut-rule-item"><span>🎯</span> <span><b>게임 목표</b> : 뒤섞인 모든 타일을 <b>0번(항등원·정위치 앞면)</b>으로 완성</span></div>
+              <div class="tut-rule-item"><span>📐</span> <span><b>행렬 성분 컨트롤</b> : 3×3 각 라인(행·열)을 선택하여 라인 전체 대칭 변환</span></div>
+              <div class="tut-rule-item"><span>🔄</span> <span><b>1행 1열 점(Dot)</b> : 점 클릭으로 1행 조작 ↔ 1열 조작 모드 자유 전환</span></div>
+              <div class="tut-rule-item"><span>⚡</span> <span><b>반사 + 반사 = 회전</b> : MX ∘ MY = R180 (클라인 4원군 V4)</span></div>
+              <div class="tut-rule-item"><span>🌌</span> <span><b>8차 정이면체군 D4</b> : 회전 4종(0°, 90°, 180°, 270°) + 반사 4종(MX, MY, MD, MAD)</span></div>
             </div>
           </div>
         </div>
 
-        <!-- 하단 컨트롤 버튼 바 -->
+        <!-- 하단 슬라이드 네비게이션 버튼 바 -->
         <div class="tutorial-footer">
-          <button id="btn-tut-skip" class="tut-btn-skip">건너뛰기</button>
-          <button id="btn-tut-action" class="tut-btn-action">
-            <span id="tut-btn-action-text">다음 (1/4) ➔</span>
-          </button>
+          <button id="btn-tut-skip" class="tut-btn-skip">닫기</button>
+          <div class="tut-footer-nav">
+            <button id="btn-tut-prev" class="tut-btn-prev" style="display: none;">◀ 이전</button>
+            <button id="btn-tut-action" class="tut-btn-action">
+              <span id="tut-btn-action-text">다음 (1/4) ➔</span>
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -233,11 +230,11 @@ export class TutorialModalController {
           const guideTag = document.createElement('div');
           guideTag.className = 'controller-guide-label guide-row';
           guideTag.id = 'tut-guide-tag-11';
-          guideTag.innerText = '1행';
+          guideTag.innerText = this.cell11Mode === 'col' ? '1열' : '1행';
           cell.appendChild(guideTag);
 
           const dot = document.createElement('div');
-          dot.className = 'dot-toggle-11';
+          dot.className = `dot-toggle-11 ${this.cell11Mode === 'col' ? 'col-mode' : ''}`;
           dot.id = 'tut-dot-11';
           dot.title = '1행 1열 모드 전환 (1행 <-> 1열)';
           dot.addEventListener('click', (e) => {
@@ -269,81 +266,90 @@ export class TutorialModalController {
     this.bindEvents();
   }
 
-  private handleDotClick(): void {
+  public handleDotClick(): void {
     this.cell11Mode = this.cell11Mode === 'row' ? 'col' : 'row';
-    const tag = document.getElementById('tut-guide-tag-11');
-    const dot = document.getElementById('tut-dot-11');
-    if (tag) {
-      tag.innerText = this.cell11Mode === 'col' ? '1열' : '1행';
-      tag.className = `controller-guide-label ${this.cell11Mode === 'col' ? 'guide-col' : 'guide-row'}`;
-    }
-    if (dot) {
-      dot.classList.toggle('col-mode', this.cell11Mode === 'col');
+    if (typeof document !== 'undefined') {
+      const tag = document.getElementById('tut-guide-tag-11');
+      const dot = document.getElementById('tut-dot-11');
+      if (tag) {
+        tag.innerText = this.cell11Mode === 'col' ? '1열' : '1행';
+        tag.className = `controller-guide-label ${this.cell11Mode === 'col' ? 'guide-col' : 'guide-row'}`;
+      }
+      if (dot) {
+        dot.classList.toggle('col-mode', this.cell11Mode === 'col');
+      }
     }
     soundEngine.playTap();
-
-    if (this.currentStep === 3) {
-      this.executeStep3Success();
-    }
   }
 
   public bindEvents(): void {
     const btnClose = document.getElementById('btn-tut-close');
     const btnSkip = document.getElementById('btn-tut-skip');
+    const btnPrev = document.getElementById('btn-tut-prev');
     const btnAction = document.getElementById('btn-tut-action');
-    const boardWrapper = document.getElementById('tut-board-wrapper');
 
     if (btnClose) btnClose.addEventListener('click', () => this.close());
     if (btnSkip) btnSkip.addEventListener('click', () => this.skip());
-    if (btnAction) btnAction.addEventListener('click', () => this.handleActionClick());
+    if (btnPrev) btnPrev.addEventListener('click', () => this.prevStep());
+    if (btnAction) btnAction.addEventListener('click', () => this.nextStep());
 
-    if (boardWrapper) {
-      boardWrapper.addEventListener(
-        'touchstart',
-        (e: TouchEvent) => {
-          if (e.touches && e.touches.length > 0) {
-            const touch = e.touches[0];
-            const rect = boardWrapper.getBoundingClientRect();
-            this.handleGestureStart(touch.clientX - rect.left, touch.clientY - rect.top);
-          }
-        },
-        { passive: false }
-      );
-
-      boardWrapper.addEventListener(
-        'touchend',
-        (e: TouchEvent) => {
-          if (e.changedTouches && e.changedTouches.length > 0) {
-            e.preventDefault();
-            const touch = e.changedTouches[0];
-            const rect = boardWrapper.getBoundingClientRect();
-            this.handleGestureEnd(
-              touch.clientX - rect.left,
-              touch.clientY - rect.top,
-              rect.width,
-              rect.height
-            );
-          }
-        },
-        { passive: false }
-      );
-
-      boardWrapper.addEventListener('mousedown', (e: MouseEvent) => {
-        const rect = boardWrapper.getBoundingClientRect();
-        this.handleGestureStart(e.clientX - rect.left, e.clientY - rect.top);
+    // 상단 스텝 프로그레스 도트 클릭 시 해당 단계로 즉시 점프
+    document.querySelectorAll('.tut-step-dot').forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const s = parseInt((dot as HTMLElement).dataset.step || '1', 10);
+        if (s >= 1 && s <= 4) {
+          this.goToStep(s);
+        }
       });
+    });
+  }
 
-      boardWrapper.addEventListener('mouseup', (e: MouseEvent) => {
-        const rect = boardWrapper.getBoundingClientRect();
-        this.handleGestureEnd(e.clientX - rect.left, e.clientY - rect.top, rect.width, rect.height);
-      });
+  /**
+   * 단계별 보드 상태 설정 (자동 시연 데이터 적용)
+   */
+  public applyStepState(step: number): void {
+    switch (step) {
+      case 1:
+        // 1단계: 뒤섞인 타일 상태
+        this.boardOps = [D4.MX, D4.R90, D4.MY, D4.ID, D4.R180, D4.MX, D4.MY, D4.ID, D4.R90];
+        break;
+      case 2:
+        // 2단계: 1행 성분들이 가로 반사(MX)로 변환된 상태
+        this.executeStep2Success();
+        break;
+      case 3:
+        // 3단계: 1행(MX)과 1열(MY)이 만나 1행 1열이 R180으로 합성된 상태
+        this.executeStep3Success();
+        break;
+      case 4:
+        // 4단계: 모든 타일이 0번(항등원·완성) 상태
+        this.boardOps = Array(9).fill(D4.ID);
+        break;
     }
+  }
+
+  public executeStep2Success(): void {
+    this.boardOps = [
+      D4.MX, D4.MX, D4.MX,
+      D4.ID, D4.ID, D4.ID,
+      D4.ID, D4.ID, D4.ID
+    ];
+  }
+
+  public executeStep3Success(): void {
+    // 가로 반사(MX) + 세로 반사(MY) = 180도 회전(R180)
+    this.boardOps = [
+      composeOps(D4.MX, D4.MY), D4.MX, D4.MX,
+      D4.MY,                    D4.ID, D4.ID,
+      D4.MY,                    D4.ID, D4.ID
+    ];
   }
 
   public updateStepUI(): void {
     if (typeof document === 'undefined') return;
     const step = this.currentStep;
 
+    // 상단 도트 활성화 상태 갱신
     document.querySelectorAll('.tut-step-dot').forEach((dot) => {
       const s = parseInt((dot as HTMLElement).dataset.step || '1', 10);
       dot.classList.toggle('active', s === step);
@@ -354,71 +360,83 @@ export class TutorialModalController {
     const mainTextEl = document.getElementById('tut-main-text');
     const subTextEl = document.getElementById('tut-sub-text');
     const formulaCard = document.getElementById('tut-formula-card');
+    const formulaBadge = document.getElementById('tut-formula-badge');
+    const formulaText = document.getElementById('tut-formula-text');
+    const formulaDesc = document.getElementById('tut-formula-desc');
     const masterCard = document.getElementById('tut-master-card');
     const boardWrapper = document.getElementById('tut-board-wrapper');
-    const fingerEl = document.getElementById('tut-finger');
+    const btnPrev = document.getElementById('btn-tut-prev');
     const btnActionText = document.getElementById('tut-btn-action-text');
 
-    if (!stepNameEl || !mainTextEl) return;
+    if (!stepNameEl || !mainTextEl || !subTextEl) return;
 
-    if (formulaCard) formulaCard.style.display = 'none';
-    if (masterCard) masterCard.style.display = 'none';
-    if (boardWrapper) boardWrapper.style.display = 'block';
     this.clearCellHighlights();
+
+    // 이전 버튼 토글 (1단계일 때는 숨김)
+    if (btnPrev) {
+      btnPrev.style.display = step > 1 ? 'block' : 'none';
+    }
 
     switch (step) {
       case 1:
-        stepNameEl.textContent = 'STEP 1. 게임의 목표';
-        mainTextEl.textContent = '모든 타일을 0번 정위치로 일치시키는 것이 목표입니다!';
-        if (subTextEl) subTextEl.textContent = '섞여 있는 강아지들을 모두 똑바로 선 앞면(0번 뱃지)으로 맞추면 승리!';
-        if (fingerEl) fingerEl.style.display = 'none';
-        this.boardOps = [D4.MX, D4.R90, D4.MY, D4.ID, D4.R180, D4.MX, D4.MY, D4.ID, D4.R90];
-        if (btnActionText) btnActionText.textContent = '행렬 변환 배우기 (1/4) ➔';
-        soundEngine.speak('모든 타일을 0번 정위치 앞면으로 일치시키는 것이 게임의 최종 목표입니다!');
+        stepNameEl.textContent = 'STEP 1. 게임의 목표 & 행렬 성분 구조';
+        mainTextEl.textContent = "뒤섞인 모든 타일을 항등원 '0번(정위치 앞면)'으로 일치시키기";
+        subTextEl.textContent = "뒤섞인 모든 타일을 항등원 '0번(정위치 앞면)'으로 일치시키는 것이 목표입니다! 3×3 행렬의 각 성분(1~3행, 1~3열)이 해당 라인의 대칭 변환을 이끄는 컨트롤러 역할을 합니다.";
+        if (formulaCard) formulaCard.style.display = 'none';
+        if (masterCard) masterCard.style.display = 'none';
+        if (boardWrapper) boardWrapper.style.display = 'block';
+        if (btnActionText) btnActionText.textContent = '다음 (1/4) ➔';
+        soundEngine.speak('모든 타일을 0번 정위치 앞면으로 일치시키는 것이 게임의 최종 목표입니다. 3행 3열 행렬의 각 성분이 대칭 변환을 이끕니다.');
         break;
 
       case 2:
-        stepNameEl.textContent = 'STEP 2. 1행 1열 가로 대칭 변환';
-        mainTextEl.textContent = '1행 1열을 가로(↔)로 쓱 그어보세요!';
-        if (subTextEl) subTextEl.textContent = '1행 1열 타일을 스와이프하면 1행 전체가 가로 대칭(MX)으로 뒤집힙니다.';
-        if (fingerEl) {
-          fingerEl.style.display = 'block';
-          fingerEl.className = 'tut-finger tut-finger-swipe-x';
-          fingerEl.textContent = '👆';
-        }
+        stepNameEl.textContent = 'STEP 2. 성분별 행렬 변환 원리';
+        mainTextEl.textContent = '1행 성분을 조작하면 1행 전체가 가로 반사(MX)로 일제히 반전!';
+        subTextEl.textContent = '1행 성분을 조작하면 1행 전체가 가로 반사(MX)로 일제히 뒤집힙니다! 특히 1행 1열의 점(Dot)을 누르면 1행과 1열 조작 모드가 자유롭게 전환되어 행과 열을 모두 컨트롤할 수 있습니다.';
         this.highlightCells([0, 1, 2], 'highlight-row');
-        this.boardOps = Array(9).fill(D4.ID);
-        if (btnActionText) btnActionText.textContent = '직접 해보기 (2/4)';
-        soundEngine.speak('1행 1열을 가로로 쓱 그어보세요!');
+        if (formulaCard) {
+          formulaCard.style.display = 'block';
+          if (formulaBadge) formulaBadge.textContent = '💡 성분별 대칭 변환';
+          if (formulaText) formulaText.textContent = '1행 가로 반사 (MX)';
+          if (formulaDesc) formulaDesc.textContent = '1행의 모든 성분이 가로 반사되어 일제히 뒷면(X 뱃지)으로 뒤집힙니다.';
+        }
+        if (masterCard) masterCard.style.display = 'none';
+        if (boardWrapper) boardWrapper.style.display = 'block';
+        if (btnActionText) btnActionText.textContent = '다음 (2/4) ➔';
+        soundEngine.speak('1행을 조작하면 1행 성분들이 가로 반사로 일제히 뒤집히며, 1행 1열의 점으로 행과 열 조작 모드를 전환할 수 있습니다.');
         break;
 
       case 3:
-        stepNameEl.textContent = 'STEP 3. 1행 1열 모드 전환 (1행 ↔ 1열)';
-        mainTextEl.textContent = '1행 1열 우측 하단의 점을 눌러보세요!';
-        if (subTextEl) subTextEl.textContent = '점을 누르면 1행 조작에서 1열 조작 모드로 즉시 전환됩니다.';
-        if (fingerEl) {
-          fingerEl.style.display = 'block';
-          fingerEl.className = 'tut-finger tut-finger-tap';
-          fingerEl.textContent = '👉';
+        stepNameEl.textContent = 'STEP 3. 반사 + 반사 = 회전 (V4 클라인 4원군)';
+        mainTextEl.textContent = '반사와 반사가 연속으로 만나면 180° 회전이 탄생합니다!';
+        subTextEl.textContent = "거울 반사(가로 대칭 MX)와 세로 반사(MY)가 연속으로 만나면, 뒷면이 다시 앞면으로 돌아오면서 180도 회전(R180)이 탄생합니다! (MX ∘ MY = R180)\n이 4가지 원소 {항등 0, MX, MY, R180}는 수학적으로 교환법칙이 성립하는 아름다운 '클라인 4원군(V4)' 부분군을 형성합니다.";
+        this.highlightCells([0], 'highlight-center');
+        this.highlightCells([1, 2], 'highlight-row');
+        this.highlightCells([3, 6], 'highlight-row');
+        if (formulaCard) {
+          formulaCard.style.display = 'block';
+          if (formulaBadge) formulaBadge.textContent = '✨ 반사 + 반사 = 회전 (V4 군론)';
+          if (formulaText) formulaText.textContent = 'MX ∘ MY = R180 (클라인 4원군)';
+          if (formulaDesc) formulaDesc.textContent = '가로 반사 후 세로 반사를 적용하면 앞면으로 복원되며 180° 회전이 합성됩니다.';
         }
-        this.highlightCells([0], 'highlight-row');
-        if (btnActionText) btnActionText.textContent = '모드 전환 해보기 (3/4)';
-        soundEngine.speak('1행 1열 우측 하단의 점을 눌러보세요!');
+        if (masterCard) masterCard.style.display = 'none';
+        if (boardWrapper) boardWrapper.style.display = 'block';
+        if (btnActionText) btnActionText.textContent = '다음 (3/4) ➔';
+        soundEngine.speak('가로 반사와 세로 반사가 만나면 앞면으로 복원되며 180도 회전이 탄생합니다. 이는 반사끼리 만나면 회전이 되는 군론과 클라인 4원군의 원리입니다.');
         break;
 
       case 4:
-        stepNameEl.textContent = 'STEP 4. 군론 행렬 퍼즐 완전 정복 🎉';
-        mainTextEl.textContent = '축하합니다! 게임 목표와 군론 원리 마스터!';
-        if (subTextEl) subTextEl.textContent = '이제 실전 행렬 큐브 퍼즐에서 0번을 향해 도전하세요!';
+        stepNameEl.textContent = 'STEP 4. 완전한 대칭 군 D4와 마스터';
+        mainTextEl.textContent = '8차 정이면체군 D4를 마스터하고 실전 퍼즐에 도전하세요!';
+        subTextEl.textContent = "회전 4가지(0°, 90°, 180°, 270°)와 반사 4가지(가로 MX, 세로 MY, 주대각선 MD, 역대각선 MAD)가 모여 총 8가지 대칭을 이루는 '8차 정이면체군 D4'를 완성합니다! 이 대칭 규칙을 활용하여 최소 횟수로 모든 타일을 0번으로 맞춰보세요!";
+        if (formulaCard) formulaCard.style.display = 'none';
         if (boardWrapper) boardWrapper.style.display = 'none';
         if (masterCard) masterCard.style.display = 'block';
         if (btnActionText) btnActionText.textContent = '🎮 실전 퍼즐 시작하기';
         soundEngine.playClear();
-        soundEngine.speak('축하합니다! 게임의 목표와 군론 대칭 변환 원리를 마스터하셨습니다!');
+        soundEngine.speak('회전 4가지와 반사 4가지가 모여 정이면체군 D4를 완성합니다. 이제 실전 큐브에 도전해 보세요!');
         break;
     }
-
-    this.renderBoard();
   }
 
   private highlightCells(indices: number[], className: string): void {
@@ -434,103 +452,6 @@ export class TutorialModalController {
       if (cell) {
         cell.className = 'tut-cell-box';
       }
-    }
-  }
-
-  public handleGestureStart(x: number, y: number): void {
-    this.dragStart = { x, y, time: Date.now() };
-  }
-
-  public handleGestureEnd(x: number, y: number, _w: number, h: number): void {
-    if (!this.dragStart) return;
-    const dx = x - this.dragStart.x;
-    const dy = y - this.dragStart.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    const startYRatio = this.dragStart.y / h;
-    const isRow1 = startYRatio < 0.45;
-
-    this.dragStart = null;
-
-    if (this.currentStep === 1) {
-      this.nextStep();
-    } else if (this.currentStep === 2) {
-      if ((Math.abs(dx) > 20 && Math.abs(dx) > Math.abs(dy) * 1.1 && isRow1) || (dist < 25 && isRow1)) {
-        this.executeStep2Success();
-      }
-    } else if (this.currentStep === 3) {
-      if (dist < 35 && startYRatio < 0.4) {
-        this.handleDotClick();
-      }
-    }
-  }
-
-  public executeStep2Success(): void {
-    this.boardOps[0] = D4.MX;
-    this.boardOps[1] = D4.MX;
-    this.boardOps[2] = D4.MX;
-    this.renderBoard();
-    soundEngine.playFlip();
-
-    if (typeof document !== 'undefined') {
-      const formulaCard = document.getElementById('tut-formula-card');
-      const formulaBadge = document.getElementById('tut-formula-badge');
-      const formulaText = document.getElementById('tut-formula-text');
-      const formulaDesc = document.getElementById('tut-formula-desc');
-      const btnActionText = document.getElementById('tut-btn-action-text');
-
-      if (formulaBadge) formulaBadge.textContent = '💡 1행 변환 성공!';
-      if (formulaText) formulaText.textContent = '1행 가로 대칭 (MX)';
-      if (formulaDesc) formulaDesc.textContent = '1행 강아지들이 모두 뒤태(X 뱃지)로 뒤집혔습니다!';
-      if (formulaCard) formulaCard.style.display = 'block';
-      if (btnActionText) btnActionText.textContent = '모드 전환 배우기 ➔';
-    }
-
-    this.clearAutoTimer();
-    this.autoTimer = setTimeout(() => {
-      if (this.currentStep === 2 && this.isOpen) {
-        this.nextStep();
-      }
-    }, 1500);
-  }
-
-  public executeStep3Success(): void {
-    this.boardOps[0] = composeOps(D4.MX, D4.MY); // R180
-    this.boardOps[3] = D4.MY;
-    this.boardOps[6] = D4.MY;
-    this.renderBoard();
-    soundEngine.playCombo();
-
-    if (typeof document !== 'undefined') {
-      const formulaCard = document.getElementById('tut-formula-card');
-      const formulaBadge = document.getElementById('tut-formula-badge');
-      const formulaText = document.getElementById('tut-formula-text');
-      const formulaDesc = document.getElementById('tut-formula-desc');
-      const btnActionText = document.getElementById('tut-btn-action-text');
-
-      if (formulaBadge) formulaBadge.textContent = '✨ 1열 모드 전환 성공!';
-      if (formulaText) formulaText.textContent = '1행 ↔ 1열 변환 모드 자유자재!';
-      if (formulaDesc) formulaDesc.textContent = '점을 눌러 1행과 1열을 언제든 바꿔서 변환할 수 있습니다.';
-      if (formulaCard) formulaCard.style.display = 'block';
-      if (btnActionText) btnActionText.textContent = '마스터 완료하기 ➔';
-    }
-
-    this.clearAutoTimer();
-    this.autoTimer = setTimeout(() => {
-      if (this.currentStep === 3 && this.isOpen) {
-        this.nextStep();
-      }
-    }, 1600);
-  }
-
-  public handleActionClick(): void {
-    if (this.currentStep === 1) {
-      this.nextStep();
-    } else if (this.currentStep === 2) {
-      this.executeStep2Success();
-    } else if (this.currentStep === 3) {
-      this.handleDotClick();
-    } else if (this.currentStep === 4) {
-      this.completeTutorial();
     }
   }
 

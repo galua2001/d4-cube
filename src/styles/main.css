@@ -1014,6 +1014,11 @@ body {
   border-radius: 3px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  cursor: pointer;
+}
+
+.tut-step-dot:hover {
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .tut-step-dot.active {
@@ -1063,9 +1068,11 @@ body {
 }
 
 .tut-guide-sub-text {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: #94a3b8;
-  margin-top: 4px;
+  margin-top: 5px;
+  line-height: 1.45;
+  white-space: pre-line;
 }
 
 /* 6. 인터랙티브 튜토리얼 3x3 보드 래퍼 */
@@ -1293,8 +1300,38 @@ body {
   color: #ffffff;
 }
 
+.tut-footer-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.tut-btn-prev {
+  background: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tut-btn-prev:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.tut-btn-prev:active {
+  transform: scale(0.98);
+}
+
 .tut-btn-action {
   flex: 1;
+  max-width: 240px;
   background: linear-gradient(135deg, #6366f1, #a855f7);
   color: #ffffff;
   border: none;
