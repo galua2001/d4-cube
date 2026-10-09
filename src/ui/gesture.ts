@@ -115,9 +115,19 @@ export class GestureRecognizer {
     this.boardEl.addEventListener('pointerdown', (e) => {
       if (this.isLocked) return;
 
-      // 1행 1열 듀얼 스위치 클릭 감지 시 제스처 무시
+      // 1행 1열 스위치(.tile-switch-11 등) 조작 시 제스처 전면 무시 (스위치 탭 시 회전 방지, 회전은 오직 타일 중앙 클릭 시에만)
       const targetElem = e.target as HTMLElement;
-      if (targetElem && (targetElem.classList.contains('dot-toggle-11') || targetElem.closest('.dual-switch-11') || targetElem.classList.contains('dual-switch-11'))) {
+      if (
+        targetElem &&
+        (targetElem.closest('.tile-switch-11') ||
+          targetElem.classList.contains('tile-switch-11') ||
+          targetElem.closest('#tile-switch-11') ||
+          targetElem.closest('.side-switch-11') ||
+          targetElem.classList.contains('side-switch-11') ||
+          targetElem.classList.contains('dot-toggle-11') ||
+          targetElem.closest('.dual-switch-11') ||
+          targetElem.classList.contains('dual-switch-11'))
+      ) {
         return;
       }
 

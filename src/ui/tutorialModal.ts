@@ -46,7 +46,8 @@ export interface ExampleMoveStep {
  * STEP 1. 각 행과 열의 첫 성분 조작에 따른 행/열 변환 실전 시연
  * 1) 11 성분 가로 쓱 밀기 ➔ 1행 전체 가로 반사(MX)
  * 2) 12 성분 세로 쓱 밀기 ➔ 1행이 MX인 상태에서 12를 세로로 밀어 MX ∘ MY = R180 (180° 회전) 합성!
- * 3) 31 성분 대각선 밀기 ➔ 31 대각선 복합 밀기로 주대각선·부대각선 반사 변환(MD/MAD)
+ * 3) 31 성분 3회 클릭 ➔ 3행 전체 90°씩 3회 순차 회전(R90 ➔ R180 ➔ R270)
+ * 4) 21 성분 대각선 긋기 ➔ 2행 첫 성분 21에서 ↖➔↘(MD) 및 ↗➔↙(MAD) 대각선 변환!
  */
 export const STEP1_SUB_DEMOS: ExampleMoveStep[] = [
   {
@@ -90,16 +91,16 @@ export const STEP1_SUB_DEMOS: ExampleMoveStep[] = [
   },
   {
     subStep: 3,
-    label: '④ 22 대각선 긋기 (2행)',
+    label: '④ 21 대각선 긋기 (2행)',
     boardOps: [
       D4.MX,   D4.R180, D4.MX,
       D4.MD,   D4.MD,   D4.MD,
       D4.R270, D4.R270, D4.R270
     ],
     highlightCells: [3, 4, 5],
-    formulaBadge: '⚡ [22] 2행 대각선 긋기 (2행 변환)',
-    formulaText: '22 성분에서 대각선 긋기 ➔ 2행의 행들만이 대각선 반사(MD)!',
-    formulaDesc: '메인 퍼즐처럼 22 성분에서 대각선으로 그으면 2행의 행들([21, 22, 23])만이 일제히 대각선 반사(MD)를 해요!'
+    formulaBadge: '⚡ [21] 2행 첫 성분 대각선 변환',
+    formulaText: '21 성분 대각선 긋기 ➔ 2행의 행들이 대각선 반사(MD/MAD)!',
+    formulaDesc: '손가락이 21 성분에서 왼쪽 상단➔오른쪽 하단으로 쓱 그으면 2행이 주대각선 대칭(MD), 오른쪽 상단➔왼쪽 하단으로 쓱 움직이면 부대각선 대칭(MAD)이 돼요!'
   }
 ];
 
@@ -772,10 +773,10 @@ export class TutorialModalController {
             icon.textContent = '👆';
             bubble.textContent = '31 가운데 3회 클릭 (3행)';
           } else {
-            this.positionHandAtCell(4); // 22 (2행 2열, idx 4) 성분 타일 정중앙
+            this.positionHandAtCell(3); // 21 (2행 1열, idx 3) 성분 타일 정중앙
             hand.classList.add('hand-anim-cell-diag-combo');
             icon.textContent = '👆';
-            bubble.textContent = '22 대각선 긋기 (2행)';
+            bubble.textContent = '21 대각선 긋기 (2행)';
           }
         }
         break;
@@ -1111,17 +1112,18 @@ export class TutorialModalController {
 
       this.step1AnimTimers.push(t1, t2, t3, t4, t5, t6);
     } else if (this.step1SubStep === 3) {
-      // ④ 22 대각선 긋기: 메인 화면처럼 22 성분에서 대각선을 그으면 2행의 행들([3, 4, 5])만이 대각선 반사(MD ➔ MAD)
+      // ④ 21 대각선 긋기: 21 성분(idx 3)에서 대각선을 그으면 2행 전체([3, 4, 5])가 대각선 반사(MD ➔ MAD)
+      this.positionHandAtCell(3);
       this.boardOps = [
         D4.MX,   D4.R180, D4.MX,
         D4.ID,   D4.MY,   D4.ID,
         D4.R270, D4.R270, D4.R270
       ];
       this.clearCellHighlights();
-      this.highlightCells([3, 4, 5], 'highlight-row'); // 2행의 행들 하이라이트!
+      this.highlightCells([3, 4, 5], 'highlight-row'); // 2행 전체 하이라이트!
       this.renderBoard();
 
-      // [1단계] 22 성분 주대각선 긋기 (↘ MD) ➔ 2행의 행들([3, 4, 5])만이 주대각 반사(MD): t = 450ms
+      // [1단계: 주대각선] t = 450ms: 손가락이 왼쪽 상단에서 오른쪽 하단으로 쓱 그을 때 (↖ ➔ ↘ MD)
       const t1 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
           this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag');
@@ -1132,11 +1134,11 @@ export class TutorialModalController {
           soundEngine.playFlip();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '22 대각선 긋기 (↘ MD)';
+          if (bubble) bubble.textContent = '1) ↖➔↘ 주대각 긋기 (2행 MD)';
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
-          if (fBadge) fBadge.textContent = '⚡ [22] 2행 대각선 반사 (MD)';
-          if (fText) fText.textContent = '22 성분 대각선 긋기 ➔ 2행의 행들만이 주대각선 반사 (MD)';
+          if (fBadge) fBadge.textContent = '⚡ [21] 2행 주대각선 대칭 (MD)';
+          if (fText) fText.textContent = '21에서 ↖➔↘로 쓱 그으면 ➔ 2행이 주대각선 대칭(MD)!';
         }
       }, 450);
 
@@ -1144,13 +1146,13 @@ export class TutorialModalController {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
           this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag');
         }
-      }, 950);
+      }, 1000);
 
-      // [2단계] 22 성분 부대각선 긋기 (↙ MAD) ➔ 2행의 행들([3, 4, 5])만이 부대각 반사(MAD): t = 1450ms
+      // [2단계: 부대각선] t = 1700ms: 손가락이 오른쪽 상단에서 왼쪽 하단으로 쓱 움직일 때 (↗ ➔ ↙ MAD)
       const t3 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
           this.clearCellHighlights();
-          this.highlightCells([3, 4, 5], 'highlight-row'); // 2행의 행들 하이라이트!
+          this.highlightCells([3, 4, 5], 'highlight-row'); // 2행 전체 하이라이트!
           this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag');
           this.boardOps[3] = D4.MAD;
           this.boardOps[4] = D4.MAD;
@@ -1159,21 +1161,21 @@ export class TutorialModalController {
           soundEngine.playFlip();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '22 부대각선 긋기 (↙ MAD)';
+          if (bubble) bubble.textContent = '2) ↗➔↙ 부대각 긋기 (2행 MAD)';
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
           const fDesc = document.getElementById('tut-formula-desc');
-          if (fBadge) fBadge.textContent = '⚡ [22] 2행 대각선 반사 (MAD)';
-          if (fText) fText.textContent = '22 성분 부대각선 긋기 ➔ 2행의 행들만이 부대각선 반사 (MAD)';
-          if (fDesc) fDesc.textContent = '메인 화면처럼 22 성분에서 대각선으로 그으면 2행의 행들([21, 22, 23])만이 일제히 대각선 반사(MD ➔ MAD)를 해요!';
+          if (fBadge) fBadge.textContent = '⚡ [21] 2행 부대각선 대칭 (MAD)';
+          if (fText) fText.textContent = '21에서 ↗➔↙로 쓱 움직이면 ➔ 2행이 부대각선 대칭(MAD)!';
+          if (fDesc) fDesc.textContent = '손가락이 21 성분에서 왼쪽 상단➔오른쪽 하단으로 쓱 그으면 2행이 주대각선 대칭(MD), 오른쪽 상단➔왼쪽 하단으로 쓱 움직이면 부대각선 대칭(MAD)이 돼요!';
         }
-      }, 1450);
+      }, 1700);
 
       const t4 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
           this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag');
         }
-      }, 1950);
+      }, 2250);
 
       this.step1AnimTimers.push(t1, t2, t3, t4);
     } else {

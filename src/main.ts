@@ -140,7 +140,7 @@ class MatrixCubeApp {
     tileSwitch.className = `tile-switch-11 ${mode === 'col' ? 'mode-col' : 'mode-row'}`;
   }
 
-  private renderBoard() {
+  public renderBoard() {
     this.updateBoard();
   }
 
@@ -175,13 +175,15 @@ class MatrixCubeApp {
           <span class="tile-switch-opt opt-row">1행</span>
           <span class="tile-switch-opt opt-col">1열</span>
         `;
+        const stopEvent = (e: Event) => e.stopPropagation();
+        sw.addEventListener('pointerdown', stopEvent);
+        sw.addEventListener('pointerup', stopEvent);
         sw.addEventListener('click', (e) => {
           e.stopPropagation();
           const newMode = this.gestureRecognizer.toggleCell11Mode();
           this.updateTileSwitch11();
           soundEngine.playTap();
           this.highlightActiveLine(newMode);
-          this.renderBoard();
         });
         box.appendChild(sw);
       } else {
