@@ -94,13 +94,13 @@ export const STEP1_SUB_DEMOS: ExampleMoveStep[] = [
     label: '④ 21 대각선 긋기 (2행)',
     boardOps: [
       D4.MX,   D4.R180, D4.MX,
-      D4.MD,   D4.MD,   D4.MD,
+      D4.ID,   D4.ID,   D4.ID,
       D4.R270, D4.R270, D4.R270
     ],
     highlightCells: [3, 4, 5],
     formulaBadge: '⚡ [21] 2행 첫 성분 대각선 변환',
-    formulaText: '21 성분 대각선 긋기 ➔ 2행의 행들이 대각선 반사(MD/MAD)!',
-    formulaDesc: '손가락이 21 성분에서 왼쪽 상단➔오른쪽 하단으로 쓱 그으면 2행이 주대각선 대칭(MD), 오른쪽 상단➔왼쪽 하단으로 쓱 움직이면 부대각선 대칭(MAD)이 돼요!'
+    formulaText: '21 대각선 긋기 ➔ 주대각선 대칭 후 대각선 하면 처음(0번) 복원!',
+    formulaDesc: '손가락이 21 성분에서 ↖➔↘로 쓱 그으면 2행이 주대각선 대칭(MD), 처음 위치로 와서 대각선을 한 번 더 그으면 대칭의 자기상쇄(MD² = ID)로 처음 0번으로 복원돼요!'
   }
 ];
 
@@ -956,27 +956,27 @@ export class TutorialModalController {
       ];
       this.renderBoard();
 
-      // 손가락이 11 타일 좌측 안착 후 대기(0ms~700ms)하다가,
-      // 오른쪽으로 쓱 긋기 시작하는 바로 그 순간(t = 700ms)에 1행 타일들 3D 가로 플립도 완벽 동시 시작!
+      // 손가락이 초기 1초간 미노출 대기 후 11 타일 좌측에 단정하게 안착(1000ms~1200ms)하고,
+      // 오른쪽으로 쓱 긋기 시작하는 바로 그 순간(t = 1200ms)에 1행 타일들 3D 가로 플립도 완벽 동시 시작!
       const t1 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 0) {
           this.addCellAnimClass([0, 1, 2], 'tut-cell-flipping-h');
           soundEngine.playFlip();
         }
-      }, 700);
+      }, 1200);
 
-      // 플립 중간 90도 회전 시점 (손가락이 타일 중앙을 통과하는 순간 t = 700 + 400 = 1100ms): 1행 타일들이 일제히 가로 반사(MX, 뒷면)로 뒤집힘
+      // 플립 중간 90도 회전 시점 (손가락이 타일 중앙을 통과하는 순간 t = 1200 + 400 = 1600ms): 1행 타일들이 일제히 가로 반사(MX, 뒷면)로 뒤집힘
       const t2 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 0) {
           this.boardOps = [...stepData.boardOps];
           this.renderBoard();
         }
-      }, 1100);
+      }, 1600);
 
-      // 플립 완료 시점 (손가락 우측 도달 및 타일 플립 완료 t = 700 + 800 = 1500ms): 플립 클래스 제거
+      // 플립 완료 시점 (손가락 우측 도달 및 타일 플립 완료 t = 1200 + 800 = 2000ms): 플립 클래스 제거
       const t3 = setTimeout(() => {
         this.removeCellAnimClass([0, 1, 2], 'tut-cell-flipping-h');
-      }, 1520);
+      }, 2020);
 
       this.step1AnimTimers.push(t1, t2, t3);
 
@@ -1106,18 +1106,18 @@ export class TutorialModalController {
 
       this.step1AnimTimers.push(t1, t2, t3, t4, t5, t6);
     } else if (this.step1SubStep === 3) {
-      // ④ 21 대각선 긋기: 21 성분(idx 3)에서 대각선을 그으면 2행 전체([3, 4, 5])가 대각선 반사(MD ➔ MAD)
+      // ④ 21 대각선 긋기: 21 성분(idx 3)에서 주대각선 그으면 MD, 처음 위치로 와서 대각선 한 번 더 그으면 처음(ID)으로 복원!
       this.positionHandAtCell(3);
       this.boardOps = [
         D4.MX,   D4.R180, D4.MX,
-        D4.ID,   D4.MY,   D4.ID,
+        D4.ID,   D4.ID,   D4.ID,
         D4.R270, D4.R270, D4.R270
       ];
       this.clearCellHighlights();
       this.highlightCells([3, 4, 5], 'highlight-row'); // 2행 전체 하이라이트!
       this.renderBoard();
 
-      // [1단계: 주대각선] t = 450ms: 손가락이 왼쪽 상단에서 오른쪽 하단으로 쓱 그을 때 (↖ ➔ ↘ MD)
+      // [1단계: 주대각선 긋기] t = 600ms: 손가락이 ↖ ➔ ↘로 주대각선 쓱 그을 때 (2행 MD)
       const t1 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
           this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
@@ -1131,45 +1131,46 @@ export class TutorialModalController {
           if (bubble) bubble.textContent = '1) ↖➔↘ 주대각 긋기 (2행 MD)';
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
-          if (fBadge) fBadge.textContent = '⚡ [21] 2행 주대각선 대칭 (MD)';
+          if (fBadge) fBadge.textContent = '⚡ [21] 1) 주대각선 대칭 (MD)';
           if (fText) fText.textContent = '21에서 ↖➔↘로 쓱 그으면 ➔ 2행이 주대각선 대칭(MD)!';
         }
-      }, 450);
+      }, 600);
 
       const t2 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
           this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
         }
-      }, 1000);
+      }, 1200);
 
-      // [2단계: 부대각선] t = 1700ms: 손가락이 오른쪽 상단에서 왼쪽 하단으로 쓱 움직일 때 (↗ ➔ ↙ MAD)
+      // [2단계: 처음 위치로 복귀 후 대각선 한 번 더 긋기] t = 1750ms:
+      // 손가락이 처음 위치(↖)로 돌아와서 다시 ↖ ➔ ↘로 그을 때 ➔ 처음(0번 ID)으로 복원!
       const t3 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
           this.clearCellHighlights();
-          this.highlightCells([3, 4, 5], 'highlight-row'); // 2행 전체 하이라이트!
-          this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-anti');
-          this.boardOps[3] = D4.MAD;
-          this.boardOps[4] = D4.MAD;
-          this.boardOps[5] = D4.MAD;
+          this.highlightCells([3, 4, 5], 'highlight-row');
+          this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
+          this.boardOps[3] = D4.ID;
+          this.boardOps[4] = D4.ID;
+          this.boardOps[5] = D4.ID;
           this.renderBoard();
           soundEngine.playFlip();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '2) ↗➔↙ 부대각 긋기 (2행 MAD)';
+          if (bubble) bubble.textContent = '2) 처음으로 와서 다시 그어 복원!';
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
           const fDesc = document.getElementById('tut-formula-desc');
-          if (fBadge) fBadge.textContent = '⚡ [21] 2행 부대각선 대칭 (MAD)';
-          if (fText) fText.textContent = '21에서 ↗➔↙로 쓱 움직이면 ➔ 2행이 부대각선 대칭(MAD)!';
-          if (fDesc) fDesc.textContent = '손가락이 21 성분에서 왼쪽 상단➔오른쪽 하단으로 쓱 그으면 2행이 주대각선 대칭(MD), 오른쪽 상단➔왼쪽 하단으로 쓱 움직이면 부대각선 대칭(MAD)이 돼요!';
+          if (fBadge) fBadge.textContent = '🎉 [21] 2) 대각선 한 번 더 ➔ 처음(0번) 복원!';
+          if (fText) fText.textContent = '2) ↖➔↘로 한 번 더 그으면 ➔ MD² = ID (처음 0번 복원!)';
+          if (fDesc) fDesc.textContent = '손가락이 주대각선(↖➔↘)을 그은 후 처음 위치로 돌아와서 대각선을 한 번 더 그으면, 대칭의 자기상쇄(MD² = ID)로 2행이 처음 상태(0번)로 말끔히 돌아와요!';
         }
-      }, 1700);
+      }, 1750);
 
       const t4 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
-          this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-anti');
+          this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
         }
-      }, 2250);
+      }, 2400);
 
       this.step1AnimTimers.push(t1, t2, t3, t4);
     } else {

@@ -236,13 +236,13 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
       expect(STEP1_SUB_DEMOS[2].label).toContain('31 3회 클릭');
       expect(STEP1_SUB_DEMOS[2].boardOps[6]).toBe(D4.R270);
       expect(STEP1_SUB_DEMOS[2].highlightCells).toEqual([6, 7, 8]);
-      // ④ 21 대각선 긋기 (2행 변환)
+      // ④ 21 대각선 긋기 (2행 변환: 주대각선 후 대각선 하면 처음 ID 복원)
       expect(STEP1_SUB_DEMOS[3].label).toContain('21 대각선 긋기');
       expect(STEP1_SUB_DEMOS[3].formulaBadge).toContain('[21]');
-      expect(STEP1_SUB_DEMOS[3].formulaText).toContain('21 성분 대각선 긋기');
-      expect(STEP1_SUB_DEMOS[3].boardOps[3]).toBe(D4.MD);
-      expect(STEP1_SUB_DEMOS[3].boardOps[4]).toBe(D4.MD);
-      expect(STEP1_SUB_DEMOS[3].boardOps[5]).toBe(D4.MD);
+      expect(STEP1_SUB_DEMOS[3].formulaText).toContain('21 대각선 긋기');
+      expect(STEP1_SUB_DEMOS[3].boardOps[3]).toBe(D4.ID);
+      expect(STEP1_SUB_DEMOS[3].boardOps[4]).toBe(D4.ID);
+      expect(STEP1_SUB_DEMOS[3].boardOps[5]).toBe(D4.ID);
       expect(STEP1_SUB_DEMOS[3].highlightCells).toEqual([3, 4, 5]);
     });
 
@@ -515,16 +515,16 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
       ctrl.open(1);
       ctrl.stopStep1DemoLoop();
 
-      // 11 가로 밀기 플립 애니메이션 (손가락 안착 대기 후 700ms에 긋기 시작과 동시에 플립 시작)
+      // 11 가로 밀기 플립 애니메이션 (초기 1초간 미노출 대기 후 1200ms에 긋기 시작과 동시에 플립 시작)
       ctrl.goToStep1SubStep(0);
-      vi.advanceTimersByTime(700);
+      vi.advanceTimersByTime(1200);
       const cell0 = document.getElementById('tut-cell-0');
       expect(cell0?.classList.contains('tut-cell-flipping-h')).toBe(true);
 
-      vi.advanceTimersByTime(400); // 1100ms 시점
+      vi.advanceTimersByTime(400); // 1600ms 시점
       expect(ctrl.boardOps[0]).toBe(D4.MX);
 
-      vi.advanceTimersByTime(450); // 1550ms 시점 (애니메이션 완료 후 제거)
+      vi.advanceTimersByTime(450); // 2050ms 시점 (애니메이션 완료 후 제거)
       expect(cell0?.classList.contains('tut-cell-flipping-h')).toBe(false);
 
       // 12 세로 밀기 플립 애니메이션
@@ -580,14 +580,14 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
       vi.advanceTimersByTime(400);
       expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(false);
 
-      // 21 대각선 긋기: 2행 전체([3, 4, 5]) 대각선 반사 (MD ➔ MAD)
+      // 21 대각선 긋기: 2행 전체([3, 4, 5]) 주대각선 대칭 후 대각선 하면 처음 ID 복원
       ctrl.goToStep1SubStep(3);
       const cell3 = document.getElementById('tut-cell-3');
       const cell4 = document.getElementById('tut-cell-4');
       const cell5 = document.getElementById('tut-cell-5');
 
-      // 1) 주대각 변환 (t = 450ms): 2행 [3, 4, 5] MD 변환 및 주대각 플립 클래스 부여
-      vi.advanceTimersByTime(450);
+      // 1) 주대각 변환 (t = 600ms): 2행 [3, 4, 5] MD 변환 및 주대각 플립 클래스 부여
+      vi.advanceTimersByTime(600);
       expect(cell3?.classList.contains('tut-cell-flipping-diag-main')).toBe(true);
       expect(cell4?.classList.contains('tut-cell-flipping-diag-main')).toBe(true);
       expect(cell5?.classList.contains('tut-cell-flipping-diag-main')).toBe(true);
@@ -595,20 +595,20 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
       expect(ctrl.boardOps[4]).toBe(D4.MD);
       expect(ctrl.boardOps[5]).toBe(D4.MD);
 
-      // t = 1000ms: 1단계 플립 클래스 제거
-      vi.advanceTimersByTime(550);
+      // t = 1200ms: 1단계 플립 클래스 제거
+      vi.advanceTimersByTime(600);
       expect(cell3?.classList.contains('tut-cell-flipping-diag-main')).toBe(false);
 
-      // 2) 부대각 변환 (t = 1700ms): 누적 700ms 추가(총 1700ms) 시 2행 [3, 4, 5] MAD 변환 및 부대각 플립 클래스 부여
-      vi.advanceTimersByTime(700);
-      expect(cell3?.classList.contains('tut-cell-flipping-diag-anti')).toBe(true);
-      expect(ctrl.boardOps[3]).toBe(D4.MAD);
-      expect(ctrl.boardOps[4]).toBe(D4.MAD);
-      expect(ctrl.boardOps[5]).toBe(D4.MAD);
-
-      // t = 2250ms: 2단계 플립 클래스 제거
+      // 2) 처음 위치로 복귀 후 대각선 한 번 더 변환 (t = 1750ms): 누적 550ms 추가 시 2행 [3, 4, 5] ID 복원 및 플립 클래스 부여
       vi.advanceTimersByTime(550);
-      expect(cell3?.classList.contains('tut-cell-flipping-diag-anti')).toBe(false);
+      expect(cell3?.classList.contains('tut-cell-flipping-diag-main')).toBe(true);
+      expect(ctrl.boardOps[3]).toBe(D4.ID);
+      expect(ctrl.boardOps[4]).toBe(D4.ID);
+      expect(ctrl.boardOps[5]).toBe(D4.ID);
+
+      // t = 2400ms: 2단계 플립 클래스 제거
+      vi.advanceTimersByTime(650);
+      expect(cell3?.classList.contains('tut-cell-flipping-diag-main')).toBe(false);
 
       vi.useRealTimers();
     });
