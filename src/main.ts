@@ -7,7 +7,7 @@ import { campaignManager } from './game/campaign';
 import { recordManager, formatTime } from './game/recordManager';
 import { renderDogTileCanvas } from './ui/tileRenderer';
 import { GestureRecognizer } from './ui/gesture';
-import { showSolutionModal } from './ui/solutionModal';
+import { solutionInlinePanel } from './ui/solutionModal';
 import { showAboutModal } from './ui/aboutModal';
 import { showTutorialModal, isTutorialCompleted } from './ui/tutorialModal';
 import { victoryManager } from './ui/victoryEffect';
@@ -109,8 +109,10 @@ class MatrixCubeApp {
         <canvas id="gesture-canvas"></canvas>
       </div>
 
+      <!-- 보드 아래쪽 실시간 인라인 해설 패널 컨테이너 -->
+      <div id="solution-panel-container"></div>
+
       <div class="controls-panel">
-        <button id="btn-scramble" class="btn-action">🎲 섞기</button>
         <button id="btn-undo" class="btn-action">↩ 되돌리기</button>
         <button id="btn-hint" class="btn-action">💡 힌트</button>
         <button id="btn-solution" class="btn-action primary">📖 해설</button>
@@ -309,10 +311,6 @@ class MatrixCubeApp {
 
     // 난이도(N수) 버튼 목록 초기 렌더링
     this.renderDifficultyButtons();
-
-    document.getElementById('btn-scramble')?.addEventListener('click', () => {
-      this.scrambleBoard();
-    });
 
     document.getElementById('btn-undo')?.addEventListener('click', () => {
       this.undoMove();
@@ -551,6 +549,7 @@ class MatrixCubeApp {
   }
 
   private scrambleBoard() {
+    solutionInlinePanel.close();
     this.isGameStarted = false;
     recordManager.resetTimer();
     const timerEl = document.getElementById('label-timer');
@@ -622,11 +621,53 @@ class MatrixCubeApp {
   }
 
   private openSolution() {
+    const container = document.getElementById('solution-panel-container');
+    if (!container) return;
+
+    const originalOps = [...this.currentOps];
     const steps = solveBoard(this.currentOps, this.boardSize, this.currentGroup);
-    showSolutionModal(
+
+    solutionInlinePanel.render(
+      container,
+      this.currentOps,
+      this.boardSize,
       steps,
-      () => this.runAutoSolve(steps),
-      () => {}
+      {
+        onPreviewState: (previewOps, lineId) => {
+          this.currentOps = [...previewOps];
+          this.updateBoard();
+
+          // 모든 이전 하이라이트 제거
+          const total = this.boardSize * this.boardSize;
+          for (let i = 0; i < total; i++) {
+            const b = this.boardGrid.children[i] as HTMLElement;
+            if (b) b.classList.remove('highlight-hint');
+          }
+
+          // 해당 라인 하이라이트
+          if (lineId !== null) {
+            const lineCellsList = generateLineCells(this.boardSize);
+            const cells = lineCellsList[lineId] || [];
+            cells.forEach(idx => {
+              const b = this.boardGrid.children[idx] as HTMLElement;
+              if (b) b.classList.add('highlight-hint');
+            });
+          }
+        },
+        onAutoSolve: () => {
+          this.currentOps = [...originalOps];
+          this.updateBoard();
+          this.runAutoSolve(steps);
+        },
+        onClose: () => {
+          const total = this.boardSize * this.boardSize;
+          for (let i = 0; i < total; i++) {
+            const b = this.boardGrid.children[i] as HTMLElement;
+            if (b) b.classList.remove('highlight-hint');
+          }
+          this.updateBoard();
+        }
+      }
     );
   }
 
