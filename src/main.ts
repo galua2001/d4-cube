@@ -11,6 +11,7 @@ import { showSolutionModal } from './ui/solutionModal';
 import { showAboutModal } from './ui/aboutModal';
 import { showTutorialModal, isTutorialCompleted } from './ui/tutorialModal';
 import { victoryManager } from './ui/victoryEffect';
+import { initPWAManager } from './pwaManager';
 
 class MatrixCubeApp {
   private boardSize = 3;
@@ -37,6 +38,7 @@ class MatrixCubeApp {
     this.bindControls();
     this.updateBoard();
     this.updateBestRecordBadge();
+    initPWAManager();
   }
 
   private initBoardOps() {
@@ -58,6 +60,7 @@ class MatrixCubeApp {
       <div class="header-bar">
         <div class="header-title">🧩 행렬 큐브</div>
         <div class="header-actions">
+          <button id="btn-pwa-install" class="btn-icon" style="display:none; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: bold; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);" title="스마트폰에 앱으로 설치">📱 앱설치</button>
           <button id="btn-header-tutorial" class="btn-icon btn-nav-tutorial" title="30초 인터랙티브 D4 연산 튜토리얼">🎓 튜토리얼</button>
           <button id="btn-about" class="btn-icon" title="작품 소개 및 수학적 배경">ℹ️ 소개</button>
           <button id="btn-toggle-guide" class="btn-icon" title="컨트롤러 타일 가이드">🧭 가이드</button>
