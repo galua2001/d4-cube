@@ -247,31 +247,37 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
     });
 
     it('open(2) 호출 시 2단계([V4 실전] V4 4수 마스터) 진입 및 V4 초기 보드 상태 로드와 goToV4SubStep(1~4) 서브 스텝 탐색이 원활히 동작해야 함', () => {
+      vi.useFakeTimers();
       const ctrl = new TutorialModalController();
       ctrl.open(2);
       expect(ctrl.currentStep).toBe(2);
       expect(ctrl.v4SubStep).toBe(0);
       expect(ctrl.boardOps).toEqual(V4_EXAMPLE_STEPS[0].boardOps);
 
-      // 1수로 변경
+      // 1수로 변경 (31 두 번 클릭하여 180도 회전 완성)
       ctrl.goToV4SubStep(1);
       expect(ctrl.v4SubStep).toBe(1);
+      vi.advanceTimersByTime(1100);
       expect(ctrl.boardOps).toEqual(V4_EXAMPLE_STEPS[1].boardOps);
 
-      // 2수로 변경
+      // 2수로 변경 (13 세로 그어 3열 변환)
       ctrl.goToV4SubStep(2);
       expect(ctrl.v4SubStep).toBe(2);
+      vi.advanceTimersByTime(800);
       expect(ctrl.boardOps).toEqual(V4_EXAMPLE_STEPS[2].boardOps);
 
-      // 3수로 변경
+      // 3수로 변경 (21 세로 그어 2행 변환)
       ctrl.goToV4SubStep(3);
       expect(ctrl.v4SubStep).toBe(3);
+      vi.advanceTimersByTime(800);
       expect(ctrl.boardOps).toEqual(V4_EXAMPLE_STEPS[3].boardOps);
 
-      // 4수(완성)로 변경
+      // 4수(완성)로 변경 (11 두 번 클릭하여 전체 완성)
       ctrl.goToV4SubStep(4);
       expect(ctrl.v4SubStep).toBe(4);
+      vi.advanceTimersByTime(1100);
       expect(ctrl.boardOps.every(op => op === D4.ID)).toBe(true);
+      vi.useRealTimers();
     });
 
     it('3단계 진입 시 완전한 대칭 군 D4 원리 8가지 원소 예시 보드가 시연되어야 함', () => {
@@ -469,23 +475,25 @@ describe('TutorialModal & Group Theory Core Logic (5단계 슬라이드 및 실�
       ctrl.goToV4SubStep(0); // 0수: 중앙 타일 (idx 4)
       expect(handEl?.classList.contains('hand-anim-tap')).toBe(true);
 
-      ctrl.goToV4SubStep(1); // 1수: 3행 1열 (idx 6) 더블탭
-      expect(handEl?.classList.contains('hand-anim-double-tap')).toBe(true);
+      ctrl.goToV4SubStep(1); // 1수: 3행 1열 (idx 6) 손가락 1개로 두 번 클릭
+      expect(handEl?.classList.contains('hand-anim-single-double-tap')).toBe(true);
+      expect(iconEl?.textContent).toBe('👆');
       expect(handEl?.style.left).toBe('16.7%');
       expect(handEl?.style.top).toBe('83.3%');
 
       ctrl.goToV4SubStep(2); // 2수: 1행 3열 (idx 2) 세로 밀기
-      expect(handEl?.classList.contains('hand-anim-swipe-col3')).toBe(true);
+      expect(handEl?.classList.contains('hand-anim-cell-swipe-v')).toBe(true);
       expect(handEl?.style.left).toBe('83.3%');
       expect(handEl?.style.top).toBe('16.7%');
 
       ctrl.goToV4SubStep(3); // 3수: 2행 1열 (idx 3) 세로 밀기
-      expect(handEl?.classList.contains('hand-anim-swipe-v')).toBe(true);
+      expect(handEl?.classList.contains('hand-anim-cell-swipe-v')).toBe(true);
       expect(handEl?.style.left).toBe('16.7%');
       expect(handEl?.style.top).toBe('50.0%');
 
-      ctrl.goToV4SubStep(4); // 4수: 1행 1열 (idx 0) 더블탭
-      expect(handEl?.classList.contains('hand-anim-double-tap')).toBe(true);
+      ctrl.goToV4SubStep(4); // 4수: 1행 1열 (idx 0) 손가락 1개로 두 번 클릭
+      expect(handEl?.classList.contains('hand-anim-single-double-tap')).toBe(true);
+      expect(iconEl?.textContent).toBe('👆');
       expect(handEl?.style.left).toBe('16.7%');
       expect(handEl?.style.top).toBe('16.7%');
 

@@ -26,7 +26,7 @@
       // Service Worker 등록 및 캐시 강제 무효화
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js?v=20261009_2022').then((reg) => {
+          navigator.serviceWorker.register('sw.js?v=20261009_2035').then((reg) => {
             reg.update();
           }).catch(() => {});
         });

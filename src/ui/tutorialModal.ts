@@ -297,6 +297,7 @@ export class TutorialModalController {
   private autoPlayTimer: any = null;
   private step1Timer: any = null;
   private step1AnimTimers: any[] = [];
+  private v4AnimTimers: any[] = [];
   public get step2Timer(): any { return this.step1Timer; }
   public set step2Timer(v: any) { this.step1Timer = v; }
   public get step2AnimTimers(): any[] { return this.step1AnimTimers; }
@@ -332,6 +333,7 @@ export class TutorialModalController {
   public close(): void {
     this.stopStep1DemoLoop();
     this.stopAutoPlay();
+    this.clearV4AnimTimers();
     this.isOpen = false;
     if (typeof document !== 'undefined') {
       const overlay = document.getElementById('tutorial-modal-overlay');
@@ -344,6 +346,7 @@ export class TutorialModalController {
 
   public skip(): void {
     this.stopAutoPlay();
+    this.clearV4AnimTimers();
     markTutorialCompleted();
     this.close();
     soundEngine.playTap();
@@ -366,6 +369,7 @@ export class TutorialModalController {
   public goToStep(step: number, playSound = true): void {
     this.stopStep1DemoLoop();
     this.stopAutoPlay();
+    this.clearV4AnimTimers();
     this.currentStep = Math.max(1, Math.min(5, step));
 
     if (this.currentStep === 1) {
@@ -777,41 +781,37 @@ export class TutorialModalController {
         break;
 
       case 2:
-        // STEP 2: V4 실전 예제 각 수별 시연 (positionHandAtCell 정밀 위치 연동)
+        // STEP 2: V4 실전 예제 각 수별 시연 (손가락 1개로 정밀 제스처 시연)
+        icon.textContent = '👆';
         switch (subStep) {
           case 0:
             this.positionHandAtCell(4); // 보드 중앙 가이드
             hand.classList.add('hand-anim-tap');
-            icon.textContent = '👆';
-            bubble.textContent = 'V4 모드 소개';
+            bubble.textContent = '위의 수 버튼을 눌러보세요!';
             break;
           case 1:
-            // 1수: 3행 1열(idx 6) 더블 탭 시연
+            // 1수: 3행 1열(31, idx 6) 손가락 1개로 두 번 클릭 (각 90°씩 회전)
             this.positionHandAtCell(6);
-            hand.classList.add('hand-anim-double-tap');
-            icon.textContent = '👆👆';
-            bubble.textContent = '3행 더블 탭 (180°)';
+            hand.classList.add('hand-anim-single-double-tap');
+            bubble.textContent = '31 두 번 클릭 (90°+90°=180°)';
             break;
           case 2:
-            // 2수: 1행 3열(idx 2) 세로 밀기
+            // 2수: 1행 3열(13, idx 2) 세로 쓱 그어 3열 변환
             this.positionHandAtCell(2);
-            hand.classList.add('hand-anim-swipe-col3');
-            icon.textContent = '👆';
-            bubble.textContent = '3열 세로 밀기 (↕)';
+            hand.classList.add('hand-anim-cell-swipe-v');
+            bubble.textContent = '13 세로 쓱 그어 3열 변환 (↕)';
             break;
           case 3:
-            // 3수: 2행 1열(idx 3) 세로 밀기
+            // 3수: 2행 1열(21, idx 3) 세로 쓱 그어 2행 변환
             this.positionHandAtCell(3);
-            hand.classList.add('hand-anim-swipe-v');
-            icon.textContent = '👆';
-            bubble.textContent = '2행 세로 밀기 (↕)';
+            hand.classList.add('hand-anim-cell-swipe-v');
+            bubble.textContent = '21 세로 쓱 그어 2행 변환 (↕)';
             break;
           case 4:
-            // 4수: 1행 1열(idx 0) 더블 탭
+            // 4수: 1행 1열(11, idx 0) 손가락 1개로 두 번 클릭 (각 90°씩 회전)
             this.positionHandAtCell(0);
-            hand.classList.add('hand-anim-double-tap');
-            icon.textContent = '👆👆';
-            bubble.textContent = '1행 더블 탭 (180°)';
+            hand.classList.add('hand-anim-single-double-tap');
+            bubble.textContent = '11 두 번 클릭 (90°+90°=180°)';
             break;
         }
         break;
@@ -888,6 +888,13 @@ export class TutorialModalController {
     if (this.step1AnimTimers && this.step1AnimTimers.length > 0) {
       this.step1AnimTimers.forEach((t) => clearTimeout(t));
       this.step1AnimTimers = [];
+    }
+  }
+
+  private clearV4AnimTimers(): void {
+    if (this.v4AnimTimers && this.v4AnimTimers.length > 0) {
+      this.v4AnimTimers.forEach((t) => clearTimeout(t));
+      this.v4AnimTimers = [];
     }
   }
 
@@ -1205,11 +1212,15 @@ export class TutorialModalController {
 
   /**
    * V4 실전 예제 서브 스텝 변경
+   * 1수: 31 두 번 클릭 -> 각 클릭마다 90°씩 회전하여 180° 회전 상쇄
+   * 2수: 13 세로 쓱 그을 때 동시에 3열 세로 반사 플립
+   * 3수: 21 세로 쓱 그을 때 동시에 2행 세로 반사 플립
+   * 4수: 11 손가락 1개로 두 번 톡톡 -> 각 클릭마다 90°씩 회전하여 최종 완성
    */
   public goToV4SubStep(subStep: number, playSound = true): void {
+    this.clearV4AnimTimers();
     this.v4SubStep = Math.max(0, Math.min(V4_EXAMPLE_STEPS.length - 1, subStep));
     const stepData = V4_EXAMPLE_STEPS[this.v4SubStep];
-    this.boardOps = [...stepData.boardOps];
 
     this.clearCellHighlights();
     if (stepData.highlightCells.length > 0) {
@@ -1228,9 +1239,154 @@ export class TutorialModalController {
 
       this.updateMovePillsActive(this.v4SubStep);
       this.updateHandDemo(2, this.v4SubStep);
-      this.renderBoard();
     }
-    if (playSound) soundEngine.playTap();
+
+    if (this.v4SubStep === 0) {
+      // 0수 (초기 상태)
+      this.boardOps = [...stepData.boardOps];
+      this.renderBoard();
+      if (playSound) soundEngine.playTap();
+
+    } else if (this.v4SubStep === 1) {
+      // 1수: 31 두 번 클릭 -> 1회 클릭 시 90도 회전, 2회 클릭 시 또 90도 회전해서 총 180도 회전 완성!
+      this.boardOps = [...V4_EXAMPLE_STEPS[0].boardOps];
+      this.renderBoard();
+
+      // [1회 클릭] t = 100ms: 3행 전체([6, 7, 8]) 90° 시계 회전
+      const t1 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 1) {
+          this.addCellAnimClass([6, 7, 8], 'tut-cell-rotating-90');
+          this.boardOps[6] = composeOps(V4_EXAMPLE_STEPS[0].boardOps[6], D4.R90);
+          this.boardOps[7] = composeOps(V4_EXAMPLE_STEPS[0].boardOps[7], D4.R90);
+          this.boardOps[8] = composeOps(V4_EXAMPLE_STEPS[0].boardOps[8], D4.R90);
+          this.renderBoard();
+          soundEngine.playTap();
+        }
+      }, 100);
+
+      const t2 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 1) {
+          this.removeCellAnimClass([6, 7, 8], 'tut-cell-rotating-90');
+        }
+      }, 450);
+
+      // [2회 클릭] t = 680ms: 3행 전체 다시 90° 추가 회전 (총 180° 회전 완성!)
+      const t3 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 1) {
+          this.addCellAnimClass([6, 7, 8], 'tut-cell-rotating-90');
+          this.boardOps = [...V4_EXAMPLE_STEPS[1].boardOps];
+          this.renderBoard();
+          soundEngine.playTap();
+        }
+      }, 680);
+
+      const t4 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 1) {
+          this.removeCellAnimClass([6, 7, 8], 'tut-cell-rotating-90');
+        }
+      }, 1050);
+
+      this.v4AnimTimers.push(t1, t2, t3, t4);
+
+    } else if (this.v4SubStep === 2) {
+      // 2수: 13 세로 그을 때 동시에 3열([2, 5, 8]) 세로 반사 변환!
+      this.boardOps = [...V4_EXAMPLE_STEPS[1].boardOps];
+      this.renderBoard();
+
+      // 손가락이 움직이는 순간 동시에 (t = 50ms) 3열 3D 플립 발동
+      const t1 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 2) {
+          this.addCellAnimClass([2, 5, 8], 'tut-cell-flipping-v');
+          soundEngine.playFlip();
+        }
+      }, 50);
+
+      // 플립 회전 중간 시점: 3열 타일들이 세로 반사로 갱신 (MX ∘ MY = R180 합성)
+      const t2 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 2) {
+          this.boardOps = [...V4_EXAMPLE_STEPS[2].boardOps];
+          this.renderBoard();
+        }
+      }, 350);
+
+      const t3 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 2) {
+          this.removeCellAnimClass([2, 5, 8], 'tut-cell-flipping-v');
+        }
+      }, 750);
+
+      this.v4AnimTimers.push(t1, t2, t3);
+
+    } else if (this.v4SubStep === 3) {
+      // 3수: 21 세로 그을 때 동시에 2행([3, 4, 5]) 세로 반사 변환!
+      this.boardOps = [...V4_EXAMPLE_STEPS[2].boardOps];
+      this.renderBoard();
+
+      // 손가락이 움직이는 순간 동시에 (t = 50ms) 2행 3D 플립 발동
+      const t1 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 3) {
+          this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-v');
+          soundEngine.playFlip();
+        }
+      }, 50);
+
+      // 플립 회전 중간 시점: 2행 타일들이 세로 반사로 갱신 (MY² = 0 상쇄)
+      const t2 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 3) {
+          this.boardOps = [...V4_EXAMPLE_STEPS[3].boardOps];
+          this.renderBoard();
+        }
+      }, 350);
+
+      const t3 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 3) {
+          this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-v');
+        }
+      }, 750);
+
+      this.v4AnimTimers.push(t1, t2, t3);
+
+    } else if (this.v4SubStep === 4) {
+      // 4수: 11 손가락 1개로 두 번 톡톡 -> 그때마다 90도씩 회전해서 180도 회전 완성!
+      this.boardOps = [...V4_EXAMPLE_STEPS[3].boardOps];
+      this.renderBoard();
+
+      // [1회 클릭] t = 100ms: 1행 전체([0, 1, 2]) 90° 시계 회전
+      const t1 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 4) {
+          this.addCellAnimClass([0, 1, 2], 'tut-cell-rotating-90');
+          this.boardOps[0] = composeOps(V4_EXAMPLE_STEPS[3].boardOps[0], D4.R90);
+          this.boardOps[1] = composeOps(V4_EXAMPLE_STEPS[3].boardOps[1], D4.R90);
+          this.boardOps[2] = composeOps(V4_EXAMPLE_STEPS[3].boardOps[2], D4.R90);
+          this.renderBoard();
+          soundEngine.playTap();
+        }
+      }, 100);
+
+      const t2 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 4) {
+          this.removeCellAnimClass([0, 1, 2], 'tut-cell-rotating-90');
+        }
+      }, 450);
+
+      // [2회 클릭] t = 680ms: 1행 전체 다시 90° 추가 회전 (총 180° 회전 및 전체 0번 완성!)
+      const t3 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 4) {
+          this.addCellAnimClass([0, 1, 2], 'tut-cell-rotating-90');
+          this.boardOps = [...V4_EXAMPLE_STEPS[4].boardOps];
+          this.renderBoard();
+          soundEngine.playWin();
+        }
+      }, 680);
+
+      const t4 = setTimeout(() => {
+        if (this.currentStep === 2 && this.v4SubStep === 4) {
+          this.removeCellAnimClass([0, 1, 2], 'tut-cell-rotating-90');
+        }
+      }, 1050);
+
+      this.v4AnimTimers.push(t1, t2, t3, t4);
+    }
   }
 
   /**
@@ -1398,12 +1554,12 @@ export class TutorialModalController {
       case 2:
         stepNameEl.textContent = 'STEP 2. [V4 실전] V4 4수 최단 풀이';
         mainTextEl.textContent = 'V4 모드는 {0, 180, X축(가로), Y축(세로)} 4가지 대칭 변환만 사용해요!';
-        subTextEl.textContent = '대각선과 90° 회전 없이 오직 반사와 180° 회전 상쇄만으로 4수 만에 0번을 맞추는 풀이를 확인해 보세요.';
+        subTextEl.textContent = '👆 위의 [1수], [2수]... 버튼을 차례로 누르거나 [▶ 한 수씩 보기]를 누르면 손동작과 함께 4수 풀이가 실시간으로 펼쳐져요!';
         if (moveController) moveController.style.display = 'flex';
         this.renderMovePills(V4_EXAMPLE_STEPS, this.v4SubStep, (idx) => this.goToV4SubStep(idx));
         this.goToV4SubStep(this.v4SubStep, false);
         if (btnActionText) btnActionText.textContent = '다음 (2/5) ➔';
-        soundEngine.speak('V4 모드에서는 0도, 180도, X축 대칭, Y축 대칭 변환만 사용해요. 반사와 회전의 대칭 상쇄로 4수 만에 푸는 실전 과정을 보여드릴게요.');
+        soundEngine.speak('V4 모드에서는 0도, 180도, X축 대칭, Y축 대칭 변환만 사용해요. 위의 수 버튼을 눌러 4수 풀이 과정을 확인해 보세요.');
         break;
 
       case 3:
