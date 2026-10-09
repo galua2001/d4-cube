@@ -86,42 +86,57 @@ body {
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
 }
 
-/* Settings Bar (Size & Difficulty) */
+/* Settings Bar (1행 슬림 압축: 난이도 + 크기 순환 + 대각선 토글) */
 .settings-panel {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 8px;
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 8px 12px;
+  padding: 6px 10px;
 }
 
 .settings-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+}
+
+.settings-left-group {
+  display: flex;
+  align-items: center;
   gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
 
 .settings-label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--text-muted);
-  min-width: 65px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.settings-options-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
 }
 
 .button-group {
   display: flex;
-  gap: 4px;
+  gap: 3px;
   flex: 1;
 }
 
 .btn-pill {
   flex: 1;
-  padding: 6px 4px;
-  font-size: 0.8rem;
+  padding: 5px 3px;
+  font-size: 0.78rem;
   font-weight: 600;
   background: #0f172a;
   border: 1px solid var(--border-color);
@@ -130,6 +145,7 @@ body {
   cursor: pointer;
   transition: all 0.2s;
   text-align: center;
+  white-space: nowrap;
 }
 
 .btn-pill:hover {
@@ -142,6 +158,44 @@ body {
   border-color: #38bdf8;
   color: white;
   font-weight: 700;
+}
+
+/* 크기 순환 & 대각선 모드 토글 옵션 알약 버튼 */
+.btn-option-pill {
+  padding: 5px 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #0f172a;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+}
+
+.btn-option-pill:hover {
+  color: white;
+  border-color: var(--accent-color);
+  background: #1e293b;
+}
+
+.btn-option-pill:active {
+  transform: scale(0.95);
+}
+
+/* 대각선 활성화 시 네온 옐로우/골드 스타일 */
+.btn-option-pill.active-diag {
+  background: linear-gradient(135deg, #eab308, #ca8a04);
+  border-color: #fef08a;
+  color: #0f172a;
+  font-weight: 800;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.45);
 }
 
 /* Status Info */
@@ -917,8 +971,25 @@ body {
   }
 
   .settings-panel {
-    padding: 6px 8px;
-    gap: 6px;
+    padding: 5px 6px;
+  }
+
+  .settings-row {
+    gap: 4px;
+  }
+
+  .settings-label {
+    display: none;
+  }
+
+  .btn-pill {
+    padding: 4px 2px;
+    font-size: 0.74rem;
+  }
+
+  .btn-option-pill {
+    padding: 4px 6px;
+    font-size: 0.74rem;
   }
 
   .board-container {

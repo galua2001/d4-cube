@@ -15,6 +15,7 @@ export class GestureRecognizer {
   private startCell: { r: number; c: number; target: LineTarget } | null = null;
   private isLocked = false;
   private boardSize = 3;
+  private allowDiagonal = false;
 
   // 1-1 성분의 현재 모드 ('row': 1행 변환 모드, 'col': 1열 변환 모드)
   private cell11Mode: 'row' | 'col' = 'row';
@@ -39,6 +40,14 @@ export class GestureRecognizer {
 
   public setBoardSize(size: number) {
     this.boardSize = size;
+  }
+
+  public setAllowDiagonal(allow: boolean) {
+    this.allowDiagonal = allow;
+  }
+
+  public isDiagonalAllowed(): boolean {
+    return this.allowDiagonal;
   }
 
   public setLocked(locked: boolean) {
@@ -82,20 +91,23 @@ export class GestureRecognizer {
       return lines.find(l => l.type === 'col' && l.idx === c) || null;
     }
 
-    // 대각선: 우측 하단 모서리는 주대각선, (1, sz-1)은 부대각선
-    if (r === sz - 1 && c === sz - 1) {
-      return lines.find(l => l.type === 'diag' && l.idx === 'main') || null;
-    }
-    if (r === 1 && c === sz - 1) {
-      return lines.find(l => l.type === 'diag' && l.idx === 'anti') || null;
+    // 대각선 변환이 활성화되었을 때만 대각선 및 보드 중앙 성분 인식
+    if (this.allowDiagonal) {
+      // 대각선: 우측 하단 모서리는 주대각선, (1, sz-1)은 부대각선
+      if (r === sz - 1 && c === sz - 1) {
+        return lines.find(l => l.type === 'diag' && l.idx === 'main') || null;
+      }
+      if (r === 1 && c === sz - 1) {
+        return lines.find(l => l.type === 'diag' && l.idx === 'anti') || null;
+      }
+
+      // 보드 중앙 성분(예: 3x3의 2행2열) 터치 시 2행 변환으로 매핑
+      if (r === Math.floor(sz / 2) && c === Math.floor(sz / 2)) {
+        return lines.find(l => l.type === 'row' && l.idx === r) || null;
+      }
     }
 
-    // 보드 중앙 성분(예: 3x3의 2행2열) 터치 시 2행 변환으로 매핑하여 무반응 방지
-    if (r === Math.floor(sz / 2) && c === Math.floor(sz / 2)) {
-      return lines.find(l => l.type === 'row' && l.idx === r) || null;
-    }
-
-    // 그 외 비제어 내부 성분
+    // 기본(대각선 비활성화) 모드에서는 오직 외곽 5곳(11, 12, 13, 21, 31)만 컨트롤러로 인식
     return null;
   }
 

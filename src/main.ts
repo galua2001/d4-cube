@@ -16,6 +16,7 @@ import { initPWAManager } from './pwaManager';
 class MatrixCubeApp {
   private boardSize = 3;
   private scrambleMoves = 3; // 기본 3수 섞기
+  private isDiagonalEnabled = false; // 기본적으로 대각선 변환 비활성화
   private currentOps: D4Op[] = [];
   private currentGroup: SymmetryGroupKey = 'D4';
   private moveHistory: Array<{ lineId: number; op: D4Op; prevOps: D4Op[] }> = [];
@@ -69,25 +70,16 @@ class MatrixCubeApp {
         </div>
       </div>
 
-      <!-- 보드 크기 & 난이도 설정 패널 -->
+      <!-- 단 1행으로 압축된 슬림 설정 패널 (난이도 행 우측에 크기 순환 및 대각선 토글 버튼 배치) -->
       <div class="settings-panel">
         <div class="settings-row">
-          <span class="settings-label">📐 크기</span>
-          <div class="button-group" id="size-button-group">
-            <button class="btn-pill active" data-size="3">3×3</button>
-            <button class="btn-pill" data-size="4">4×4</button>
-            <button class="btn-pill" data-size="5">5×5</button>
+          <div class="settings-left-group">
+            <span class="settings-label">🎲 난이도</span>
+            <div class="button-group" id="moves-button-group"></div>
           </div>
-        </div>
-        <div class="settings-row">
-          <span class="settings-label">🎲 난이도</span>
-          <div class="button-group" id="moves-button-group">
-            <button class="btn-pill active" data-moves="3">3수</button>
-            <button class="btn-pill" data-moves="4">4수</button>
-            <button class="btn-pill" data-moves="5">5수</button>
-            <button class="btn-pill" data-moves="6">6수</button>
-            <button class="btn-pill" data-moves="7">7수</button>
-            <button class="btn-pill" data-moves="8">8수</button>
+          <div class="settings-options-group">
+            <button id="btn-cycle-size" class="btn-option-pill" title="보드 크기 순환 (3×3 ➔ 4×4 ➔ 5×5)">📐 ${this.boardSize}×${this.boardSize}</button>
+            <button id="btn-toggle-diag" class="btn-option-pill ${this.isDiagonalEnabled ? 'active-diag' : ''}" title="대각선 변환 모드 켜기/끄기">⚡ 대각선 ${this.isDiagonalEnabled ? 'ON' : 'OFF'}</button>
           </div>
         </div>
       </div>
@@ -128,13 +120,14 @@ class MatrixCubeApp {
     this.boardGrid = document.getElementById('board-grid')!;
     this.gestureCanvas = document.getElementById('gesture-canvas') as HTMLCanvasElement;
 
-    // 제스처 인식기 활성화
+    // 제스처 인식기 활성화 (대각선 허용 상태 동기화)
     this.gestureRecognizer = new GestureRecognizer(
       this.boardGrid,
       this.gestureCanvas,
       (target, op) => this.handleLineOperation(target, op),
       this.boardSize
     );
+    this.gestureRecognizer.setAllowDiagonal(this.isDiagonalEnabled);
 
     this.rebuildBoardDOM();
   }
@@ -190,12 +183,14 @@ class MatrixCubeApp {
         } else if (r === 0 && c > 0) {
           guideText = `${c + 1}열`;
           guideClass = 'guide-col';
-        } else if (r === this.boardSize - 1 && c === this.boardSize - 1) {
-          guideText = '↖대각';
-          guideClass = 'guide-diag';
-        } else if (r === 1 && c === this.boardSize - 1) {
-          guideText = '↗대각';
-          guideClass = 'guide-diag';
+        } else if (this.isDiagonalEnabled) {
+          if (r === this.boardSize - 1 && c === this.boardSize - 1) {
+            guideText = '↖대각';
+            guideClass = 'guide-diag';
+          } else if (r === 1 && c === this.boardSize - 1) {
+            guideText = '↗대각';
+            guideClass = 'guide-diag';
+          }
         }
 
         if (guideText) {
@@ -295,18 +290,14 @@ class MatrixCubeApp {
       (e.target as HTMLElement).innerText = on ? '🔊 SFX' : '🔈 SFX';
     });
 
-    // 보드 크기 선택 이벤트
-    document.querySelectorAll('#size-button-group .btn-pill').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const target = e.currentTarget as HTMLElement;
-        const newSize = parseInt(target.dataset.size || '3', 10);
-        if (newSize === this.boardSize) return;
+    // 보드 크기 순환 버튼 이벤트 (3×3 ➔ 4×4 ➔ 5×5)
+    document.getElementById('btn-cycle-size')?.addEventListener('click', () => {
+      this.cycleBoardSize();
+    });
 
-        document.querySelectorAll('#size-button-group .btn-pill').forEach(b => b.classList.remove('active'));
-        target.classList.add('active');
-
-        this.setBoardSize(newSize);
-      });
+    // 대각선 변환 모드 토글 버튼 이벤트
+    document.getElementById('btn-toggle-diag')?.addEventListener('click', () => {
+      this.toggleDiagonal();
     });
 
     // 난이도(N수) 버튼 목록 초기 렌더링
@@ -329,6 +320,34 @@ class MatrixCubeApp {
     document.getElementById('btn-set-d4')?.addEventListener('click', () => this.switchGroup('D4'));
   }
 
+  // 보드 크기 순환 전환 (3x3 ➔ 4x4 ➔ 5x5 ➔ 3x3)
+  private cycleBoardSize() {
+    let nextSize = 3;
+    if (this.boardSize === 3) nextSize = 4;
+    else if (this.boardSize === 4) nextSize = 5;
+    else nextSize = 3;
+
+    this.setBoardSize(nextSize);
+  }
+
+  // 대각선 변환 모드 켜기/끄기 토글
+  private toggleDiagonal() {
+    this.isDiagonalEnabled = !this.isDiagonalEnabled;
+    this.gestureRecognizer.setAllowDiagonal(this.isDiagonalEnabled);
+
+    const btnDiag = document.getElementById('btn-toggle-diag');
+    if (btnDiag) {
+      btnDiag.innerText = `⚡ 대각선 ${this.isDiagonalEnabled ? 'ON' : 'OFF'}`;
+      btnDiag.classList.toggle('active-diag', this.isDiagonalEnabled);
+      btnDiag.title = this.isDiagonalEnabled ? '대각선 변환 모드 켜짐 (탭하여 끄기)' : '대각선 변환 모드 꺼짐 (탭하여 켜기)';
+    }
+
+    soundEngine.playTap();
+    this.rebuildBoardDOM();
+    this.updateBoard();
+    this.scrambleBoard();
+  }
+
   private updateBestRecordBadge() {
     const badge = document.getElementById('badge-best-record');
     if (!badge) return;
@@ -349,6 +368,11 @@ class MatrixCubeApp {
     this.initBoardOps();
     this.rebuildBoardDOM();
     this.gestureRecognizer.setBoardSize(newSize);
+
+    const btnSize = document.getElementById('btn-cycle-size');
+    if (btnSize) {
+      btnSize.innerText = `📐 ${newSize}×${newSize}`;
+    }
 
     this.isGameStarted = false;
     recordManager.resetTimer();
@@ -560,10 +584,13 @@ class MatrixCubeApp {
     const groupDef = SYMMETRY_GROUPS[this.currentGroup];
     const validOps = groupDef.ops.filter(o => o !== D4.ID);
 
+    // 대각선 변환 활성화 여부에 따라 사용 가능한 라인 범위 결정 (대각선 OFF시 오직 행과 열만 섞음)
+    const maxLineIdx = this.isDiagonalEnabled ? lines.length : this.boardSize * 2;
+
     let ops = Array(this.boardSize * this.boardSize).fill(D4.ID);
 
     for (let i = 0; i < this.scrambleMoves; i++) {
-      const lineId = Math.floor(Math.random() * lines.length);
+      const lineId = Math.floor(Math.random() * maxLineIdx);
       const randOp = validOps[Math.floor(Math.random() * validOps.length)];
       ops = applyLineMoveGeneric(ops, lineCellsList[lineId], randOp);
     }
@@ -583,7 +610,7 @@ class MatrixCubeApp {
       return;
     }
 
-    const steps = solveBoard(this.currentOps, this.boardSize, this.currentGroup);
+    const steps = solveBoard(this.currentOps, this.boardSize, this.currentGroup, this.isDiagonalEnabled);
     if (steps.length === 0) return;
 
     const first = steps[0];
@@ -625,7 +652,7 @@ class MatrixCubeApp {
     if (!container) return;
 
     const originalOps = [...this.currentOps];
-    const steps = solveBoard(this.currentOps, this.boardSize, this.currentGroup);
+    const steps = solveBoard(this.currentOps, this.boardSize, this.currentGroup, this.isDiagonalEnabled);
 
     solutionInlinePanel.render(
       container,

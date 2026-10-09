@@ -46,7 +46,7 @@ export interface ExampleMoveStep {
  * STEP 1. 각 행과 열의 첫 성분 조작에 따른 행/열 변환 실전 시연
  * 1) 11 성분 가로 쓱 밀기 ➔ 1행 전체 가로 반사(MX)
  * 2) 12 성분 세로 쓱 밀기 ➔ 1행이 MX인 상태에서 12를 세로로 밀어 MX ∘ MY = R180 (180° 회전) 합성!
- * 3) 13 성분 대각선 밀기 ➔ 13 대각선 복합 밀기로 대각선 반사 변환(MD/MAD)
+ * 3) 31 성분 대각선 밀기 ➔ 31 대각선 복합 밀기로 주대각선·부대각선 반사 변환(MD/MAD)
  */
 export const STEP1_SUB_DEMOS: ExampleMoveStep[] = [
   {
@@ -77,16 +77,16 @@ export const STEP1_SUB_DEMOS: ExampleMoveStep[] = [
   },
   {
     subStep: 2,
-    label: '③ 13 대각선 변환',
+    label: '③ 31 대각선 변환',
     boardOps: [
       D4.MX,  D4.R180, D4.MAD,
       D4.ID,  D4.MD,   D4.ID,
       D4.MAD, D4.MY,   D4.ID
     ],
     highlightCells: [2, 4, 6],
-    formulaBadge: '⚡ [13] 대각선 변환 (MD / MAD)',
-    formulaText: '13 대각선 복합 밀기 ➔ 대각선 반사 변환!',
-    formulaDesc: '13 성분을 대각선으로 밀면 대각선 라인을 따라 신비로운 대각 반사(MD / MAD)가 일어납니다!'
+    formulaBadge: '⚡ [31] 3행 첫 성분 대각선 변환',
+    formulaText: '31 대각선 밀기 ➔ 주대각선 & 부대각선 변환',
+    formulaDesc: '31 성분을 대각선으로 밀면 주대각선 ➔ 부대각선 ➔ 다시 부대각선으로 0번 복원되는 대칭 변환을 볼 수 있어요!'
   }
 ];
 
@@ -422,7 +422,7 @@ export class TutorialModalController {
           <div class="tut-guide-box" id="tut-guide-box">
             <div class="tut-guide-step-name" id="tut-step-name">STEP 1. 게임의 목표 & 행렬 성분 구조</div>
             <div class="tut-guide-main-text" id="tut-main-text">뒤섞인 모든 타일을 항등원 '0번(정위치 앞면)'으로 일치시키기</div>
-            <div class="tut-guide-sub-text" id="tut-sub-text">뒤섞인 모든 타일을 항등원 '0번(정위치 앞면)'으로 일치시키는 것이 목표입니다! 3×3 행렬의 각 성분(1~3행, 1~3열)이 해당 라인의 대칭 변환을 이끄는 컨트롤러 역할을 합니다.</div>
+            <div class="tut-guide-sub-text" id="tut-sub-text">뒤섞인 모든 타일을 항등원 '0번(정위치 앞면)'으로 일치시키는 것이 목표입니다! 3×3 행렬의 외곽 성분(1~3행, 1~3열)이 해당 라인의 행·열 대칭 변환을 이끄는 컨트롤러 역할을 합니다.</div>
           </div>
 
           <!-- 실전 예제 수별 컨트롤러 (Step 5, Step 6에서만 표시) -->
@@ -506,7 +506,7 @@ export class TutorialModalController {
             <p style="font-size:0.88rem; color:#94a3b8; margin:0 0 10px 0;">게임의 목표와 D4 정이면체군 대칭 변환 원리, 실전 해법을 모두 마스터하셨습니다.</p>
             <div class="tut-rules-summary-list">
               <div class="tut-rule-item"><span>🎯</span> <span><b>게임 목표</b> : 뒤섞인 모든 타일을 <b>0번(항등원·정위치 앞면)</b>으로 완성</span></div>
-              <div class="tut-rule-item"><span>📐</span> <span><b>행렬 컨트롤러</b> : 테두리 타일(1~3행, 1~3열, 대각선)을 조작하여 해당 라인 전체 변환</span></div>
+              <div class="tut-rule-item"><span>📐</span> <span><b>행렬 컨트롤러</b> : 외곽 성분 타일(1~3행, 1~3열)을 조작하여 해당 라인의 행·열 대칭 변환</span></div>
               <div class="tut-rule-item"><span>🔄</span> <span><b>1행 1열 스위치</b> : [↔1행|↕1열] 탭으로 1행 ↔ 1열 조작 모드 자유 전환</span></div>
               <div class="tut-rule-item"><span>🎮</span> <span><b>손동작 변환</b> : 탭(90°), 더블탭(180°), 롱프레스(270°), 가로밀기(MX), 세로밀기(MY), 대각밀기(MD)</span></div>
               <div class="tut-rule-item"><span>⚡</span> <span><b>반사 + 반사 = 회전</b> : MX ∘ MY = R180 (클라인 4원군 V4)</span></div>
@@ -549,15 +549,12 @@ export class TutorialModalController {
         cell.appendChild(canvas);
 
         // 각 성분 위치별 컨트롤러 역할 가이드 라벨
-        // 0: (0,0) 1행 (보라점 토글 시 1열)
+        // 0: (0,0) [↔ 1행 | ↕ 1열] 스위치
         // 1: (0,1) 2열
         // 2: (0,2) 3열
         // 3: (1,0) 2행
-        // 4: (1,1) 2행(중앙)
-        // 5: (1,2) ↗부대각
         // 6: (2,0) 3행
-        // 7: (2,1) 내부 성분
-        // 8: (2,2) ↖주대각
+        // 4번(22), 5번(23), 7번(32), 8번(33)은 기본 행·열 컨트롤러가 아니므로 라벨을 일체 표시하지 않음
         if (i === 0) {
           const switch11 = document.createElement('div');
           switch11.className = `dual-switch-11 ${this.cell11Mode === 'col' ? 'mode-col' : 'mode-row'}`;
@@ -582,21 +579,6 @@ export class TutorialModalController {
           const guideTag = document.createElement('div');
           guideTag.className = 'controller-guide-label guide-row';
           guideTag.innerText = `${Math.floor(i / 3) + 1}행`;
-          cell.appendChild(guideTag);
-        } else if (i === 4) {
-          const guideTag = document.createElement('div');
-          guideTag.className = 'controller-guide-label guide-row';
-          guideTag.innerText = '2행';
-          cell.appendChild(guideTag);
-        } else if (i === 5) {
-          const guideTag = document.createElement('div');
-          guideTag.className = 'controller-guide-label guide-diag';
-          guideTag.innerText = '↗부대각';
-          cell.appendChild(guideTag);
-        } else if (i === 8) {
-          const guideTag = document.createElement('div');
-          guideTag.className = 'controller-guide-label guide-diag';
-          guideTag.innerText = '↖주대각';
           cell.appendChild(guideTag);
         }
 
@@ -765,10 +747,10 @@ export class TutorialModalController {
             icon.textContent = '👆';
             bubble.textContent = '12 세로 쓱 밀기 (↕)';
           } else {
-            this.positionHandAtCell(2); // 13 (1행 3열, idx 2) 타일 정중앙
+            this.positionHandAtCell(6); // 31 (3행 1열, idx 6) 타일 정중앙
             hand.classList.add('hand-anim-cell-diag-combo');
             icon.textContent = '👆';
-            bubble.textContent = '13 대각선 밀기 (↘➔↗)';
+            bubble.textContent = '31 대각선 밀기 (↘➔↗)';
           }
         }
         break;
@@ -1015,7 +997,7 @@ export class TutorialModalController {
       this.step1AnimTimers.push(t1, t2, t3);
     } else if (this.step1SubStep === 2) {
       // ③ 13 대각선 3단 모션: 주대각선(MD) ➔ 부대각선(MAD) ➔ 다시 부대각선(MAD² = ID 복원)
-      // 시작 상태: 보드 초기화 및 13 타일 정위치 강조
+      // 시작 상태: 보드 초기화 및 31 타일 정위치 강조
       this.boardOps = [
         D4.MX, D4.R180, D4.MX,
         D4.ID, D4.MY,   D4.ID,
@@ -1035,8 +1017,8 @@ export class TutorialModalController {
           if (bubble) bubble.textContent = '1) 주대각선 밀기 (↘ MD)';
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
-          if (fBadge) fBadge.textContent = '↘ [13] 주대각선 반사 (MD)';
-          if (fText) fText.textContent = '1) 13 주대각선 밀기 ➔ 주대각선 반사 (MD)';
+          if (fBadge) fBadge.textContent = '↘ [31] 주대각선 반사 (MD)';
+          if (fText) fText.textContent = '1) 31 주대각선 밀기 ➔ 주대각선 반사 (MD)';
         }
       }, 350);
 
@@ -1062,7 +1044,7 @@ export class TutorialModalController {
           if (bubble) bubble.textContent = '2) 부대각선 밀기 (↙ MAD)';
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
-          if (fBadge) fBadge.textContent = '↙ [13] 부대각선 반사 (MAD)';
+          if (fBadge) fBadge.textContent = '↙ [31] 부대각선 반사 (MAD)';
           if (fText) fText.textContent = '2) 이어서 부대각선 밀기 ➔ 부대각선 반사 (MAD)';
         }
       }, 1250);
@@ -1088,7 +1070,7 @@ export class TutorialModalController {
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
           const fDesc = document.getElementById('tut-formula-desc');
-          if (fBadge) fBadge.textContent = '✨ [13] 반사 자기상쇄 (MAD² = ID)';
+          if (fBadge) fBadge.textContent = '✨ [31] 반사 자기상쇄 (MAD² = ID)';
           if (fText) fText.textContent = '3) 다시 부대각선 밀기 ➔ MAD² = 0번 복원!';
           if (fDesc) fDesc.textContent = '부대각선 반사가 2번 연속 만나 다시 똑바른 0번(ID)으로 복원돼요! (회전·반사 완전 정복)';
         }
@@ -1323,7 +1305,7 @@ export class TutorialModalController {
       case 1:
         stepNameEl.textContent = 'STEP 1. 퍼즐 목표 & 행렬 변환 실전 시연';
         mainTextEl.textContent = '난이도와 모드에 따라 행과 열의 회전과 반사로 뒤섞인 모든 강아지들을, 행과 열 변환만으로 모두 처음의 강아지로 만드는 것이 목적이에요';
-        subTextEl.textContent = '① 11 가로 쓱(1행 반사 MX) ➔ ② 12 세로 쓱(180° 회전 R180) ➔ ③ 13 대각선 밀기(대각 변환 MD/MAD)';
+        subTextEl.textContent = '① 11 가로 쓱(1행 반사 MX) ➔ ② 12 세로 쓱(180° 회전 R180) ➔ ③ 31 대각선 밀기(대각 변환 MD/MAD)';
         if (moveController) {
           moveController.style.display = 'flex';
           if (btnAuto) btnAuto.style.display = 'none';

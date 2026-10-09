@@ -27,29 +27,48 @@ describe('TutorialModal & Group Theory Core Logic (6단계 슬라이드 및 실�
     const elements: Record<string, any> = {};
     const getOrCreateEl = (id: string) => {
       if (!elements[id]) {
-        elements[id] = {
-          id,
+        let elId = id;
+        const classSet = new Set<string>();
+        let rawClassName = '';
+        const elObj: any = {
+          get id() { return elId; },
+          set id(val: string) {
+            delete elements[elId];
+            elId = val;
+            elements[val] = elObj;
+          },
           style: {},
+          get className() { return rawClassName; },
+          set className(val: string) {
+            rawClassName = val;
+            classSet.clear();
+            val.split(/\s+/).filter(Boolean).forEach(c => classSet.add(c));
+          },
           classList: {
-            classes: new Set<string>(),
-            add(c: string) { this.classes.add(c); },
-            remove(c: string) { this.classes.delete(c); },
-            contains(c: string) { return this.classes.has(c); },
+            classes: classSet,
+            add(c: string) { classSet.add(c); rawClassName = Array.from(classSet).join(' '); },
+            remove(c: string) { classSet.delete(c); rawClassName = Array.from(classSet).join(' '); },
+            contains(c: string) { return classSet.has(c); },
             toggle(c: string, force?: boolean) {
-              if (force === true) this.classes.add(c);
-              else if (force === false) this.classes.delete(c);
-              else if (this.classes.has(c)) this.classes.delete(c);
-              else this.classes.add(c);
+              if (force === true) this.add(c);
+              else if (force === false) this.remove(c);
+              else if (classSet.has(c)) this.remove(c);
+              else this.add(c);
             }
           },
           dataset: {},
           textContent: '',
           innerText: '',
+          children: [] as any[],
           querySelector: vi.fn(),
-          appendChild: vi.fn(),
+          appendChild: vi.fn(function(child: any) {
+            elObj.children.push(child);
+            return child;
+          }),
           remove: vi.fn(),
           addEventListener: vi.fn()
         };
+        elements[id] = elObj;
       }
       return elements[id];
     };
@@ -213,7 +232,8 @@ describe('TutorialModal & Group Theory Core Logic (6단계 슬라이드 및 실�
       // ② 12 180° 회전 R180
       expect(STEP1_SUB_DEMOS[1].boardOps[1]).toBe(D4.R180);
       expect(STEP1_SUB_DEMOS[1].highlightCells).toEqual([1, 4, 7]);
-      // ③ 13 대각선 변환 MD/MAD
+      // ③ 31 대각선 변환 MD/MAD
+      expect(STEP1_SUB_DEMOS[2].label).toContain('31 대각선 변환');
       expect(STEP1_SUB_DEMOS[2].boardOps[2]).toBe(D4.MAD);
       expect(STEP1_SUB_DEMOS[2].highlightCells).toEqual([2, 4, 6]);
     });
@@ -333,6 +353,45 @@ describe('TutorialModal & Group Theory Core Logic (6단계 슬라이드 및 실�
       expect(ctrl.cell11Mode).toBe('row');
     });
 
+    it('3×3 보드의 타일 라벨 생성 시 외곽 컨트롤러 5개만 라벨이 표시되고 내부/대각 성분(4, 5, 7, 8)에는 라벨이 없어야 함', () => {
+      const ctrl = new TutorialModalController();
+      ctrl.open(1);
+
+      // 0번: 1행/1열 듀얼 스위치 보유
+      const cell0 = document.getElementById('tut-cell-0') as any;
+      const hasSwitch0 = cell0?.children.some((c: any) => c.classList.contains('dual-switch-11'));
+      expect(hasSwitch0).toBe(true);
+
+      // 1번 (0,1): 2열 라벨
+      const cell1 = document.getElementById('tut-cell-1') as any;
+      const label1 = cell1?.children.find((c: any) => c.classList.contains('controller-guide-label'));
+      expect(label1?.innerText).toBe('2열');
+
+      // 2번 (0,2): 3열 라벨
+      const cell2 = document.getElementById('tut-cell-2') as any;
+      const label2 = cell2?.children.find((c: any) => c.classList.contains('controller-guide-label'));
+      expect(label2?.innerText).toBe('3열');
+
+      // 3번 (1,0): 2행 라벨
+      const cell3 = document.getElementById('tut-cell-3') as any;
+      const label3 = cell3?.children.find((c: any) => c.classList.contains('controller-guide-label'));
+      expect(label3?.innerText).toBe('2행');
+
+      // 6번 (2,0): 3행 라벨
+      const cell6 = document.getElementById('tut-cell-6') as any;
+      const label6 = cell6?.children.find((c: any) => c.classList.contains('controller-guide-label'));
+      expect(label6?.innerText).toBe('3행');
+
+      // 4번(22), 5번(23), 7번(32), 8번(33): 어떠한 컨트롤러 가이드 라벨도 없어야 함
+      [4, 5, 7, 8].forEach((idx) => {
+        const cell = document.getElementById(`tut-cell-${idx}`) as any;
+        const hasGuideLabel = cell?.children.some((c: any) => c.classList.contains('controller-guide-label'));
+        const hasSwitch = cell?.children.some((c: any) => c.classList.contains('dual-switch-11'));
+        expect(hasGuideLabel).toBe(false);
+        expect(hasSwitch).toBe(false);
+      });
+    });
+
     it('6단계에서 nextStep 또는 completeTutorial 호출 시 튜토리얼 완료 처리되어야 함', () => {
       const ctrl = new TutorialModalController();
       ctrl.open(6);
@@ -381,10 +440,10 @@ describe('TutorialModal & Group Theory Core Logic (6단계 슬라이드 및 실�
       expect(handEl?.classList.contains('hand-anim-cell-swipe-v')).toBe(true);
       expect(bubbleEl?.textContent).toContain('12 세로');
 
-      // 1단계 서브 시연 3: 13 대각선 변환 시연
+      // 1단계 서브 시연 3: 31 대각선 변환 시연
       ctrl.goToStep1SubStep(2);
       expect(handEl?.classList.contains('hand-anim-cell-diag-combo')).toBe(true);
-      expect(bubbleEl?.textContent).toContain('13 대각선');
+      expect(bubbleEl?.textContent).toContain('31 대각선');
 
       // 2단계: 세로 밀기 스와이프
       ctrl.goToStep(2);

@@ -124,9 +124,9 @@ export function solveBoard3x3(curOps: D4Op[], groupKey: SymmetryGroupKey = 'D4',
 }
 
 // 4x4, 5x5 등 임의 크기 보드를 위한 범용 BFS 솔버 (최대 5수까지 빠른 탐색)
-export function solveBoardGeneric(curOps: D4Op[], size: number, groupKey: SymmetryGroupKey = 'D4', maxDepth = 4): MoveStep[] {
+export function solveBoardGeneric(curOps: D4Op[], size: number, groupKey: SymmetryGroupKey = 'D4', maxDepth = 4, allowDiagonal: boolean = true): MoveStep[] {
   if (size === 3) {
-    return solveBoard3x3(curOps, groupKey, true);
+    return solveBoard3x3(curOps, groupKey, allowDiagonal);
   }
 
   const isSolved = (ops: D4Op[]) => ops.every(o => o === 'ID');
@@ -136,6 +136,9 @@ export function solveBoardGeneric(curOps: D4Op[], size: number, groupKey: Symmet
   const lineCells = generateLineCells(size);
   const groupDef = SYMMETRY_GROUPS[groupKey] || SYMMETRY_GROUPS.D4;
   const groupOps = groupDef.ops.filter(op => op !== 'ID');
+
+  // 대각선 허용 여부에 따라 탐색할 최대 라인 인덱스 제한 (대각선은 끝 2개: idx size*2, size*2+1)
+  const maxLines = allowDiagonal ? lines.length : size * 2;
 
   interface StateNode {
     ops: D4Op[];
@@ -151,7 +154,7 @@ export function solveBoardGeneric(curOps: D4Op[], size: number, groupKey: Symmet
   for (let depth = 0; depth < maxDepth; depth++) {
     const nextQueue: StateNode[] = [];
     for (const node of queue) {
-      for (let lineId = 0; lineId < lines.length; lineId++) {
+      for (let lineId = 0; lineId < maxLines; lineId++) {
         for (const op of groupOps) {
           const nextOps = applyLineMoveGeneric(node.ops, lineCells[lineId], op);
           const nextStep: MoveStep = {
@@ -181,9 +184,9 @@ export function solveBoardGeneric(curOps: D4Op[], size: number, groupKey: Symmet
   return [];
 }
 
-export function solveBoard(curOps: D4Op[], size: number, groupKey: SymmetryGroupKey = 'D4'): MoveStep[] {
+export function solveBoard(curOps: D4Op[], size: number, groupKey: SymmetryGroupKey = 'D4', allowDiagonal: boolean = true): MoveStep[] {
   if (size === 3) {
-    return solveBoard3x3(curOps, groupKey, true);
+    return solveBoard3x3(curOps, groupKey, allowDiagonal);
   }
-  return solveBoardGeneric(curOps, size, groupKey, 4);
+  return solveBoardGeneric(curOps, size, groupKey, 4, allowDiagonal);
 }
