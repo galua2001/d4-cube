@@ -94,13 +94,13 @@ export const STEP1_SUB_DEMOS: ExampleMoveStep[] = [
     label: '④ 21 대각선 긋기 (2행)',
     boardOps: [
       D4.MX,   D4.R180, D4.MX,
-      D4.ID,   D4.ID,   D4.ID,
+      D4.R180, D4.R180, D4.R180,
       D4.R270, D4.R270, D4.R270
     ],
     highlightCells: [3, 4, 5],
     formulaBadge: '⚡ [21] 2행 첫 성분 대각선 변환',
-    formulaText: '21 대각선 긋기 ➔ 주대각선 대칭 후 대각선 하면 처음(0번) 복원!',
-    formulaDesc: '손가락이 21 성분에서 ↖➔↘로 쓱 그으면 2행이 주대각선 대칭(MD), 처음 위치로 와서 대각선을 한 번 더 그으면 대칭의 자기상쇄(MD² = ID)로 처음 0번으로 복원돼요!'
+    formulaText: '21 대각선 긋기 ➔ 주대각선(MD) + 대각선(MAD) = 180° 회전(R180)!',
+    formulaDesc: '손가락이 21 성분에서 ↖➔↘로 쓱 그으면 2행이 주대각선 대칭(MD), ↗➔↙로 대각선을 그으면 두 반사가 교차되어 180° 회전(R180)이 돼요!'
   }
 ];
 
@@ -1132,18 +1132,18 @@ export class TutorialModalController {
 
       this.step1AnimTimers.push(t1, t2, t3, t4, t5, t6);
     } else if (this.step1SubStep === 3) {
-      // ④ 21 대각선 긋기: 21 성분(idx 3)에서 주대각선 그으면 MD, 처음 위치로 와서 대각선 한 번 더 그으면 처음(ID)으로 복원!
+      // ④ 21 대각선 긋기: 1단계 주대각선(↖➔↘) 후 2단계 대각선(↗➔↙)으로 180° 회전 합성!
       this.positionHandAtCell(3);
       this.boardOps = [
         D4.MX,   D4.R180, D4.MX,
-        D4.ID,   D4.ID,   D4.ID,
+        D4.ID,   D4.MY,   D4.ID,
         D4.R270, D4.R270, D4.R270
       ];
       this.clearCellHighlights();
       this.highlightCells([3, 4, 5], 'highlight-row'); // 2행 전체 하이라이트!
       this.renderBoard();
 
-      // [1단계: 주대각선 긋기] t = 600ms: 손가락이 ↖ ➔ ↘로 주대각선 쓱 그을 때 (2행 MD)
+      // [1단계: 주대각선 긋기] t = 500ms: 손가락이 ↖ ➔ ↘로 주대각선 쓱 그을 때 (2행 MD 주대각 플립)
       const t1 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
           this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
@@ -1158,45 +1158,45 @@ export class TutorialModalController {
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
           if (fBadge) fBadge.textContent = '⚡ [21] 1) 주대각선 대칭 (MD)';
-          if (fText) fText.textContent = '21에서 ↖➔↘로 쓱 그으면 ➔ 2행이 주대각선 대칭(MD)!';
+          if (fText) fText.textContent = '1) 21에서 ↖➔↘로 쓱 그으면 ➔ 2행이 주대각선 대칭(MD)!';
         }
-      }, 600);
+      }, 500);
 
       const t2 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
           this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
         }
-      }, 1200);
+      }, 1100);
 
-      // [2단계: 처음 위치로 복귀 후 대각선 한 번 더 긋기] t = 1750ms:
-      // 손가락이 처음 위치(↖)로 돌아와서 다시 ↖ ➔ ↘로 그을 때 ➔ 처음(0번 ID)으로 복원!
+      // [2단계: 부대각선 긋기] t = 1650ms:
+      // 손가락이 ↗에서 ↙로 대각선 쓱 그을 때 (2행 MAD 부대각 플립 ➔ 180° 회전 합성!)
       const t3 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
           this.clearCellHighlights();
           this.highlightCells([3, 4, 5], 'highlight-row');
-          this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
-          this.boardOps[3] = D4.ID;
-          this.boardOps[4] = D4.ID;
-          this.boardOps[5] = D4.ID;
+          this.addCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-anti');
+          this.boardOps[3] = D4.R180;
+          this.boardOps[4] = D4.R180;
+          this.boardOps[5] = D4.R180;
           this.renderBoard();
           soundEngine.playFlip();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '2) 처음으로 와서 다시 그어 복원!';
+          if (bubble) bubble.textContent = '2) ↗➔↙ 대각선 긋기 ➔ 180° 회전!';
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
           const fDesc = document.getElementById('tut-formula-desc');
-          if (fBadge) fBadge.textContent = '🎉 [21] 2) 대각선 한 번 더 ➔ 처음(0번) 복원!';
-          if (fText) fText.textContent = '2) ↖➔↘로 한 번 더 그으면 ➔ MD² = ID (처음 0번 복원!)';
-          if (fDesc) fDesc.textContent = '손가락이 주대각선(↖➔↘)을 그은 후 처음 위치로 돌아와서 대각선을 한 번 더 그으면, 대칭의 자기상쇄(MD² = ID)로 2행이 처음 상태(0번)로 말끔히 돌아와요!';
+          if (fBadge) fBadge.textContent = '🎉 [21] 2) 대각선 긋기 ➔ 180° 회전(R180)!';
+          if (fText) fText.textContent = '2) ↗➔↙로 대각선 그으면 ➔ MD ∘ MAD = 180° 회전!';
+          if (fDesc) fDesc.textContent = '손가락이 21 성분에서 ↖➔↘로 주대각선을 그은 후, ↗➔↙로 대각선을 그으면 두 반사가 교차 합성되어 신기하게 180° 회전(R180)이 돼요!';
         }
-      }, 1750);
+      }, 1650);
 
       const t4 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 3) {
-          this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-main');
+          this.removeCellAnimClass([3, 4, 5], 'tut-cell-flipping-diag-anti');
         }
-      }, 2400);
+      }, 2350);
 
       this.step1AnimTimers.push(t1, t2, t3, t4);
     } else {
