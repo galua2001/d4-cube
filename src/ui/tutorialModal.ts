@@ -1493,71 +1493,79 @@ export class TutorialModalController {
       this.d4AnimTimers.push(t1, t2, t3, t4);
 
     } else if (this.d4SubStep === 3) {
-      // 3수: 13 성분 세로 쓱 그을 때 손가락 이동 속도(약 0.8s)에 맞춰 천천히 3열([2, 5, 8]) 세로 반사 플립!
+      // 3수: 13 성분 세로 쓱 그을 때 손가락 이동 속도에 맞춰 천천히 3열([2, 5, 8]) 세로 반사 플립!
       this.boardOps = [...D4_EXAMPLE_STEPS[2].boardOps];
       this.renderBoard();
 
+      // 손가락이 아래로 쓱 내려가기 시작하는 시점(t = 250ms)에 3열 3D 플립 발동
       const t1 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 3) {
           this.addCellAnimClass([2, 5, 8], 'tut-cell-flipping-v');
           soundEngine.playFlip();
         }
-      }, 80);
+      }, 250);
 
+      // 손가락 이동 중간 시점(t = 650ms): 3열 타일들이 세로 반사로 갱신
       const t2 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 3) {
           this.boardOps = [...D4_EXAMPLE_STEPS[3].boardOps];
           this.renderBoard();
         }
-      }, 400);
+      }, 650);
 
+      // 플립 완료 시점(t = 1100ms)
       const t3 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 3) {
           this.removeCellAnimClass([2, 5, 8], 'tut-cell-flipping-v');
         }
-      }, 880);
+      }, 1100);
 
       this.d4AnimTimers.push(t1, t2, t3);
 
     } else if (this.d4SubStep === 4) {
-      // 4수: 주대각(idx 8) 대각선 쓱 그을 때 손가락 이동 속도(약 0.8s)에 맞춰 천천히 주대각([0, 4, 8]) 대각 반사 플립!
+      // 4수: 주대각(idx 8) 대각선 쓱 그을 때 손가락 이동 속도에 맞춰 천천히 주대각([0, 4, 8]) 대각 반사 플립!
       this.boardOps = [...D4_EXAMPLE_STEPS[3].boardOps];
       this.renderBoard();
 
+      // 손가락이 ↖에서 ↘로 대각선으로 내려가기 시작하는 시점(t = 250ms)에 주대각 3D 플립 발동
       const t1 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 4) {
           this.addCellAnimClass([0, 4, 8], 'tut-cell-flipping-diag');
           soundEngine.playFlip();
         }
-      }, 80);
+      }, 250);
 
+      // 손가락 이동 중간 시점(t = 650ms): 주대각 타일들이 대각 반사로 갱신
       const t2 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 4) {
           this.boardOps = [...D4_EXAMPLE_STEPS[4].boardOps];
           this.renderBoard();
         }
-      }, 400);
+      }, 650);
 
+      // 플립 완료 시점(t = 1100ms)
       const t3 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 4) {
           this.removeCellAnimClass([0, 4, 8], 'tut-cell-flipping-diag');
         }
-      }, 880);
+      }, 1100);
 
       this.d4AnimTimers.push(t1, t2, t3);
 
     } else if (this.d4SubStep === 5) {
-      // 5수: 12 성분 가로 쓱 밀 때 손가락 이동 속도(약 0.8s)에 맞춰 천천히 2열([1, 4, 7]) 가로 반사 플립 및 전체 0번 완성!
+      // 5수: 12 성분 가로 쓱 밀 때 손가락 이동 속도에 맞춰 천천히 2열([1, 4, 7]) 가로 반사 플립 및 전체 0번 완성!
       this.boardOps = [...D4_EXAMPLE_STEPS[4].boardOps];
       this.renderBoard();
 
+      // 손가락이 가로로 쓱 밀기 시작하는 시점(t = 250ms)에 2열 3D 플립 발동
       const t1 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 5) {
           this.addCellAnimClass([1, 4, 7], 'tut-cell-flipping-h');
           soundEngine.playFlip();
         }
-      }, 80);
+      }, 250);
 
+      // 손가락 이동 중간 시점(t = 650ms): 2열 타일들이 가로 반사로 갱신 및 최종 완성 사운드!
       const t2 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 5) {
           this.boardOps = [...D4_EXAMPLE_STEPS[5].boardOps];
@@ -1568,13 +1576,14 @@ export class TutorialModalController {
             btnActionText.textContent = '🎮 실전 퍼즐 시작하기';
           }
         }
-      }, 400);
+      }, 650);
 
+      // 플립 완료 시점(t = 1100ms)
       const t3 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 5) {
           this.removeCellAnimClass([1, 4, 7], 'tut-cell-flipping-h');
         }
-      }, 880);
+      }, 1100);
 
       this.d4AnimTimers.push(t1, t2, t3);
     }

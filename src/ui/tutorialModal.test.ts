@@ -662,53 +662,53 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
       vi.advanceTimersByTime(360); // 980ms 시점
       expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(false);
 
-      // 3수: 13 성분 세로 쓱 그을 때 ➔ 3열 전체([2, 5, 8]) 손가락 이동 속도(0.8s)에 맞춰 천천히 세로 플립
+      // 3수: 13 성분 세로 쓱 그을 때 ➔ 3열 전체([2, 5, 8]) 손가락 이동 속도에 맞춰 천천히 세로 플립
       ctrl.goToD4SubStep(3);
-      vi.advanceTimersByTime(80);
+      vi.advanceTimersByTime(250);
       const cell5 = document.getElementById('tut-cell-5');
       const cell8 = document.getElementById('tut-cell-8');
       expect(cell2?.classList.contains('tut-cell-flipping-v')).toBe(true);
       expect(cell5?.classList.contains('tut-cell-flipping-v')).toBe(true);
       expect(cell8?.classList.contains('tut-cell-flipping-v')).toBe(true);
 
-      vi.advanceTimersByTime(320); // 400ms 시점: 보드 상태 갱신
+      vi.advanceTimersByTime(400); // 650ms 시점: 보드 상태 갱신
       expect(ctrl.boardOps[2]).toBe(D4.ID);
       expect(ctrl.boardOps[5]).toBe(D4.ID);
 
-      vi.advanceTimersByTime(480); // 880ms 시점: 플립 클래스 제거
+      vi.advanceTimersByTime(450); // 1100ms 시점: 플립 클래스 제거
       expect(cell2?.classList.contains('tut-cell-flipping-v')).toBe(false);
       expect(cell5?.classList.contains('tut-cell-flipping-v')).toBe(false);
 
-      // 4수: 주대각(idx 8) 대각선 쓱 그을 때 ➔ 주대각([0, 4, 8]) 손가락 이동 속도(0.8s)에 맞춰 천천히 대각 플립
+      // 4수: 주대각(idx 8) 대각선 쓱 그을 때 ➔ 주대각([0, 4, 8]) 손가락 이동 속도에 맞춰 천천히 대각 플립
       ctrl.goToD4SubStep(4);
-      vi.advanceTimersByTime(80);
+      vi.advanceTimersByTime(250);
       const cell4 = document.getElementById('tut-cell-4');
       expect(cell0?.classList.contains('tut-cell-flipping-diag')).toBe(true);
       expect(cell4?.classList.contains('tut-cell-flipping-diag')).toBe(true);
       expect(cell8?.classList.contains('tut-cell-flipping-diag')).toBe(true);
 
-      vi.advanceTimersByTime(320); // 400ms 시점
+      vi.advanceTimersByTime(400); // 650ms 시점
       expect(ctrl.boardOps[0]).toBe(D4.ID);
       expect(ctrl.boardOps[4]).toBe(D4.MX);
       expect(ctrl.boardOps[8]).toBe(D4.ID);
 
-      vi.advanceTimersByTime(480); // 880ms 시점
+      vi.advanceTimersByTime(450); // 1100ms 시점
       expect(cell0?.classList.contains('tut-cell-flipping-diag')).toBe(false);
 
-      // 5수: 12 성분 가로 쓱 밀 때 ➔ 2열 전체([1, 4, 7]) 손가락 이동 속도(0.8s)에 맞춰 천천히 가로 플립 및 완성
+      // 5수: 12 성분 가로 쓱 밀 때 ➔ 2열 전체([1, 4, 7]) 손가락 이동 속도에 맞춰 천천히 가로 플립 및 완성
       ctrl.goToD4SubStep(5);
-      vi.advanceTimersByTime(80);
+      vi.advanceTimersByTime(250);
       const cell7 = document.getElementById('tut-cell-7');
       expect(cell1?.classList.contains('tut-cell-flipping-h')).toBe(true);
       expect(cell4?.classList.contains('tut-cell-flipping-h')).toBe(true);
       expect(cell7?.classList.contains('tut-cell-flipping-h')).toBe(true);
 
-      vi.advanceTimersByTime(320); // 400ms 시점: 전체 0번 완성!
+      vi.advanceTimersByTime(400); // 650ms 시점: 전체 0번 완성!
       expect(ctrl.boardOps.every(op => op === D4.ID)).toBe(true);
       const btnAction = document.getElementById('tut-btn-action-text');
       expect(btnAction?.textContent).toBe('🎮 실전 퍼즐 시작하기');
 
-      vi.advanceTimersByTime(480); // 880ms 시점: 플립 클래스 제거
+      vi.advanceTimersByTime(450); // 1100ms 시점: 플립 클래스 제거
       expect(cell1?.classList.contains('tut-cell-flipping-h')).toBe(false);
       expect(cell4?.classList.contains('tut-cell-flipping-h')).toBe(false);
       expect(cell7?.classList.contains('tut-cell-flipping-h')).toBe(false);
