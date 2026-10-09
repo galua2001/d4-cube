@@ -2,18 +2,18 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  base: '/matrix-cube/',
+  base: '/d4-cube/',
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'assets/*', 'icon-192.png', 'icon-512.png'],
       manifest: {
-        name: '행렬 큐브 (Matrix Cube)',
-        short_name: 'MatrixCube',
-        id: '/matrix-cube/',
-        start_url: '/matrix-cube/',
-        scope: '/matrix-cube/',
-        description: '군론(D4 대칭군) 기반 3x3 행렬 큐브 퍼즐 게임',
+        name: 'D4 행렬 큐브',
+        short_name: 'D4Cube',
+        id: 'https://galua2001.github.io/d4-cube/',
+        start_url: '/d4-cube/',
+        scope: '/d4-cube/',
+        description: 'D4 대칭군 기반 행렬 큐브 퍼즐',
         theme_color: '#0f172a',
         background_color: '#0f172a',
         display: 'standalone',
