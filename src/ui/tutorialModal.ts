@@ -370,6 +370,7 @@ export class TutorialModalController {
         this.highlightCells([0, 1, 2], 'highlight-row');
         this.boardOps = Array(9).fill(D4.ID);
         if (btnActionText) btnActionText.textContent = '직접 해보기 (1/5)';
+        soundEngine.speak('1행을 가로로 쓱 그어보세요!');
         break;
 
       case 2:
@@ -382,6 +383,7 @@ export class TutorialModalController {
         }
         this.highlightCells([0, 1, 2], 'highlight-row');
         if (btnActionText) btnActionText.textContent = '직접 해보기 (2/5)';
+        soundEngine.speak('이번엔 1행을 세로로 한 번 더 그어보세요!');
         break;
 
       case 3:
@@ -396,6 +398,7 @@ export class TutorialModalController {
         }
         this.highlightCells([0, 4, 8], 'highlight-diag');
         if (btnActionText) btnActionText.textContent = '직접 해보기 (3/5)';
+        soundEngine.speak('주대각선 방향으로 그어보세요!');
         break;
 
       case 4:
@@ -410,6 +413,7 @@ export class TutorialModalController {
         }
         this.highlightCells([4], 'highlight-center');
         if (btnActionText) btnActionText.textContent = '직접 해보기 (4/5)';
+        soundEngine.speak('중앙 타일을 콕 탭해보세요!');
         break;
 
       case 5:
@@ -420,6 +424,7 @@ export class TutorialModalController {
         if (masterCard) masterCard.style.display = 'block';
         if (btnActionText) btnActionText.textContent = '🎮 실전 퍼즐 시작하기';
         soundEngine.playClear();
+        soundEngine.speak('축하합니다! 대칭과 회전 연산을 마스터하셨습니다!');
         break;
     }
 

@@ -231,6 +231,31 @@ class SoundEngine {
   public isSfxOn(): boolean {
     return this.sfxEnabled;
   }
+
+  /**
+   * 튜토리얼 친절한 한국어 음성(TTS) 나레이션
+   */
+  public speak(text: string) {
+    if (!this.sfxEnabled) return;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+    try {
+      window.speechSynthesis.cancel(); // 이전 음성 중단
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'ko-KR';
+      utter.rate = 1.05; // 30초 튜토리얼에 맞춘 경쾌하고 산뜻한 템포
+      utter.pitch = 1.08; // 친절하고 명랑한 톤
+
+      // 한국어 음성 선호 매핑
+      const voices = window.speechSynthesis.getVoices();
+      const koVoice = voices.find(v => v.lang.startsWith('ko'));
+      if (koVoice) {
+        utter.voice = koVoice;
+      }
+
+      window.speechSynthesis.speak(utter);
+    } catch (e) {}
+  }
 }
 
 export const soundEngine = new SoundEngine();
