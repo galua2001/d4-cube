@@ -1389,57 +1389,42 @@ body {
   50% { transform: translate(-50%, -50%) scale(1.18) translateY(-8px); opacity: 1; }
 }
 
-/* 시연 A: 11 성분 가운데 가로 쓱 밀기 (1행 전체 MX 변환) - 실전 퍼즐 동기화 */
+/* 시연 A: 11 성분 가운데 가로 쓱 밀기 (1행 전체 MX 변환) - 실전 퍼즐 동기화 (1회 실행 후 완료) */
 .tut-hand-demo.hand-anim-cell-swipe-h {
-  animation: handCellSwipeH 2.4s infinite ease-in-out;
+  animation: handCellSwipeH 1.6s ease-in-out forwards;
 }
 
 @keyframes handCellSwipeH {
   0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
   15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
   25% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
-  55% { transform: translate(calc(-50% + 46px), -50%) scale(1.0); opacity: 1; }
-  75% { transform: translate(calc(-50% + 50px), -50%) scale(0.85); opacity: 0; }
-  100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+  60% { transform: translate(calc(-50% + 46px), -50%) scale(1.0); opacity: 1; }
+  85% { transform: translate(calc(-50% + 50px), -50%) scale(0.85); opacity: 0; }
+  100% { transform: translate(calc(-50% + 50px), -50%) scale(0.85); opacity: 0; }
 }
 
-/* 시연 B: 12 성분 가운데 세로 쓱 밀기 (가로+세로 = 180° 회전) - 실전 퍼즐 동기화 */
+/* 시연 B: 12 성분 가운데 세로 쓱 밀기 (가로+세로 = 180° 회전) - 실전 퍼즐 동기화 (1회 실행 후 완료) */
 .tut-hand-demo.hand-anim-cell-swipe-v {
-  animation: handCellSwipeV 2.4s infinite ease-in-out;
+  animation: handCellSwipeV 1.6s ease-in-out forwards;
 }
 
 @keyframes handCellSwipeV {
   0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
   15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
   25% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
-  55% { transform: translate(-50%, calc(-50% + 46px)) scale(1.0); opacity: 1; }
-  75% { transform: translate(-50%, calc(-50% + 50px)) scale(0.85); opacity: 0; }
-  100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
+  60% { transform: translate(-50%, calc(-50% + 46px)) scale(1.0); opacity: 1; }
+  85% { transform: translate(-50%, calc(-50% + 50px)) scale(0.85); opacity: 0; }
+  100% { transform: translate(-50%, calc(-50% + 50px)) scale(0.85); opacity: 0; }
 }
 
-/* 시연 C: 13 성분 대각선 복합 밀기 (↘ ➔ ↗) - 실전 대각선 변환 동기화 */
-.tut-hand-demo.hand-anim-cell-diag-combo {
-  animation: handCellDiagCombo 2.6s infinite ease-in-out;
-}
-
-@keyframes handCellDiagCombo {
-  0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
-  15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-  25% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
-  50% { transform: translate(calc(-50% + 36px), calc(-50% + 36px)) scale(1.0); opacity: 1; } /* ↘ 대각선 밀기 */
-  72% { transform: translate(calc(-50% + 44px), calc(-50% - 16px)) scale(1.0); opacity: 1; } /* ↗ 방향 전환 */
-  85% { transform: translate(calc(-50% + 48px), calc(-50% - 20px)) scale(0.85); opacity: 0; }
-  100% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
-}
-
-/* 2단계 시연 C: 21 성분 가운데 3번 클릭 회전 (클릭할 때마다 90°씩 순차 회전) */
+/* 시연 C: 31 성분 가운데 3회 클릭 회전 (3행 전체 90°씩 순차 회전) (1회 완결 후 종료) */
 .tut-hand-demo.hand-anim-cell-triple-tap {
-  animation: handCellTripleTap 2.4s infinite ease-in-out;
+  animation: handCellTripleTap 2.4s ease-in-out forwards;
 }
 
 @keyframes handCellTripleTap {
   0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
-  12% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  10% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
   22% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; } /* 1회 탭 (90°) */
   42% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
   52% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; } /* 2회 탭 (180°) */
@@ -1937,18 +1922,18 @@ body {
 }
 
 /* ========================================================
-   13. 보드 아래쪽 인라인 해설 패널 (.inline-solution-panel)
+   13. 보드 아래쪽 인라인 해설 패널 (.inline-solution-panel) - 시원하게 크기 확대
    ======================================================== */
 .inline-solution-panel {
   width: 100%;
-  max-width: 440px;
-  margin: 6px auto;
-  background: linear-gradient(165deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
-  border: 1.5px solid rgba(56, 189, 248, 0.4);
-  border-radius: 16px;
-  padding: 10px 14px;
+  max-width: 480px;
+  margin: 8px auto;
+  background: linear-gradient(165deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.99));
+  border: 2px solid rgba(56, 189, 248, 0.5);
+  border-radius: 18px;
+  padding: 14px 18px;
   box-sizing: border-box;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(56, 189, 248, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.25);
   animation: solPanelSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -1961,46 +1946,47 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .inline-solution-title-wrap {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .inline-solution-badge {
   background: linear-gradient(135deg, #0284c7, #38bdf8);
   color: #ffffff;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 8px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.3px;
 }
 
 .inline-solution-title {
-  font-size: 0.88rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  font-weight: 900;
   color: #f8fafc;
 }
 
 .inline-solution-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .btn-sol-action {
-  padding: 4px 10px;
-  font-size: 0.74rem;
+  padding: 6px 14px;
+  font-size: 0.82rem;
   font-weight: 700;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(51, 65, 85, 0.8);
-  color: #cbd5e1;
+  background: rgba(51, 65, 85, 0.85);
+  color: #e2e8f0;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -2008,70 +1994,87 @@ body {
 .btn-sol-action:hover {
   background: rgba(71, 85, 105, 1);
   color: #ffffff;
+  transform: translateY(-1px);
 }
 
 .btn-sol-action.primary {
   background: linear-gradient(135deg, #a855f7, #ec4899);
   border-color: #a855f7;
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.4);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.45);
 }
 
-/* 수별 알약 버튼 바 (가로 스크롤) */
+/* 수별 알약 버튼 바 (가로 스크롤 및 크기 대폭 확대) */
 .sol-step-pills-bar {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   overflow-x: auto;
-  padding-bottom: 6px;
-  margin-bottom: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
   scrollbar-width: thin;
 }
 
 .sol-step-pill {
-  padding: 5px 10px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(15, 23, 42, 0.8);
-  color: #94a3b8;
+  padding: 8px 14px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  min-height: 38px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  background: rgba(15, 23, 42, 0.85);
+  color: #cbd5e1;
   white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 초기 상태 버튼 크기 대폭 강조 */
+.sol-step-pill[data-step="0"] {
+  font-size: 0.95rem;
+  font-weight: 900;
+  padding: 8px 18px;
+  border-color: #38bdf8;
+  color: #38bdf8;
+  background: rgba(14, 116, 144, 0.25);
 }
 
 .sol-step-pill:hover {
-  background: rgba(51, 65, 85, 0.8);
+  background: rgba(51, 65, 85, 0.9);
   color: #ffffff;
+  transform: translateY(-1px);
 }
 
 .sol-step-pill.active {
   background: linear-gradient(135deg, #0284c7, #38bdf8);
   border-color: #38bdf8;
   color: #ffffff;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
-  font-weight: 800;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.6);
+  font-weight: 900;
+  transform: scale(1.03);
 }
 
-/* 실시간 수학적 원리 해설 카드 */
+/* 실시간 수학적 원리 해설 카드 확대 */
 .sol-math-card {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 8px 10px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1.5px solid rgba(56, 189, 248, 0.25);
+  border-radius: 12px;
+  padding: 12px 14px;
 }
 
 .sol-math-step-name {
-  font-size: 0.78rem;
+  font-size: 0.92rem;
   font-weight: 800;
   color: #38bdf8;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
 }
 
 .sol-math-content {
-  font-size: 0.76rem;
-  color: #cbd5e1;
-  line-height: 1.4;
+  font-size: 0.86rem;
+  color: #e2e8f0;
+  line-height: 1.5;
 }
 
 

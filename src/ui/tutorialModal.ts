@@ -77,16 +77,16 @@ export const STEP1_SUB_DEMOS: ExampleMoveStep[] = [
   },
   {
     subStep: 2,
-    label: '③ 31 대각선 변환',
+    label: '③ 31 3회 클릭 (3행)',
     boardOps: [
-      D4.MX,  D4.R180, D4.MAD,
-      D4.ID,  D4.MD,   D4.ID,
-      D4.MAD, D4.MY,   D4.ID
+      D4.MX,   D4.R180, D4.MX,
+      D4.ID,   D4.MY,   D4.ID,
+      D4.R270, D4.R270, D4.R270
     ],
-    highlightCells: [2, 4, 6],
-    formulaBadge: '⚡ [31] 3행 첫 성분 대각선 변환',
-    formulaText: '31 대각선 밀기 ➔ 주대각선 & 부대각선 변환',
-    formulaDesc: '31 성분을 대각선으로 밀면 주대각선 ➔ 부대각선 ➔ 다시 부대각선으로 0번 복원되는 대칭 변환을 볼 수 있어요!'
+    highlightCells: [6, 7, 8],
+    formulaBadge: '↻ [31] 3행 첫 성분 (3행 전체 변환)',
+    formulaText: '31 3회 클릭 ➔ 3행 전체 90°씩 3회 순차 회전!',
+    formulaDesc: '3행의 첫 성분 31을 누르면 클릭할 때마다 3행 전체가 90° ➔ 180° ➔ 270°로 3번 회전해요!'
   }
 ];
 
@@ -748,9 +748,9 @@ export class TutorialModalController {
             bubble.textContent = '12 세로 쓱 밀기 (↕)';
           } else {
             this.positionHandAtCell(6); // 31 (3행 1열, idx 6) 타일 정중앙
-            hand.classList.add('hand-anim-cell-diag-combo');
+            hand.classList.add('hand-anim-cell-triple-tap');
             icon.textContent = '👆';
-            bubble.textContent = '31 대각선 밀기 (↘➔↗)';
+            bubble.textContent = '31 가운데 3회 클릭 (3행)';
           }
         }
         break;
@@ -996,95 +996,93 @@ export class TutorialModalController {
 
       this.step1AnimTimers.push(t1, t2, t3);
     } else if (this.step1SubStep === 2) {
-      // ③ 13 대각선 3단 모션: 주대각선(MD) ➔ 부대각선(MAD) ➔ 다시 부대각선(MAD² = ID 복원)
-      // 시작 상태: 보드 초기화 및 31 타일 정위치 강조
+      // ③ 31 성분 3회 클릭 (3행 전체 변환): 3행 첫 성분을 3번 클릭하여 90° ➔ 180° ➔ 270°로 3번 순차 변환
+      // 시작 상태: 1행 MX, 12는 R180, 2열 MY 상태에서 3행(idx 6, 7, 8)을 정위치 ID로 준비
       this.boardOps = [
         D4.MX, D4.R180, D4.MX,
         D4.ID, D4.MY,   D4.ID,
-        D4.ID, D4.MY,   D4.ID
+        D4.ID, D4.ID,   D4.ID
       ];
       this.clearCellHighlights();
-      this.highlightCells([0, 4, 8], 'highlight-diag');
+      this.highlightCells([6, 7, 8], 'highlight-row');
       this.renderBoard();
 
-      // [1단계] 주대각선 밀기 (↘ MD): t = 350ms
+      // [1회 클릭] t = 450ms: 3행 전체(idx 6, 7, 8) 90° 시계 회전 (R90)
       const t1 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 2) {
-          this.addCellAnimClass([0, 4, 8], 'tut-cell-flipping-diag');
-          soundEngine.playFlip();
+          this.addCellAnimClass([6, 7, 8], 'tut-cell-flipping-v');
+          this.boardOps[6] = D4.R90;
+          this.boardOps[7] = D4.R90;
+          this.boardOps[8] = D4.R90;
+          this.renderBoard();
+          soundEngine.playTap();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '1) 주대각선 밀기 (↘ MD)';
+          if (bubble) bubble.textContent = '1회 클릭 ➔ 3행 90° 회전';
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
-          if (fBadge) fBadge.textContent = '↘ [31] 주대각선 반사 (MD)';
-          if (fText) fText.textContent = '1) 31 주대각선 밀기 ➔ 주대각선 반사 (MD)';
+          if (fBadge) fBadge.textContent = '↻ [31] 3행 1회 클릭 (90°)';
+          if (fText) fText.textContent = '1) 31 1회 클릭 ➔ 3행 전체 90° 시계 회전 (R90)';
         }
-      }, 350);
+      }, 450);
 
       const t2 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 2) {
-          this.boardOps[0] = D4.MD;
-          this.boardOps[4] = D4.MD;
-          this.boardOps[8] = D4.MD;
-          this.renderBoard();
-          this.removeCellAnimClass([0, 4, 8], 'tut-cell-flipping-diag');
+          this.removeCellAnimClass([6, 7, 8], 'tut-cell-flipping-v');
         }
-      }, 650);
+      }, 850);
 
-      // [2단계] 부대각선 밀기 (↙ MAD): t = 1250ms
+      // [2회 클릭] t = 1350ms: 3행 전체(idx 6, 7, 8) 180° 반전 회전 (R180)
       const t3 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 2) {
-          this.clearCellHighlights();
-          this.highlightCells([2, 4, 6], 'highlight-diag');
-          this.addCellAnimClass([2, 4, 6], 'tut-cell-flipping-diag');
-          soundEngine.playFlip();
+          this.addCellAnimClass([6, 7, 8], 'tut-cell-flipping-v');
+          this.boardOps[6] = D4.R180;
+          this.boardOps[7] = D4.R180;
+          this.boardOps[8] = D4.R180;
+          this.renderBoard();
+          soundEngine.playTap();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '2) 부대각선 밀기 (↙ MAD)';
+          if (bubble) bubble.textContent = '2회 클릭 ➔ 3행 180° 반전';
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
-          if (fBadge) fBadge.textContent = '↙ [31] 부대각선 반사 (MAD)';
-          if (fText) fText.textContent = '2) 이어서 부대각선 밀기 ➔ 부대각선 반사 (MAD)';
+          if (fBadge) fBadge.textContent = '🔄 [31] 3행 2회 클릭 (180°)';
+          if (fText) fText.textContent = '2) 31 2회 클릭 ➔ 3행 전체 180° 반전 (R180)';
         }
-      }, 1250);
+      }, 1350);
 
       const t4 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 2) {
-          this.boardOps[2] = D4.MAD;
-          this.boardOps[4] = D4.MAD;
-          this.boardOps[6] = D4.MAD;
-          this.renderBoard();
-          this.removeCellAnimClass([2, 4, 6], 'tut-cell-flipping-diag');
+          this.removeCellAnimClass([6, 7, 8], 'tut-cell-flipping-v');
         }
-      }, 1550);
+      }, 1750);
 
-      // [3단계] 다시 부대각선 밀기 (↗ MAD² = ID 복원): t = 2150ms
+      // [3회 클릭] t = 2250ms: 3행 전체(idx 6, 7, 8) 270° 회전 (R270 완성)
       const t5 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 2) {
-          this.addCellAnimClass([2, 4, 6], 'tut-cell-flipping-diag');
-          soundEngine.playFlip();
+          this.addCellAnimClass([6, 7, 8], 'tut-cell-flipping-v');
+          this.boardOps[6] = D4.R270;
+          this.boardOps[7] = D4.R270;
+          this.boardOps[8] = D4.R270;
+          this.renderBoard();
+          soundEngine.playTap();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '3) 다시 부대각선 (↗ 0번 복원)';
+          if (bubble) bubble.textContent = '3회 클릭 ➔ 3행 270° 회전 완성!';
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
           const fDesc = document.getElementById('tut-formula-desc');
-          if (fBadge) fBadge.textContent = '✨ [31] 반사 자기상쇄 (MAD² = ID)';
-          if (fText) fText.textContent = '3) 다시 부대각선 밀기 ➔ MAD² = 0번 복원!';
-          if (fDesc) fDesc.textContent = '부대각선 반사가 2번 연속 만나 다시 똑바른 0번(ID)으로 복원돼요! (회전·반사 완전 정복)';
+          if (fBadge) fBadge.textContent = '✨ [31] 3행 3회 클릭 완료 (R270)';
+          if (fText) fText.textContent = '3) 31 3회 클릭 ➔ 3행 전체 270° 회전 완성 (R270)';
+          if (fDesc) fDesc.textContent = '3행 첫 성분 31을 누르면 클릭할 때마다 3행 전체 강아지가 90° ➔ 180° ➔ 270°로 3번 회전해요!';
         }
-      }, 2150);
+      }, 2250);
 
       const t6 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 2) {
-          this.boardOps[2] = D4.ID;
-          this.boardOps[4] = D4.ID;
-          this.boardOps[6] = D4.ID;
-          this.renderBoard();
-          this.removeCellAnimClass([2, 4, 6], 'tut-cell-flipping-diag');
+          this.removeCellAnimClass([6, 7, 8], 'tut-cell-flipping-v');
         }
-      }, 2450);
+      }, 2650);
 
       this.step1AnimTimers.push(t1, t2, t3, t4, t5, t6);
     } else {
@@ -1104,12 +1102,13 @@ export class TutorialModalController {
     this.stopStep1DemoLoop();
     this.step1Timer = setInterval(() => {
       if (this.currentStep === 1) {
+        // 31 성분 3회 회전이 완전히 끝나고 넉넉히 관찰할 수 있도록 보장
         const nextSub = (this.step1SubStep + 1) % STEP1_SUB_DEMOS.length;
         this.goToStep1SubStep(nextSub, false);
       } else {
         this.stopStep1DemoLoop();
       }
-    }, 3200);
+    }, 4500);
   }
 
   public stopStep1DemoLoop(): void {

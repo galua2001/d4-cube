@@ -232,10 +232,10 @@ describe('TutorialModal & Group Theory Core Logic (6단계 슬라이드 및 실�
       // ② 12 180° 회전 R180
       expect(STEP1_SUB_DEMOS[1].boardOps[1]).toBe(D4.R180);
       expect(STEP1_SUB_DEMOS[1].highlightCells).toEqual([1, 4, 7]);
-      // ③ 31 대각선 변환 MD/MAD
-      expect(STEP1_SUB_DEMOS[2].label).toContain('31 대각선 변환');
-      expect(STEP1_SUB_DEMOS[2].boardOps[2]).toBe(D4.MAD);
-      expect(STEP1_SUB_DEMOS[2].highlightCells).toEqual([2, 4, 6]);
+      // ③ 31 3회 클릭 (3행 전체 회전)
+      expect(STEP1_SUB_DEMOS[2].label).toContain('31 3회 클릭');
+      expect(STEP1_SUB_DEMOS[2].boardOps[6]).toBe(D4.R270);
+      expect(STEP1_SUB_DEMOS[2].highlightCells).toEqual([6, 7, 8]);
     });
 
     it('2단계 진입 시 반사+반사=회전 원리(V4 클라인 4원군)가 시연되어야 함', () => {
@@ -440,10 +440,10 @@ describe('TutorialModal & Group Theory Core Logic (6단계 슬라이드 및 실�
       expect(handEl?.classList.contains('hand-anim-cell-swipe-v')).toBe(true);
       expect(bubbleEl?.textContent).toContain('12 세로');
 
-      // 1단계 서브 시연 3: 31 대각선 변환 시연
+      // 1단계 서브 시연 3: 31 3회 클릭 (3행 전체 회전) 시연
       ctrl.goToStep1SubStep(2);
-      expect(handEl?.classList.contains('hand-anim-cell-diag-combo')).toBe(true);
-      expect(bubbleEl?.textContent).toContain('31 대각선');
+      expect(handEl?.classList.contains('hand-anim-cell-triple-tap')).toBe(true);
+      expect(bubbleEl?.textContent).toContain('31');
 
       // 2단계: 세로 밀기 스와이프
       ctrl.goToStep(2);
@@ -502,27 +502,25 @@ describe('TutorialModal & Group Theory Core Logic (6단계 슬라이드 및 실�
       vi.advanceTimersByTime(300);
       expect(ctrl.boardOps[1]).toBe(D4.R180);
 
-      // 13 3단 대각선 변환 (주대각 MD ➔ 부대각 MAD ➔ 다시 부대각 복원 ID)
+      // 31 3회 클릭 (3행 전체 90°씩 순차 회전)
       ctrl.goToStep1SubStep(2);
-      // 1단계 (t = 350ms): 주대각선 [0, 4, 8] 플립
-      vi.advanceTimersByTime(350);
-      const cell0Diag = document.getElementById('tut-cell-0');
-      expect(cell0Diag?.classList.contains('tut-cell-flipping-diag')).toBe(true);
+      // 1회 클릭 (t = 450ms): 3행 [6, 7, 8] 90° 회전 (R90)
+      vi.advanceTimersByTime(450);
+      expect(ctrl.boardOps[6]).toBe(D4.R90);
+      expect(ctrl.boardOps[7]).toBe(D4.R90);
+      expect(ctrl.boardOps[8]).toBe(D4.R90);
 
-      vi.advanceTimersByTime(300); // 650ms
-      expect(ctrl.boardOps[0]).toBe(D4.MD);
+      // 2회 클릭 (t = 1350ms): 3행 [6, 7, 8] 180° 회전 (R180)
+      vi.advanceTimersByTime(900); // 누적 1350ms
+      expect(ctrl.boardOps[6]).toBe(D4.R180);
+      expect(ctrl.boardOps[7]).toBe(D4.R180);
+      expect(ctrl.boardOps[8]).toBe(D4.R180);
 
-      // 2단계 (t = 1250ms): 부대각선 [2, 4, 6] 플립
-      vi.advanceTimersByTime(600); // 누적 1250ms
-      const cell2 = document.getElementById('tut-cell-2');
-      expect(cell2?.classList.contains('tut-cell-flipping-diag')).toBe(true);
-
-      vi.advanceTimersByTime(300); // 누적 1550ms
-      expect(ctrl.boardOps[2]).toBe(D4.MAD);
-
-      // 3단계 (t = 2450ms): 다시 부대각선 플립으로 ID 복원 (MAD² = ID)
-      vi.advanceTimersByTime(900); // 누적 2450ms
-      expect(ctrl.boardOps[2]).toBe(D4.ID);
+      // 3회 클릭 (t = 2250ms): 3행 [6, 7, 8] 270° 회전 완성 (R270)
+      vi.advanceTimersByTime(900); // 누적 2250ms
+      expect(ctrl.boardOps[6]).toBe(D4.R270);
+      expect(ctrl.boardOps[7]).toBe(D4.R270);
+      expect(ctrl.boardOps[8]).toBe(D4.R270);
 
       vi.useRealTimers();
     });
