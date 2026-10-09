@@ -1473,21 +1473,15 @@ body {
   50% { transform: translate(-50%, -50%) scale(1.18) translateY(-8px); opacity: 1; }
 }
 
-/* 시연 A: 11 성분 가운데 가로 쓱 밀기 (1행 전체 MX 변환) - 초기 1초간 여유 대기 후 등장, 타일 플립과 완벽 동시 진행 */
+/* 시연 A: 11 성분 가운데 가로 쓱 밀기 (1행 전체 MX 변환) - 타일 플립과 완벽 동시 진행 (0.8s 순수 이동) */
 .tut-hand-demo.hand-anim-cell-swipe-h {
-  animation: handCellSwipeH 2.4s ease-in-out forwards;
+  animation: handCellSwipeH 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes handCellSwipeH {
-  /* 0% ~ 42% (0ms ~ 1000ms): 모달 오픈 직후 손가락 완전 미노출 (사용자가 보드와 설명을 충분히 인지) */
-  0%, 41% { transform: translate(calc(-50% - 36px), -50%) scale(0.85); opacity: 0; }
-  /* 42% ~ 50% (1000ms ~ 1200ms): 11 타일 좌측에 부드럽게 등장 후 단정하게 안착 */
-  46% { transform: translate(calc(-50% - 36px), -50%) scale(1.08); opacity: 1; }
-  50% { transform: translate(calc(-50% - 36px), -50%) scale(1.0); opacity: 1; }
-  /* 50% ~ 83% (1200ms ~ 2000ms, 정확히 800ms): 손가락이 가로로 쓱 이동! 타일 플립(0.8s)과 완벽 동시 진행! */
-  83% { transform: translate(calc(-50% + 36px), -50%) scale(1.0); opacity: 1; }
-  /* 83% ~ 100%: 이동 완료 후 부드럽게 페이드아웃 */
-  92% { transform: translate(calc(-50% + 40px), -50%) scale(0.95); opacity: 0.5; }
+  /* 타일 플립(0.8s)과 완벽히 동일한 타이밍 곡선으로 좌측 -> 우측으로 쓱 이동 */
+  0% { transform: translate(calc(-50% - 36px), -50%) scale(1.0); opacity: 1; }
+  80% { transform: translate(calc(-50% + 36px), -50%) scale(1.0); opacity: 1; }
   100% { transform: translate(calc(-50% + 40px), -50%) scale(0.85); opacity: 0; }
 }
 

@@ -777,6 +777,7 @@ export class TutorialModalController {
             hand.classList.add('hand-anim-cell-swipe-h');
             icon.textContent = '👆';
             bubble.textContent = '11 가로 쓱 밀기 (↔)';
+            hand.style.opacity = '0'; // 초기 렌더링 시 깜빡임/선출현 방지 (600ms 후 등장)
           } else if (demoIdx === 1) {
             this.positionHandAtCell(1); // 12 (1행 2열, idx 1) 타일 정중앙
             hand.classList.add('hand-anim-cell-swipe-v');
@@ -956,29 +957,51 @@ export class TutorialModalController {
       ];
       this.renderBoard();
 
-      // 손가락이 초기 1초간 미노출 대기 후 11 타일 좌측에 단정하게 안착(1000ms~1200ms)하고,
-      // 오른쪽으로 쓱 긋기 시작하는 바로 그 순간(t = 1200ms)에 1행 타일들 3D 가로 플립도 완벽 동시 시작!
+      // [손가락 초기 미노출]
+      const hand = document.getElementById('tut-hand-demo');
+      if (hand) {
+        hand.style.opacity = '0';
+        hand.style.transform = 'translate(calc(-50% - 36px), -50%)';
+      }
+
+      // [준비] t = 600ms: 손가락이 11 타일 좌측에 부드럽게 등장 (사용자가 충분히 인지)
+      const t0 = setTimeout(() => {
+        if (this.currentStep === 1 && this.step1SubStep === 0) {
+          const h = document.getElementById('tut-hand-demo');
+          if (h) {
+            h.style.opacity = '1';
+          }
+        }
+      }, 600);
+
+      // [동시 발동] t = 1100ms: 손가락 긋기 시작과 1행 타일들 3D 가로 플립이 완벽히 한 타이밍에 동시 시작!
       const t1 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 0) {
+          const h = document.getElementById('tut-hand-demo');
+          if (h) {
+            h.classList.remove('hand-anim-cell-swipe-h');
+            void h.offsetWidth; // 리플로우 강제
+            h.classList.add('hand-anim-cell-swipe-h');
+          }
           this.addCellAnimClass([0, 1, 2], 'tut-cell-flipping-h');
           soundEngine.playFlip();
         }
-      }, 1200);
+      }, 1100);
 
-      // 플립 중간 90도 회전 시점 (손가락이 타일 중앙을 통과하는 순간 t = 1200 + 400 = 1600ms): 1행 타일들이 일제히 가로 반사(MX, 뒷면)로 뒤집힘
+      // [플립 중간 90도 회전] t = 1100 + 400 = 1500ms: 1행 타일들이 일제히 가로 반사(MX, 뒷면)로 뒤집힘
       const t2 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 0) {
           this.boardOps = [...stepData.boardOps];
           this.renderBoard();
         }
-      }, 1600);
+      }, 1500);
 
-      // 플립 완료 시점 (손가락 우측 도달 및 타일 플립 완료 t = 1200 + 800 = 2000ms): 플립 클래스 제거
+      // [플립 완료] t = 1100 + 800 = 1900ms: 플립 클래스 제거
       const t3 = setTimeout(() => {
         this.removeCellAnimClass([0, 1, 2], 'tut-cell-flipping-h');
-      }, 2020);
+      }, 1920);
 
-      this.step1AnimTimers.push(t1, t2, t3);
+      this.step1AnimTimers.push(t0, t1, t2, t3);
 
     } else if (this.step1SubStep === 1) {
       // ② 12 세로 쓱 밀기:
