@@ -762,6 +762,7 @@ export class TutorialModalController {
 
     // 기존 애니메이션 클래스 및 인라인 스타일 리셋
     hand.className = 'tut-hand-demo';
+    void hand.offsetWidth; // CSS 키프레임 애니메이션 리셋 및 재실행 확실 보장
     hand.style.top = '';
     hand.style.left = '';
     hand.style.display = 'flex';
@@ -955,26 +956,27 @@ export class TutorialModalController {
       ];
       this.renderBoard();
 
-      // 손가락이 11 타일 좌측 안착 후 오른쪽으로 쓱 긋기 시작하는 시점(t = 380ms)에 1행 타일들 3D 가로 플립 시작!
+      // 손가락이 11 타일 좌측 안착 후 대기(0ms~700ms)하다가,
+      // 오른쪽으로 쓱 긋기 시작하는 바로 그 순간(t = 700ms)에 1행 타일들 3D 가로 플립도 완벽 동시 시작!
       const t1 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 0) {
           this.addCellAnimClass([0, 1, 2], 'tut-cell-flipping-h');
           soundEngine.playFlip();
         }
-      }, 380);
+      }, 700);
 
-      // 플립 중간 90도 회전 시점: 1행 타일들이 일제히 가로 반사(MX, 뒷면)로 뒤집힘
+      // 플립 중간 90도 회전 시점 (손가락이 타일 중앙을 통과하는 순간 t = 700 + 400 = 1100ms): 1행 타일들이 일제히 가로 반사(MX, 뒷면)로 뒤집힘
       const t2 = setTimeout(() => {
         if (this.currentStep === 1 && this.step1SubStep === 0) {
           this.boardOps = [...stepData.boardOps];
           this.renderBoard();
         }
-      }, 780);
+      }, 1100);
 
-      // 플립 완료 시점: 플립 클래스 제거
+      // 플립 완료 시점 (손가락 우측 도달 및 타일 플립 완료 t = 700 + 800 = 1500ms): 플립 클래스 제거
       const t3 = setTimeout(() => {
         this.removeCellAnimClass([0, 1, 2], 'tut-cell-flipping-h');
-      }, 1200);
+      }, 1520);
 
       this.step1AnimTimers.push(t1, t2, t3);
 

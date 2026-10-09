@@ -515,16 +515,16 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
       ctrl.open(1);
       ctrl.stopStep1DemoLoop();
 
-      // 11 가로 밀기 플립 애니메이션
+      // 11 가로 밀기 플립 애니메이션 (손가락 안착 대기 후 700ms에 긋기 시작과 동시에 플립 시작)
       ctrl.goToStep1SubStep(0);
-      vi.advanceTimersByTime(380);
+      vi.advanceTimersByTime(700);
       const cell0 = document.getElementById('tut-cell-0');
       expect(cell0?.classList.contains('tut-cell-flipping-h')).toBe(true);
 
-      vi.advanceTimersByTime(400); // 780ms 시점
+      vi.advanceTimersByTime(400); // 1100ms 시점
       expect(ctrl.boardOps[0]).toBe(D4.MX);
 
-      vi.advanceTimersByTime(450); // 1230ms 시점 (애니메이션 완료 후 제거)
+      vi.advanceTimersByTime(450); // 1550ms 시점 (애니메이션 완료 후 제거)
       expect(cell0?.classList.contains('tut-cell-flipping-h')).toBe(false);
 
       // 12 세로 밀기 플립 애니메이션
