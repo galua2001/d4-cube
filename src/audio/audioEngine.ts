@@ -243,8 +243,8 @@ class SoundEngine {
       window.speechSynthesis.cancel(); // 이전 음성 중단
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = 'ko-KR';
-      utter.rate = 1.0; // 늘어지는 기계음 제거 및 자연스러운 한국어 표준 발화 속도
-      utter.pitch = 1.02; // 생기 있고 자연스러운 표준 한국어 음조
+      utter.rate = 1.04; // 늘어지지 않고 경쾌하고 생생한 한국어 구어체 속도
+      utter.pitch = 1.0; // 과도한 피치 변형 없이 편안하고 자연스러운 한국어 음조
 
       // 고품질 자연스러운 한국어(Natural / Neural / Google 한국의 / SunHi) 우선 탐색
       const voices = window.speechSynthesis.getVoices();

@@ -59,9 +59,11 @@ class MatrixCubeApp {
     const app = document.getElementById('app')!;
     app.innerHTML = `
       <div class="header-bar">
-        <div class="header-title">🧩 행렬 큐브</div>
-        <div class="header-actions">
+        <div class="header-top-row">
+          <div class="header-title">🧩 행렬 큐브</div>
           <button id="btn-pwa-install" class="btn-icon" style="display:none; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: bold; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);" title="스마트폰에 앱으로 설치">📱 앱설치</button>
+        </div>
+        <div class="header-actions">
           <button id="btn-header-tutorial" class="btn-icon btn-nav-tutorial" title="30초 인터랙티브 D4 연산 튜토리얼">🎓 튜토리얼</button>
           <button id="btn-about" class="btn-icon" title="작품 소개 및 수학적 배경">ℹ️ 소개</button>
           <button id="btn-toggle-guide" class="btn-icon" title="컨트롤러 타일 가이드">🧭 가이드</button>
@@ -74,7 +76,7 @@ class MatrixCubeApp {
       <div class="settings-panel">
         <div class="settings-row">
           <div class="settings-left-group">
-            <span class="settings-label">🎲 난이도</span>
+            <span class="settings-label">🎯 난이도</span>
             <div class="button-group" id="moves-button-group"></div>
           </div>
           <div class="settings-options-group">
@@ -87,7 +89,7 @@ class MatrixCubeApp {
       <div class="status-bar">
         <div style="display:flex; align-items:center; gap:6px;">
           <span class="badge-group" id="badge-group-name">D₄ (정사면군)</span>
-          <span id="label-stage-info">${this.boardSize}×${this.boardSize} (${this.scrambleMoves}수)</span>
+          <span id="label-stage-info">${this.boardSize}×${this.boardSize} (최소 ${this.scrambleMoves}수 보장 퍼즐)</span>
         </div>
         <div class="timer-container">
           <span class="timer-display" id="label-timer">00:00.0</span>
@@ -106,8 +108,8 @@ class MatrixCubeApp {
 
       <div class="controls-panel">
         <button id="btn-undo" class="btn-action">↩ 되돌리기</button>
-        <button id="btn-hint" class="btn-action">💡 힌트</button>
-        <button id="btn-solution" class="btn-action primary">📖 해설</button>
+        <button id="btn-hint" class="btn-action">💡 힌트보기</button>
+        <button id="btn-solution" class="btn-action primary">📖 해설보기</button>
       </div>
 
       <div class="controls-panel" style="margin-top: 4px;">
@@ -408,7 +410,7 @@ class MatrixCubeApp {
   private updateStatusInfo() {
     const lbl = document.getElementById('label-stage-info');
     if (lbl) {
-      lbl.innerText = `${this.boardSize}×${this.boardSize} (${this.scrambleMoves}수 도전)`;
+      lbl.innerText = `${this.boardSize}×${this.boardSize} (최소 ${this.scrambleMoves}수 보장 퍼즐)`;
     }
   }
 
@@ -603,9 +605,58 @@ class MatrixCubeApp {
     // 대각선 변환 활성화 여부에 따라 사용 가능한 라인 범위 결정 (대각선 OFF시 오직 행과 열만 섞음)
     const maxLineIdx = this.isDiagonalEnabled ? lines.length : this.boardSize * 2;
 
+    const targetMoves = this.scrambleMoves;
     let ops = Array(this.boardSize * this.boardSize).fill(D4.ID);
+    let bestCandidate: D4Op[] | null = null;
+    let bestDistDiff = 999;
 
-    for (let i = 0; i < this.scrambleMoves; i++) {
+    // 3x3 보드는 고속 BFS 솔버로 최단 거리가 정확히 targetMoves 수와 일치하는 퍼즐만 엄선 출제
+    const maxAttempts = this.boardSize === 3 ? 150 : 20;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      let candidate = Array(this.boardSize * this.boardSize).fill(D4.ID);
+      let lastLineId = -1;
+
+      for (let i = 0; i < targetMoves; i++) {
+        let lineId = Math.floor(Math.random() * maxLineIdx);
+        // 연속 동일 라인 적용 방지로 무의미한 상쇄 최소화
+        if (targetMoves > 1 && lineId === lastLineId) {
+          lineId = (lineId + 1) % maxLineIdx;
+        }
+        lastLineId = lineId;
+        const randOp = validOps[Math.floor(Math.random() * validOps.length)];
+        candidate = applyLineMoveGeneric(candidate, lineCellsList[lineId], randOp);
+      }
+
+      if (candidate.every(o => o === D4.ID)) {
+        continue;
+      }
+
+      if (this.boardSize === 3) {
+        const steps = solveBoard(candidate, this.boardSize, this.currentGroup, this.isDiagonalEnabled);
+        if (steps.length === targetMoves) {
+          // 정확히 최소 수(k수) 보장 달성! 즉시 확정!
+          ops = candidate;
+          bestCandidate = null;
+          break;
+        } else if (steps.length > 0) {
+          const diff = Math.abs(steps.length - targetMoves);
+          if (diff < bestDistDiff) {
+            bestDistDiff = diff;
+            bestCandidate = candidate;
+          }
+        }
+      } else {
+        ops = candidate;
+        break;
+      }
+    }
+
+    if (bestCandidate && ops.every(o => o === D4.ID)) {
+      ops = bestCandidate;
+    }
+
+    if (ops.every(o => o === D4.ID)) {
       const lineId = Math.floor(Math.random() * maxLineIdx);
       const randOp = validOps[Math.floor(Math.random() * validOps.length)];
       ops = applyLineMoveGeneric(ops, lineCellsList[lineId], randOp);
@@ -615,6 +666,7 @@ class MatrixCubeApp {
     this.moveHistory = [];
     this.movesCount = 0;
     this.updateMovesLabel();
+    this.updateStatusInfo();
     this.updateBestRecordBadge();
     soundEngine.playTap();
     this.updateBoard();

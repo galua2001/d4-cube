@@ -51,6 +51,12 @@ body {
   border-radius: 12px;
 }
 
+.header-top-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .header-title {
   font-size: 1.15rem;
   font-weight: 700;
@@ -58,13 +64,14 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .btn-icon {
@@ -1006,15 +1013,42 @@ body {
 
   .header-bar {
     padding: 6px 8px;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .header-top-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .header-title {
     font-size: 1rem;
   }
 
+  .header-actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    flex-wrap: nowrap;
+  }
+
+  .header-actions .btn-icon {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 6px 2px;
+    font-size: 0.74rem;
+    text-align: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
   .btn-icon {
-    padding: 5px 8px;
-    font-size: 0.8rem;
+    padding: 5px 6px;
+    font-size: 0.78rem;
   }
 
   .settings-panel {
@@ -1025,18 +1059,47 @@ body {
     gap: 4px;
   }
 
+  .settings-left-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* 3수, 4수 행 옆에 "난이도" 글자 모바일에서도 항시 선명하게 표시 */
   .settings-label {
-    display: none;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    white-space: nowrap;
+    margin-right: 2px;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
   }
 
   .btn-pill {
-    padding: 4px 2px;
-    font-size: 0.74rem;
+    padding: 4px 1px;
+    font-size: 0.72rem;
+    min-width: 0;
+    text-align: center;
   }
 
   .btn-option-pill {
     padding: 4px 6px;
     font-size: 0.74rem;
+  }
+
+  .btn-action {
+    padding: 8px 4px;
+    font-size: 0.85rem;
   }
 
   .board-container {
@@ -1507,18 +1570,17 @@ body {
   100% { transform: translate(calc(-50% + 40px), -50%) scale(0.85); opacity: 0; }
 }
 
-/* 일반 / D4 5수 가로 쓱 밀기: 멈춤 없이 12번 타일 중앙에서 시작해 오른쪽으로 부드럽게 쓱 이동 (1.6s ease-in-out) */
+/* 일반 / D4 5수 가로 쓱 밀기: 클릭 펄스 완전 제거, 12번 타일 좌측에서 우측으로 시원하게 쓱 긋는 순수 가로 스와이프 (1.8s infinite 반복) */
 .tut-hand-demo.hand-anim-cell-swipe-h {
-  animation: handCellSwipeH 1.6s ease-in-out forwards;
+  animation: handCellSwipeH 1.8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
 }
 
 @keyframes handCellSwipeH {
-  0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0; }
-  15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-  25% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
-  60% { transform: translate(calc(-50% + 46px), -50%) scale(1.0); opacity: 1; }
-  85% { transform: translate(calc(-50% + 50px), -50%) scale(0.85); opacity: 0; }
-  100% { transform: translate(calc(-50% + 50px), -50%) scale(0.85); opacity: 0; }
+  0% { transform: translate(calc(-50% - 35px), -50%) scale(1.0); opacity: 0; }
+  15% { transform: translate(calc(-50% - 35px), -50%) scale(1.0); opacity: 1; }
+  65% { transform: translate(calc(-50% + 55px), -50%) scale(1.0); opacity: 1; }
+  85% { transform: translate(calc(-50% + 55px), -50%) scale(1.0); opacity: 0; }
+  100% { transform: translate(calc(-50% + 55px), -50%) scale(1.0); opacity: 0; }
 }
 
 /* 시연 B: 12 성분 가운데 세로 쓱 밀기 (가로+세로 = 180° 회전) - 실전 퍼즐 동기화 (1회 실행 후 완료) */
