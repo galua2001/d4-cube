@@ -507,6 +507,8 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
 
       ctrl.goToD4SubStep(5); // 5수: 12 가로 쓱
       expect(handEl?.classList.contains('hand-anim-cell-swipe-h')).toBe(true);
+      expect(iconEl?.textContent).toBe('👉');
+      expect(bubbleEl?.textContent).toContain('가로로 쓱 긋기');
     });
 
     it('1단계 서브 시연 이동 시 실시간 보드 변환 및 타일 플립 애니메이션 클래스가 올바르게 부여되어야 함', () => {
