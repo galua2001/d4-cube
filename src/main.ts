@@ -12,6 +12,7 @@ import { showAboutModal } from './ui/aboutModal';
 import { showTutorialModal, isTutorialCompleted } from './ui/tutorialModal';
 import { victoryManager } from './ui/victoryEffect';
 import { initPWAManager } from './pwaManager';
+import { t, getCurrentLang, setLang, onLangChange, Lang } from './i18n/translations';
 
 class MatrixCubeApp {
   private boardSize = 3;
@@ -40,6 +41,14 @@ class MatrixCubeApp {
     this.updateBoard();
     this.updateBestRecordBadge();
     initPWAManager();
+
+    // 언어 변경 시 UI 자동 갱신
+    onLangChange(() => {
+      this.renderLayout();
+      this.bindControls();
+      this.updateBoard();
+      this.updateBestRecordBadge();
+    });
   }
 
   private initBoardOps() {
@@ -55,46 +64,61 @@ class MatrixCubeApp {
     this.imgDogBack.onload = onImgLoad;
   }
 
+  private getGroupName(grp: SymmetryGroupKey): string {
+    switch (grp) {
+      case 'D4': return t('status.groupD4');
+      case 'V4': return t('status.groupV4');
+      case 'C2': return t('status.groupC2');
+      default: return '';
+    }
+  }
+
   private renderLayout() {
     const app = document.getElementById('app')!;
+    const curLang = getCurrentLang();
     app.innerHTML = `
       <div class="header-bar">
         <div class="header-top-row">
-          <div class="header-title">🧩 행렬 큐브</div>
-          <button id="btn-pwa-install" class="btn-icon" style="display:none; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: bold; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);" title="스마트폰에 앱으로 설치">📱 앱설치</button>
+          <div class="header-title">${t('header.title')}</div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button id="btn-toggle-lang" class="btn-lang-toggle" title="${t('header.langToggleTitle')}">
+              🌐 <span class="${curLang === 'en' ? 'active-lang' : ''}">EN</span> | <span class="${curLang === 'ko' ? 'active-lang' : ''}">KO</span>
+            </button>
+            <button id="btn-pwa-install" class="btn-icon" style="display:none; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: bold; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);" title="${t('header.pwaInstallTitle')}">${t('header.pwaInstall')}</button>
+          </div>
         </div>
         <div class="header-actions">
-          <button id="btn-header-tutorial" class="btn-icon btn-nav-tutorial" title="30초 인터랙티브 D4 연산 튜토리얼">🎓 튜토리얼</button>
-          <button id="btn-about" class="btn-icon" title="작품 소개 및 수학적 배경">ℹ️ 소개</button>
-          <button id="btn-toggle-guide" class="btn-icon" title="컨트롤러 타일 가이드">🧭 가이드</button>
+          <button id="btn-header-tutorial" class="btn-icon btn-nav-tutorial" title="${t('header.tutorialTitle')}">${t('header.tutorial')}</button>
+          <button id="btn-about" class="btn-icon" title="${t('header.aboutTitle')}">${t('header.about')}</button>
+          <button id="btn-toggle-guide" class="btn-icon" title="${t('header.guideTitle')}">${t('header.guide')}</button>
           <button id="btn-toggle-bgm" class="btn-icon">🔇 BGM</button>
           <button id="btn-toggle-sfx" class="btn-icon">🔊 SFX</button>
         </div>
       </div>
 
-      <!-- 단 1행으로 압축된 슬림 설정 패널 (난이도 행 우측에 크기 순환 및 대각선 토글 버튼 배치) -->
+      <!-- 단 1행으로 압축된 슬림 설정 패널 -->
       <div class="settings-panel">
         <div class="settings-row">
           <div class="settings-left-group">
-            <span class="settings-label">🎯 난이도</span>
+            <span class="settings-label">${t('settings.difficulty')}</span>
             <div class="button-group" id="moves-button-group"></div>
           </div>
           <div class="settings-options-group">
-            <button id="btn-cycle-size" class="btn-option-pill" title="보드 크기 순환 (3×3 ➔ 4×4 ➔ 5×5)">📐 ${this.boardSize}×${this.boardSize}</button>
-            <button id="btn-toggle-diag" class="btn-option-pill ${this.isDiagonalEnabled ? 'active-diag' : ''}" title="대각선 변환 모드 켜기/끄기">⚡ 대각선 ${this.isDiagonalEnabled ? 'ON' : 'OFF'}</button>
+            <button id="btn-cycle-size" class="btn-option-pill" title="${t('settings.sizeTitle')}">📐 ${this.boardSize}×${this.boardSize}</button>
+            <button id="btn-toggle-diag" class="btn-option-pill ${this.isDiagonalEnabled ? 'active-diag' : ''}" title="${this.isDiagonalEnabled ? t('settings.diagTitleOn') : t('settings.diagTitleOff')}">${this.isDiagonalEnabled ? t('settings.diagOn') : t('settings.diagOff')}</button>
           </div>
         </div>
       </div>
 
       <div class="status-bar">
         <div style="display:flex; align-items:center; gap:6px;">
-          <span class="badge-group" id="badge-group-name">D₄ (정사면군)</span>
-          <span id="label-stage-info">${this.boardSize}×${this.boardSize} (최소 ${this.scrambleMoves}수 보장 퍼즐)</span>
+          <span class="badge-group" id="badge-group-name">${this.getGroupName(this.currentGroup)}</span>
+          <span id="label-stage-info">${t('status.stageInfo', { size: this.boardSize, moves: this.scrambleMoves })}</span>
         </div>
         <div class="timer-container">
           <span class="timer-display" id="label-timer">00:00.0</span>
-          <span id="label-moves">0 회</span>
-          <span class="best-record-badge" id="badge-best-record">🏆 BEST: -</span>
+          <span id="label-moves">${t('status.moves', { moves: this.movesCount })}</span>
+          <span class="best-record-badge" id="badge-best-record">${t('status.bestRecordEmpty')}</span>
         </div>
       </div>
 
@@ -107,15 +131,15 @@ class MatrixCubeApp {
       <div id="solution-panel-container"></div>
 
       <div class="controls-panel">
-        <button id="btn-undo" class="btn-action">↩ 되돌리기</button>
-        <button id="btn-hint" class="btn-action">💡 힌트보기</button>
-        <button id="btn-solution" class="btn-action primary">📖 해설보기</button>
+        <button id="btn-undo" class="btn-action">${t('controls.undo')}</button>
+        <button id="btn-hint" class="btn-action">${t('controls.hint')}</button>
+        <button id="btn-solution" class="btn-action primary">${t('controls.solution')}</button>
       </div>
 
       <div class="controls-panel" style="margin-top: 4px;">
-        <button id="btn-set-c2" class="btn-icon" style="flex:1;">C₂ 모드</button>
-        <button id="btn-set-v4" class="btn-icon" style="flex:1;">V₄ 모드</button>
-        <button id="btn-set-d4" class="btn-icon active" style="flex:1;">D₄ 모드</button>
+        <button id="btn-set-c2" class="btn-icon" style="flex:1;">${t('controls.modeC2')}</button>
+        <button id="btn-set-v4" class="btn-icon" style="flex:1;">${t('controls.modeV4')}</button>
+        <button id="btn-set-d4" class="btn-icon active" style="flex:1;">${t('controls.modeD4')}</button>
       </div>
     `;
 
@@ -172,10 +196,10 @@ class MatrixCubeApp {
         const currentMode = this.gestureRecognizer ? this.gestureRecognizer.getCell11Mode() : 'row';
         sw.className = `tile-switch-11 ${currentMode === 'col' ? 'mode-col' : 'mode-row'}`;
         sw.id = 'tile-switch-11';
-        sw.title = '탭하여 1행 / 1열 변환 모드 전환';
+        sw.title = t('board.switch11Title');
         sw.innerHTML = `
-          <span class="tile-switch-opt opt-row">1행</span>
-          <span class="tile-switch-opt opt-col">1열</span>
+          <span class="tile-switch-opt opt-row">${t('board.optRow')}</span>
+          <span class="tile-switch-opt opt-col">${t('board.optCol')}</span>
         `;
         const stopEvent = (e: Event) => e.stopPropagation();
         sw.addEventListener('pointerdown', stopEvent);
@@ -194,17 +218,17 @@ class MatrixCubeApp {
         let guideClass = '';
 
         if (c === 0 && r > 0) {
-          guideText = `${r + 1}행`;
+          guideText = t('board.row', { n: r + 1 });
           guideClass = 'guide-row';
         } else if (r === 0 && c > 0) {
-          guideText = `${c + 1}열`;
+          guideText = t('board.col', { n: c + 1 });
           guideClass = 'guide-col';
         } else if (this.isDiagonalEnabled) {
           if (r === this.boardSize - 1 && c === this.boardSize - 1) {
-            guideText = '↖대각';
+            guideText = t('board.diagMain');
             guideClass = 'guide-diag';
           } else if (r === 1 && c === this.boardSize - 1) {
-            guideText = '↗대각';
+            guideText = t('board.diagAnti');
             guideClass = 'guide-diag';
           }
         }
@@ -269,6 +293,13 @@ class MatrixCubeApp {
   }
 
   private bindControls() {
+    // 언어 전환 버튼 (EN <-> KO)
+    document.getElementById('btn-toggle-lang')?.addEventListener('click', () => {
+      soundEngine.playTap();
+      const nextLang: Lang = getCurrentLang() === 'en' ? 'ko' : 'en';
+      setLang(nextLang);
+    });
+
     // 30초 인터랙티브 튜토리얼 모달 버튼
     const btnTut = document.getElementById('btn-header-tutorial');
     if (!isTutorialCompleted() && btnTut) {
@@ -355,9 +386,9 @@ class MatrixCubeApp {
 
     const btnDiag = document.getElementById('btn-toggle-diag');
     if (btnDiag) {
-      btnDiag.innerText = `⚡ 대각선 ${this.isDiagonalEnabled ? 'ON' : 'OFF'}`;
+      btnDiag.innerText = this.isDiagonalEnabled ? t('settings.diagOn') : t('settings.diagOff');
       btnDiag.classList.toggle('active-diag', this.isDiagonalEnabled);
-      btnDiag.title = this.isDiagonalEnabled ? '대각선 변환 모드 켜짐 (탭하여 끄기)' : '대각선 변환 모드 꺼짐 (탭하여 켜기)';
+      btnDiag.title = this.isDiagonalEnabled ? t('settings.diagTitleOn') : t('settings.diagTitleOff');
     }
 
     soundEngine.playTap();
@@ -372,12 +403,12 @@ class MatrixCubeApp {
     const rec = recordManager.getRecord(this.boardSize, this.scrambleMoves);
     if (rec && (rec.bestTimeMs !== null || rec.bestMoves !== null)) {
       const timeStr = rec.bestTimeMs !== null ? formatTime(rec.bestTimeMs) : '-';
-      const moveStr = rec.bestMoves !== null ? `${rec.bestMoves}회` : '-';
+      const moveStr = rec.bestMoves !== null ? t('status.moves', { moves: rec.bestMoves }) : '-';
       badge.innerText = `🏆 ${timeStr} / ${moveStr}`;
-      badge.title = `최고 기록: ${timeStr} (${moveStr})`;
+      badge.title = t('status.bestRecordTitle', { time: timeStr, moves: moveStr });
     } else {
-      badge.innerText = '🏆 BEST: -';
-      badge.title = '아직 클리어 기록이 없습니다';
+      badge.innerText = t('status.bestRecordEmpty');
+      badge.title = t('status.bestRecordEmptyTitle');
     }
   }
 
@@ -410,7 +441,7 @@ class MatrixCubeApp {
   private updateStatusInfo() {
     const lbl = document.getElementById('label-stage-info');
     if (lbl) {
-      lbl.innerText = `${this.boardSize}×${this.boardSize} (최소 ${this.scrambleMoves}수 보장 퍼즐)`;
+      lbl.innerText = t('status.stageInfo', { size: this.boardSize, moves: this.scrambleMoves });
     }
   }
 
@@ -423,7 +454,7 @@ class MatrixCubeApp {
 
     let movesList: number[] = [3, 4, 5, 6, 7, 8];
     if (this.currentGroup === 'V4') {
-      movesList = [2, 3, 4]; // V4 모드 난이도: 2~4수
+      movesList = [2, 3, 4];
     } else if (this.currentGroup === 'C2') {
       movesList = [2, 3];
     }
@@ -437,7 +468,7 @@ class MatrixCubeApp {
       const btn = document.createElement('button');
       btn.className = `btn-pill ${m === this.scrambleMoves ? 'active' : ''}`;
       btn.dataset.moves = String(m);
-      btn.innerText = `${m}수`;
+      btn.innerText = `${m}${t('settings.movesSuffix')}`;
       btn.addEventListener('click', () => {
         this.scrambleMoves = m;
         groupEl.querySelectorAll('.btn-pill').forEach(b => b.classList.remove('active'));
@@ -456,7 +487,7 @@ class MatrixCubeApp {
   private switchGroup(grp: SymmetryGroupKey) {
     this.currentGroup = grp;
     const badge = document.getElementById('badge-group-name');
-    if (badge) badge.innerText = SYMMETRY_GROUPS[grp].name;
+    if (badge) badge.innerText = this.getGroupName(grp);
 
     ['btn-set-c2', 'btn-set-v4', 'btn-set-d4'].forEach(id => {
       const btn = document.getElementById(id);
@@ -830,7 +861,7 @@ class MatrixCubeApp {
 
   private updateMovesLabel() {
     const lbl = document.getElementById('label-moves');
-    if (lbl) lbl.innerText = `${this.movesCount} 회`;
+    if (lbl) lbl.innerText = t('status.moves', { moves: this.movesCount });
   }
 
   // 각 성분의 상태 뱃지 텍스트 반환 (0, 1, 2, 3 및 대칭 기호)

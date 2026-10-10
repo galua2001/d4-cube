@@ -1,6 +1,7 @@
 import { D4Op, D4, composeOps } from '../core/group';
 import { renderDogTileCanvas } from './tileRenderer';
 import { soundEngine } from '../audio/audioEngine';
+import { t, onLangChange } from '../i18n/translations';
 
 export const TUTORIAL_STORAGE_KEY = 'matrix_cube_tutorial_completed';
 
@@ -52,55 +53,55 @@ export interface ExampleMoveStep {
 export const STEP1_SUB_DEMOS: ExampleMoveStep[] = [
   {
     subStep: 0,
-    label: '① 11 가로 밀기',
+    get label() { return t('tutorial.step1Sub0Label'); },
     boardOps: [
       D4.MX, D4.MX, D4.MX,
       D4.ID, D4.ID, D4.ID,
       D4.ID, D4.ID, D4.ID
     ],
     highlightCells: [0, 1, 2],
-    formulaBadge: '💡 [11] 1행 첫 성분',
-    formulaText: '11 가로 쓱 밀기 ➔ 1행 전체 가로 반사(MX)',
-    formulaDesc: '1행의 첫 성분 11을 가로로 쓱 밀면 1행 전체가 일제히 뒤태(X 뱃지)로 뒤집혀요!'
+    get formulaBadge() { return t('tutorial.step1Sub0Badge'); },
+    get formulaText() { return t('tutorial.step1Sub0Text'); },
+    get formulaDesc() { return t('tutorial.step1Sub0Desc'); }
   },
   {
     subStep: 1,
-    label: '② 12 세로 밀기',
+    get label() { return t('tutorial.step1Sub1Label'); },
     boardOps: [
       D4.MX, D4.R180, D4.MX,
       D4.ID, D4.MY,   D4.ID,
       D4.ID, D4.MY,   D4.ID
     ],
     highlightCells: [1, 4, 7],
-    formulaBadge: '✨ [12] 2열 첫 성분 (MX ∘ MY = R180)',
-    formulaText: '12 세로 쓱 밀기 ➔ 12 타일 180° 회전!',
-    formulaDesc: '1행이 가로 반사(MX)된 상태에서 12를 세로로 밀면(MY), 가로와 세로가 만나 180° 회전(R180)이 돼요!'
+    get formulaBadge() { return t('tutorial.step1Sub1Badge'); },
+    get formulaText() { return t('tutorial.step1Sub1Text'); },
+    get formulaDesc() { return t('tutorial.step1Sub1Desc'); }
   },
   {
     subStep: 2,
-    label: '③ 31 3회 클릭 (3행)',
+    get label() { return t('tutorial.step1Sub2Label'); },
     boardOps: [
       D4.MX,   D4.R180, D4.MX,
       D4.ID,   D4.MY,   D4.ID,
       D4.R270, D4.R270, D4.R270
     ],
     highlightCells: [6, 7, 8],
-    formulaBadge: '↻ [31] 3행 첫 성분 (3행 전체 변환)',
-    formulaText: '31 3회 클릭 ➔ 3행 전체 90°씩 3회 순차 회전!',
-    formulaDesc: '3행의 첫 성분 31을 누르면 클릭할 때마다 3행 전체가 90° ➔ 180° ➔ 270°로 3번 회전해요!'
+    get formulaBadge() { return t('tutorial.step1Sub2Badge'); },
+    get formulaText() { return t('tutorial.step1Sub2Text'); },
+    get formulaDesc() { return t('tutorial.step1Sub2Desc'); }
   },
   {
     subStep: 3,
-    label: '④ 21 대각선 긋기 (2행)',
+    get label() { return t('tutorial.step1Sub3Label'); },
     boardOps: [
       D4.MX,   D4.R180, D4.MX,
       D4.R180, D4.R180, D4.R180,
       D4.R270, D4.R270, D4.R270
     ],
     highlightCells: [3, 4, 5],
-    formulaBadge: '⚡ [21] 2행 첫 성분 대각선 변환',
-    formulaText: '21 대각선 긋기 ➔ 주대각선(MD) + 대각선(MAD) = 180° 회전(R180)!',
-    formulaDesc: '손가락이 21 성분에서 ↖➔↘로 쓱 그으면 2행이 주대각선 대칭(MD), ↗➔↙로 대각선을 그으면 두 반사가 교차되어 180° 회전(R180)이 돼요!'
+    get formulaBadge() { return t('tutorial.step1Sub3Badge'); },
+    get formulaText() { return t('tutorial.step1Sub3Text'); },
+    get formulaDesc() { return t('tutorial.step1Sub3Desc'); }
   }
 ];
 
@@ -118,68 +119,68 @@ export const STEP2_SUB_DEMOS = STEP1_SUB_DEMOS;
 export const V4_EXAMPLE_STEPS: ExampleMoveStep[] = [
   {
     subStep: 0,
-    label: '초기',
+    get label() { return t('tutorial.v4Step0Label'); },
     boardOps: [
       D4.R180, D4.R180, D4.MX,
       D4.MY,   D4.MY,   D4.ID,
       D4.R180, D4.R180, D4.MX
     ],
     highlightCells: [],
-    formulaBadge: '🧩 V4 모드 소개',
-    formulaText: 'V4 원소: 0°, 180°, X축(가로), Y축(세로)',
-    formulaDesc: 'V4 모드에서는 대각선과 90° 회전이 없습니다. 4가지 변환 상쇄로 4수 만에 풀어보세요!'
+    get formulaBadge() { return t('tutorial.v4Step0Badge'); },
+    get formulaText() { return t('tutorial.v4Step0Text'); },
+    get formulaDesc() { return t('tutorial.v4Step0Desc'); }
   },
   {
     subStep: 1,
-    label: '1수',
+    get label() { return t('tutorial.v4Step1Label'); },
     boardOps: [
       D4.R180, D4.R180, D4.MX,
       D4.MY,   D4.MY,   D4.ID,
       D4.ID,   D4.ID,   D4.MY
     ],
     highlightCells: [6, 7, 8],
-    formulaBadge: '⚡ 1수: 3행 180° 회전 (R180)',
-    formulaText: '3행 1열(31) 더블 탭 👆👆 (R180)',
-    formulaDesc: '3행에 180° 회전을 적용하면, 3행의 R180 타일 2개가 0번으로 깔끔하게 상쇄돼요!'
+    get formulaBadge() { return t('tutorial.v4Step1Badge'); },
+    get formulaText() { return t('tutorial.v4Step1Text'); },
+    get formulaDesc() { return t('tutorial.v4Step1Desc'); }
   },
   {
     subStep: 2,
-    label: '2수',
+    get label() { return t('tutorial.v4Step2Label'); },
     boardOps: [
       D4.R180, D4.R180, D4.R180,
       D4.MY,   D4.MY,   D4.MY,
       D4.ID,   D4.ID,   D4.ID
     ],
     highlightCells: [2, 5, 8],
-    formulaBadge: '⚡ 2수: 3열 세로 반사 (MY)',
-    formulaText: '1행 3열(13) 세로 밀기 ↕ (MY)',
-    formulaDesc: '가로 반사(MX) 타일에 세로 반사(MY)가 만나면 180° 회전(MX ∘ MY = R180)으로 합성돼요!'
+    get formulaBadge() { return t('tutorial.v4Step2Badge'); },
+    get formulaText() { return t('tutorial.v4Step2Text'); },
+    get formulaDesc() { return t('tutorial.v4Step2Desc'); }
   },
   {
     subStep: 3,
-    label: '3수',
+    get label() { return t('tutorial.v4Step3Label'); },
     boardOps: [
       D4.R180, D4.R180, D4.R180,
       D4.ID,   D4.ID,   D4.ID,
       D4.ID,   D4.ID,   D4.ID
     ],
     highlightCells: [3, 4, 5],
-    formulaBadge: '⚡ 3수: 2행 세로 반사 (MY)',
-    formulaText: '2행 1열(21) 세로 밀기 ↕ (MY)',
-    formulaDesc: '2행에 세로 반사를 적용하면, MY 타일들이 자기상쇄(MY² = 0)되어 정위치 0번이 돼요!'
+    get formulaBadge() { return t('tutorial.v4Step3Badge'); },
+    get formulaText() { return t('tutorial.v4Step3Text'); },
+    get formulaDesc() { return t('tutorial.v4Step3Desc'); }
   },
   {
     subStep: 4,
-    label: '4수 (완성)',
+    get label() { return t('tutorial.v4Step4Label'); },
     boardOps: [
       D4.ID, D4.ID, D4.ID,
       D4.ID, D4.ID, D4.ID,
       D4.ID, D4.ID, D4.ID
     ],
     highlightCells: [0, 1, 2],
-    formulaBadge: '🎉 4수: 1행 180° 회전 (R180) - 완성!',
-    formulaText: '1행 1열(11) 더블 탭 👆👆 (R180)',
-    formulaDesc: '1행의 R180 타일들이 자기상쇄(180² = 0)되어 모든 강아지가 0번으로 일제히 완성!'
+    get formulaBadge() { return t('tutorial.v4Step4Badge'); },
+    get formulaText() { return t('tutorial.v4Step4Text'); },
+    get formulaDesc() { return t('tutorial.v4Step4Desc'); }
   }
 ];
 
@@ -195,81 +196,81 @@ export const V4_EXAMPLE_STEPS: ExampleMoveStep[] = [
 export const D4_EXAMPLE_STEPS: ExampleMoveStep[] = [
   {
     subStep: 0,
-    label: '초기',
+    get label() { return t('tutorial.d4Step0Label'); },
     boardOps: [
       D4.R270, D4.MAD, D4.MD,
       D4.MD,   D4.R90, D4.R90,
       D4.R180, D4.MY,  D4.MX
     ],
     highlightCells: [],
-    formulaBadge: '🧩 D4 묘수 문제',
-    formulaText: 'D4 복합 스크램블 (초기)',
-    formulaDesc: '90° 회전과 대각선 대칭이 포함된 기본 행·열 5수 최단 해법!'
+    get formulaBadge() { return t('tutorial.d4Step0Badge'); },
+    get formulaText() { return t('tutorial.d4Step0Text'); },
+    get formulaDesc() { return t('tutorial.d4Step0Desc'); }
   },
   {
     subStep: 1,
-    label: '1수',
+    get label() { return t('tutorial.d4Step1Label'); },
     boardOps: [
       D4.ID,   D4.MX,  D4.MY,
       D4.MD,   D4.R90, D4.R90,
       D4.R180, D4.MY,  D4.MX
     ],
     highlightCells: [0, 1, 2],
-    formulaBadge: '⚡ 1수: 1행 90° 회전',
-    formulaText: '1행 1열(11) 1회 탭 👆 (R90)',
-    formulaDesc: '1행이 시계 방향 90° 회전되어 첫 번째 타일(1행 1열)이 0번 정위치 완성!'
+    get formulaBadge() { return t('tutorial.d4Step1Badge'); },
+    get formulaText() { return t('tutorial.d4Step1Text'); },
+    get formulaDesc() { return t('tutorial.d4Step1Desc'); }
   },
   {
     subStep: 2,
-    label: '2수',
+    get label() { return t('tutorial.d4Step2Label'); },
     boardOps: [
       D4.ID,   D4.MX,  D4.MY,
       D4.MD,   D4.R90, D4.R90,
       D4.ID,   D4.MX,  D4.MY
     ],
     highlightCells: [6, 7, 8],
-    formulaBadge: '⚡ 2수: 3행 180° 회전',
-    formulaText: '3행 1열(31) 더블 탭 👆👆 (R180)',
-    formulaDesc: '3행에 180° 회전을 적용하여 3행 첫 번째 타일(3행 1열)이 0번으로 상쇄!'
+    get formulaBadge() { return t('tutorial.d4Step2Badge'); },
+    get formulaText() { return t('tutorial.d4Step2Text'); },
+    get formulaDesc() { return t('tutorial.d4Step2Desc'); }
   },
   {
     subStep: 3,
-    label: '3수',
+    get label() { return t('tutorial.d4Step3Label'); },
     boardOps: [
       D4.ID,   D4.MX,  D4.ID,
       D4.MD,   D4.R90, D4.MD,
       D4.ID,   D4.MX,  D4.ID
     ],
     highlightCells: [2, 5, 8],
-    formulaBadge: '⚡ 3수: 3열 세로 반사',
-    formulaText: '1행 3열(13) 세로 밀기 ↕ (MY)',
-    formulaDesc: '3열에 세로 반사를 적용하여 3열의 양 끝 타일(1행·3행)이 일제히 0번 완성!'
+    get formulaBadge() { return t('tutorial.d4Step3Badge'); },
+    get formulaText() { return t('tutorial.d4Step3Text'); },
+    get formulaDesc() { return t('tutorial.d4Step3Desc'); }
   },
   {
     subStep: 4,
-    label: '4수',
+    get label() { return t('tutorial.d4Step4Label'); },
     boardOps: [
       D4.ID,   D4.MX,  D4.ID,
       D4.ID,   D4.MX,  D4.ID,
       D4.ID,   D4.MX,  D4.ID
     ],
     highlightCells: [3, 4, 5],
-    formulaBadge: '⚡ 4수: 2행 주대각 대칭',
-    formulaText: '2행 1열(21) ↖➔↘ 대각선 긋기 (MD)',
-    formulaDesc: '21 성분에서 대각선으로 쓱 그으면 2행 전체가 주대각 대칭(MD)되어 양 끝 타일이 0번 상쇄!'
+    get formulaBadge() { return t('tutorial.d4Step4Badge'); },
+    get formulaText() { return t('tutorial.d4Step4Text'); },
+    get formulaDesc() { return t('tutorial.d4Step4Desc'); }
   },
   {
     subStep: 5,
-    label: '5수 (완성)',
+    get label() { return t('tutorial.d4Step5Label'); },
     boardOps: [
       D4.ID,   D4.ID,  D4.ID,
       D4.ID,   D4.ID,  D4.ID,
       D4.ID,   D4.ID,  D4.ID
     ],
     highlightCells: [1, 4, 7],
-    formulaBadge: '🎉 5수: 2열 가로 반사 - 완성!',
-    formulaText: '1행 2열(12) 가로 밀기 ↔ (MX)',
-    formulaDesc: '12 성분에서 가로로 쓱 밀면 2열의 모든 MX 타일이 상쇄되어 5수 만에 전체 0번 완성!'
+    get formulaBadge() { return t('tutorial.d4Step5Badge'); },
+    get formulaText() { return t('tutorial.d4Step5Text'); },
+    get formulaDesc() { return t('tutorial.d4Step5Desc'); }
   }
 ];
 
@@ -318,6 +319,13 @@ export class TutorialModalController {
       this.imgDogFront.onload = onImgLoad;
       this.imgDogBack.onload = onImgLoad;
     }
+
+    onLangChange(() => {
+      if (this.isOpen) {
+        this.updateStepUI();
+        this.renderBoard();
+      }
+    });
   }
 
   public open(startStep = 1): void {
@@ -428,32 +436,32 @@ export class TutorialModalController {
         <!-- 헤더 -->
         <div class="tutorial-header">
           <div class="tutorial-header-left">
-            <span class="tutorial-header-badge">군론 튜토리얼</span>
-            <span class="tutorial-header-title">🎓 행렬 대칭 변환 가이드</span>
+            <span class="tutorial-header-badge">${t('tutorial.headerBadge')}</span>
+            <span class="tutorial-header-title">${t('tutorial.headerTitle')}</span>
           </div>
-          <button id="btn-tut-close" class="tutorial-header-close" title="닫기">✕</button>
+          <button id="btn-tut-close" class="tutorial-header-close" title="${t('tutorial.close')}">✕</button>
         </div>
 
         <!-- 스텝 탭 / 프로그레스 바 (총 3단계 완결) -->
         <div class="tutorial-steps-bar" id="tut-steps-bar">
-          <div class="tut-step-dot" data-step="1" title="1단계: 퍼즐 목표 & 행렬 변환 실전 시연"></div>
-          <div class="tut-step-dot" data-step="2" title="2단계: [V4 실전] V4 4수 최단 풀이"></div>
-          <div class="tut-step-dot" data-step="3" title="3단계: [D4 실전] 8차 정이면체군 D4 5수 묘수 풀이"></div>
+          <div class="tut-step-dot" data-step="1" title="1"></div>
+          <div class="tut-step-dot" data-step="2" title="2"></div>
+          <div class="tut-step-dot" data-step="3" title="3"></div>
         </div>
 
         <!-- 메인 본문 컨텐츠 영역 -->
         <div class="tutorial-body" id="tut-body">
           <!-- 가이드 텍스트 -->
           <div class="tut-guide-box" id="tut-guide-box">
-            <div class="tut-guide-step-name" id="tut-step-name">STEP 1. 게임의 목표 & 행렬 성분 구조</div>
-            <div class="tut-guide-main-text" id="tut-main-text">뒤섞인 모든 타일을 항등원 '0번(정위치 앞면)'으로 일치시키기</div>
-            <div class="tut-guide-sub-text" id="tut-sub-text">뒤섞인 모든 타일을 항등원 '0번(정위치 앞면)'으로 일치시키는 것이 목표입니다! 3×3 행렬의 외곽 성분(1~3행, 1~3열)이 해당 라인의 행·열 대칭 변환을 이끄는 컨트롤러 역할을 합니다.</div>
+            <div class="tut-guide-step-name" id="tut-step-name">${t('tutorial.step1Name')}</div>
+            <div class="tut-guide-main-text" id="tut-main-text">${t('tutorial.step1Main')}</div>
+            <div class="tut-guide-sub-text" id="tut-sub-text">${t('tutorial.step1Sub')}</div>
           </div>
 
           <!-- 실전 예제 수별 컨트롤러 (Step 5, Step 6에서만 표시) -->
           <div class="tut-move-controller" id="tut-move-controller" style="display: none;">
             <div class="tut-move-pills" id="tut-move-pills"></div>
-            <button id="btn-tut-autoplay" class="tut-btn-autoplay" title="자동 한 수씩 보기">▶ 한 수씩 보기</button>
+            <button id="btn-tut-autoplay" class="tut-btn-autoplay" title="${t('tutorial.autoplayWatch')}">${t('tutorial.autoplayWatch')}</button>
           </div>
 
           <!-- 3x3 자동 시연 보드 -->
@@ -544,11 +552,11 @@ export class TutorialModalController {
 
         <!-- 하단 슬라이드 네비게이션 버튼 바 -->
         <div class="tutorial-footer">
-          <button id="btn-tut-skip" class="tut-btn-skip">닫기</button>
+          <button id="btn-tut-skip" class="tut-btn-skip">${t('tutorial.close')}</button>
           <div class="tut-footer-nav">
-            <button id="btn-tut-prev" class="tut-btn-prev" style="display: none;">◀ 이전</button>
+            <button id="btn-tut-prev" class="tut-btn-prev" style="display: none;">${t('tutorial.prev')}</button>
             <button id="btn-tut-action" class="tut-btn-action">
-              <span id="tut-btn-action-text">다음 (1/5) ➔</span>
+              <span id="tut-btn-action-text">${t('tutorial.next1')}</span>
             </button>
           </div>
         </div>
@@ -579,10 +587,10 @@ export class TutorialModalController {
           const sw = document.createElement('div');
           sw.className = `tile-switch-11 tut-tile-switch-11 ${this.cell11Mode === 'col' ? 'mode-col' : 'mode-row'}`;
           sw.id = 'tut-tile-switch-11';
-          sw.title = '탭하여 1행 / 1열 변환 모드 전환';
+          sw.title = t('board.switch11Title');
           sw.innerHTML = `
-            <span class="tile-switch-opt opt-row">1행</span>
-            <span class="tile-switch-opt opt-col">1열</span>
+            <span class="tile-switch-opt opt-row">${t('board.optRow')}</span>
+            <span class="tile-switch-opt opt-col">${t('board.optCol')}</span>
           `;
           sw.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -594,14 +602,14 @@ export class TutorialModalController {
           // 2: (0,2) 3열
           const guideTag = document.createElement('div');
           guideTag.className = 'controller-guide-label guide-col';
-          guideTag.innerText = `${i + 1}열`;
+          guideTag.innerText = t('board.col', { n: i + 1 });
           cell.appendChild(guideTag);
         } else if (i === 3 || i === 6) {
           // 3: (1,0) 2행
           // 6: (2,0) 3행
           const guideTag = document.createElement('div');
           guideTag.className = 'controller-guide-label guide-row';
-          guideTag.innerText = `${Math.floor(i / 3) + 1}행`;
+          guideTag.innerText = t('board.row', { n: Math.floor(i / 3) + 1 });
           cell.appendChild(guideTag);
         }
         // 4번(22), 5번(23), 7번(32), 8번(33)은 기본 행·열 컨트롤러가 아니므로 라벨을 일체 표시하지 않음
@@ -627,7 +635,7 @@ export class TutorialModalController {
       }
       const tag = document.getElementById('tut-guide-tag-11');
       if (tag) {
-        tag.innerText = this.cell11Mode === 'col' ? '1열' : '1행';
+        tag.innerText = this.cell11Mode === 'col' ? t('board.optCol') : t('board.optRow');
         tag.className = `controller-guide-label ${this.cell11Mode === 'col' ? 'guide-col' : 'guide-row'}`;
       }
     }
@@ -785,23 +793,23 @@ export class TutorialModalController {
             hand.classList.add('hand-anim-step1-swipe-h');
             hand.classList.remove('playing');
             icon.textContent = '👆';
-            bubble.textContent = '11 가로 쓱 밀기 (↔)';
+            bubble.textContent = t('tutorial.step1Sub0Bubble');
             hand.style.opacity = '0'; // 초기 렌더링 시 깜빡임/선출현 방지 (500ms 후 등장)
           } else if (demoIdx === 1) {
             this.positionHandAtCell(1); // 12 (1행 2열, idx 1) 타일 정중앙
             hand.classList.add('hand-anim-cell-swipe-v');
             icon.textContent = '👆';
-            bubble.textContent = '12 세로 쓱 밀기 (↕)';
+            bubble.textContent = t('tutorial.step1Sub1Bubble');
           } else if (demoIdx === 2) {
             this.positionHandAtCell(6); // 31 (3행 1열, idx 6) 타일 정중앙
             hand.classList.add('hand-anim-cell-triple-tap');
             icon.textContent = '👆';
-            bubble.textContent = '31 가운데 3회 클릭 (3행)';
+            bubble.textContent = t('tutorial.step1Sub2Bubble');
           } else {
             this.positionHandAtCell(3); // 21 (2행 1열, idx 3) 성분 타일 정중앙
             hand.classList.add('hand-anim-cell-diag-combo');
             icon.textContent = '👆';
-            bubble.textContent = '21 대각선 긋기 (2행)';
+            bubble.textContent = t('tutorial.step1Sub3Bubble');
           }
         }
         break;
@@ -813,31 +821,31 @@ export class TutorialModalController {
           case 0:
             this.positionHandAtAutoplay(); // 상단 [▶ 한 수씩 보기] 버튼 가리키기
             hand.classList.add('hand-anim-point-up');
-            bubble.textContent = '👆 [▶ 한 수씩 보기] 클릭!';
+            bubble.textContent = t('tutorial.v4Step0Bubble');
             break;
           case 1:
             // 1수: 3행 1열(31, idx 6) 손가락 1개로 두 번 클릭 (각 90°씩 회전)
             this.positionHandAtCell(6);
             hand.classList.add('hand-anim-single-double-tap');
-            bubble.textContent = '31 두 번 클릭 (90°+90°=180°)';
+            bubble.textContent = t('tutorial.v4Step1Bubble');
             break;
           case 2:
             // 2수: 1행 3열(13, idx 2) 세로 쓱 그어 3열 변환
             this.positionHandAtCell(2);
             hand.classList.add('hand-anim-cell-swipe-v');
-            bubble.textContent = '13 세로 쓱 그어 3열 변환 (↕)';
+            bubble.textContent = t('tutorial.v4Step2Bubble');
             break;
           case 3:
             // 3수: 2행 1열(21, idx 3) 세로 쓱 그어 2행 변환
             this.positionHandAtCell(3);
             hand.classList.add('hand-anim-cell-swipe-v');
-            bubble.textContent = '21 세로 쓱 그어 2행 변환 (↕)';
+            bubble.textContent = t('tutorial.v4Step3Bubble');
             break;
           case 4:
             // 4수: 1행 1열(11, idx 0) 손가락 1개로 두 번 클릭 (각 90°씩 회전)
             this.positionHandAtCell(0);
             hand.classList.add('hand-anim-single-double-tap');
-            bubble.textContent = '11 두 번 클릭 (90°+90°=180°)';
+            bubble.textContent = t('tutorial.v4Step4Bubble');
             break;
         }
         break;
@@ -849,38 +857,38 @@ export class TutorialModalController {
           case 0:
             this.positionHandAtAutoplay(); // 상단 [▶ 한 수씩 보기] 버튼 가리키기
             hand.classList.add('hand-anim-point-up');
-            bubble.textContent = '👆 [▶ 한 수씩 보기] 클릭!';
+            bubble.textContent = t('tutorial.d4Step0Bubble');
             break;
           case 1:
             // 1수: 1행 1열(11, idx 0) 1회 탭 (1행 90° 회전)
             this.positionHandAtCell(0);
             hand.classList.add('hand-anim-tap');
-            bubble.textContent = '11 1회 탭 (1행 90° 회전)';
+            bubble.textContent = t('tutorial.d4Step1Bubble');
             break;
           case 2:
             // 2수: 3행 1열(31, idx 6) 두 번 클릭 (3행 180° 회전)
             this.positionHandAtCell(6);
             hand.classList.add('hand-anim-single-double-tap');
-            bubble.textContent = '31 두 번 클릭 (3행 180° 회전)';
+            bubble.textContent = t('tutorial.d4Step2Bubble');
             break;
           case 3:
             // 3수: 1행 3열(13, idx 2) 천천히 세로 쓱 그어 3열 변환
             this.positionHandAtCell(2);
             hand.classList.add('hand-anim-cell-swipe-v');
-            bubble.textContent = '13 천천히 세로 쓱 (3열 세로 반사 ↕)';
+            bubble.textContent = t('tutorial.d4Step3Bubble');
             break;
           case 4:
             // 4수: 2행 1열(21, idx 3) 천천히 ↖➔↘ 대각선 쓱 그어 2행 주대각 변환
             this.positionHandAtCell(3);
             hand.classList.add('hand-anim-cell-diag-main');
-            bubble.textContent = '21 천천히 대각선 쓱 (2행 주대각 대칭)';
+            bubble.textContent = t('tutorial.d4Step4Bubble');
             break;
           case 5:
             // 5수: 1행 2열(12, idx 1) 천천히 가로 쓱 밀어 2열 변환 (완성!)
             this.positionHandAtCell(1);
             hand.classList.add('hand-anim-cell-swipe-h');
             icon.textContent = '👉';
-            bubble.textContent = '👉 가로로 쓱 긋기 (2열 가로 대칭 ↔)';
+            bubble.textContent = t('tutorial.d4Step5Bubble');
             break;
         }
         break;
@@ -1070,11 +1078,11 @@ export class TutorialModalController {
           soundEngine.playTap();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '1회 클릭 ➔ 3행 90° 회전';
+          if (bubble) bubble.textContent = t('tutorial.step1Sub2Bubble1');
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
-          if (fBadge) fBadge.textContent = '↻ [31] 3행 1회 클릭 (90°)';
-          if (fText) fText.textContent = '1) 31 1회 클릭 ➔ 3행 전체 90° 시계 회전 (R90)';
+          if (fBadge) fBadge.textContent = '↻ [31]';
+          if (fText) fText.textContent = t('tutorial.step1Sub2Text');
         }
       }, 450);
 
@@ -1095,11 +1103,11 @@ export class TutorialModalController {
           soundEngine.playTap();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '2회 클릭 ➔ 3행 180° 반전';
+          if (bubble) bubble.textContent = t('tutorial.step1Sub2Bubble2');
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
-          if (fBadge) fBadge.textContent = '🔄 [31] 3행 2회 클릭 (180°)';
-          if (fText) fText.textContent = '2) 31 2회 클릭 ➔ 3행 전체 180° 반전 (R180)';
+          if (fBadge) fBadge.textContent = '🔄 [31]';
+          if (fText) fText.textContent = t('tutorial.step1Sub2Text');
         }
       }, 1350);
 
@@ -1120,13 +1128,13 @@ export class TutorialModalController {
           soundEngine.playTap();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '3회 클릭 ➔ 3행 270° 회전 완성!';
+          if (bubble) bubble.textContent = t('tutorial.step1Sub2Bubble3');
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
           const fDesc = document.getElementById('tut-formula-desc');
-          if (fBadge) fBadge.textContent = '✨ [31] 3행 3회 클릭 완료 (R270)';
-          if (fText) fText.textContent = '3) 31 3회 클릭 ➔ 3행 전체 270° 회전 완성 (R270)';
-          if (fDesc) fDesc.textContent = '3행 첫 성분 31을 누르면 클릭할 때마다 3행 전체 강아지가 90° ➔ 180° ➔ 270°로 3번 회전해요!';
+          if (fBadge) fBadge.textContent = stepData.formulaBadge;
+          if (fText) fText.textContent = stepData.formulaText;
+          if (fDesc) fDesc.textContent = stepData.formulaDesc;
         }
       }, 2250);
 
@@ -1160,11 +1168,11 @@ export class TutorialModalController {
           soundEngine.playFlip();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '1) ↖➔↘ 주대각 긋기 (2행 MD)';
+          if (bubble) bubble.textContent = t('tutorial.step1Sub3Bubble1');
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
-          if (fBadge) fBadge.textContent = '⚡ [21] 1) 주대각선 대칭 (MD)';
-          if (fText) fText.textContent = '1) 21에서 ↖➔↘로 쓱 그으면 ➔ 2행이 주대각선 대칭(MD)!';
+          if (fBadge) fBadge.textContent = '⚡ [21]';
+          if (fText) fText.textContent = t('tutorial.step1Sub3Text');
         }
       }, 500);
 
@@ -1188,13 +1196,13 @@ export class TutorialModalController {
           soundEngine.playFlip();
 
           const bubble = document.getElementById('tut-hand-bubble');
-          if (bubble) bubble.textContent = '2) ↗➔↙ 대각선 긋기 ➔ 180° 회전!';
+          if (bubble) bubble.textContent = t('tutorial.step1Sub3Bubble2');
           const fBadge = document.getElementById('tut-formula-badge');
           const fText = document.getElementById('tut-formula-text');
           const fDesc = document.getElementById('tut-formula-desc');
-          if (fBadge) fBadge.textContent = '🎉 [21] 2) 대각선 긋기 ➔ 180° 회전(R180)!';
-          if (fText) fText.textContent = '2) ↗➔↙로 대각선 그으면 ➔ MD ∘ MAD = 180° 회전!';
-          if (fDesc) fDesc.textContent = '손가락이 21 성분에서 ↖➔↘로 주대각선을 그은 후, ↗➔↙로 대각선을 그으면 두 반사가 교차 합성되어 신기하게 180° 회전(R180)이 돼요!';
+          if (fBadge) fBadge.textContent = stepData.formulaBadge;
+          if (fText) fText.textContent = stepData.formulaText;
+          if (fDesc) fDesc.textContent = stepData.formulaDesc;
         }
       }, 1650);
 
@@ -1608,7 +1616,7 @@ export class TutorialModalController {
           soundEngine.playWin();
           const btnActionText = document.getElementById('tut-btn-action-text');
           if (btnActionText) {
-            btnActionText.textContent = '🎮 실전 퍼즐 시작하기';
+            btnActionText.textContent = t('tutorial.startPuzzle');
           }
         }
       }, 650);
@@ -1663,7 +1671,7 @@ export class TutorialModalController {
     if (typeof document === 'undefined') return;
     const btnAutoPlay = document.getElementById('btn-tut-autoplay');
     if (btnAutoPlay) {
-      btnAutoPlay.textContent = isPlaying ? '⏸ 일시정지' : '▶ 한 수씩 보기';
+      btnAutoPlay.textContent = isPlaying ? t('tutorial.autoplayPause') : t('tutorial.autoplayWatch');
       btnAutoPlay.classList.toggle('playing', isPlaying);
     }
   }
@@ -1723,6 +1731,7 @@ export class TutorialModalController {
     // 이전 버튼 토글 (1단계일 때는 숨김)
     if (btnPrev) {
       btnPrev.style.display = step > 1 ? 'block' : 'none';
+      btnPrev.textContent = t('tutorial.prev');
     }
 
     // 기본 가시성 세팅
@@ -1736,9 +1745,9 @@ export class TutorialModalController {
 
     switch (step) {
       case 1:
-        stepNameEl.textContent = 'STEP 1. 퍼즐 목표 & 행렬 변환 실전 시연';
-        mainTextEl.textContent = '난이도와 모드에 따라 행과 열의 회전과 반사로 뒤섞인 모든 강아지들을, 행과 열 변환만으로 모두 처음의 강아지로 만드는 것이 목적이에요';
-        subTextEl.textContent = '① 11 가로 쓱(1행 반사 MX) ➔ ② 12 세로 쓱(180° 회전 R180) ➔ ③ 31 3회 클릭(3행 회전 R270) ➔ ④ 21 대각선 긋기(2행 대각 변환)';
+        stepNameEl.textContent = t('tutorial.step1Name');
+        mainTextEl.textContent = t('tutorial.step1Main');
+        subTextEl.textContent = t('tutorial.step1Sub');
         if (moveController) {
           moveController.style.display = 'flex';
           if (btnAuto) btnAuto.style.display = 'none';
@@ -1749,30 +1758,30 @@ export class TutorialModalController {
         });
         this.goToStep1SubStep(this.step1SubStep, false);
         this.startStep1DemoLoop();
-        if (btnActionText) btnActionText.textContent = '다음 (1/3) ➔';
-        soundEngine.speak('흩어진 강아지들을 제자리로 돌려놓는 퍼즐이에요. 아래 시연을 보며 어떻게 움직이는지 살펴볼까요?');
+        if (btnActionText) btnActionText.textContent = t('tutorial.next1');
+        soundEngine.speak(t('tutorial.step1TTS'));
         break;
 
       case 2:
-        stepNameEl.textContent = 'STEP 2. [V4 실전] V4 4수 최단 풀이';
-        mainTextEl.textContent = 'V4 모드는 {0, 180, X축(가로), Y축(세로)} 4가지 대칭 변환만 사용해요!';
-        subTextEl.textContent = '👆 위의 [1수], [2수]... 버튼을 차례로 누르거나 [▶ 한 수씩 보기]를 누르면 손동작과 함께 4수 풀이가 실시간으로 펼쳐져요!';
+        stepNameEl.textContent = t('tutorial.step2Name');
+        mainTextEl.textContent = t('tutorial.step2Main');
+        subTextEl.textContent = t('tutorial.step2Sub');
         if (moveController) moveController.style.display = 'flex';
         this.renderMovePills(V4_EXAMPLE_STEPS, this.v4SubStep, (idx) => this.goToV4SubStep(idx));
         this.goToV4SubStep(this.v4SubStep, false);
-        if (btnActionText) btnActionText.textContent = '다음 (2/3) ➔';
-        soundEngine.speak('브이포 모드는 회전과 가로 세로 대칭을 써요. 위의 수 버튼을 누르면 네 수 만에 풀리는 멋진 과정을 볼 수 있어요!');
+        if (btnActionText) btnActionText.textContent = t('tutorial.next2');
+        soundEngine.speak(t('tutorial.step2TTS'));
         break;
 
       case 3:
-        stepNameEl.textContent = 'STEP 3. [D4 실전] 8차 정이면체군 D4 5수 묘수 풀이';
-        mainTextEl.textContent = 'D4 모드는 회전 4종(0°, 90°, 180°, 270°)과 반사 4종(가로, 세로, 주대각, 부대각) 총 8가지 변환을 사용해요!';
-        subTextEl.textContent = '👆 위의 [1수] ~ [5수] 버튼이나 [▶ 한 수씩 보기]를 누르면 대각선과 회전이 어우러진 5수 묘수 풀이가 실시간으로 펼쳐져요!';
+        stepNameEl.textContent = t('tutorial.step3Name');
+        mainTextEl.textContent = t('tutorial.step3Main');
+        subTextEl.textContent = t('tutorial.step3Sub');
         if (moveController) moveController.style.display = 'flex';
         this.renderMovePills(D4_EXAMPLE_STEPS, this.d4SubStep, (idx) => this.goToD4SubStep(idx));
         this.goToD4SubStep(this.d4SubStep, false);
-        if (btnActionText) btnActionText.textContent = '🎮 실전 퍼즐 시작하기';
-        soundEngine.speak('디포 모드는 회전과 대각선 대칭까지 모두 사용해요. 다섯 수 만에 완성되는 신기한 해법을 함께 즐겨보세요!');
+        if (btnActionText) btnActionText.textContent = t('tutorial.startPuzzle');
+        soundEngine.speak(t('tutorial.step3TTS'));
         break;
     }
   }

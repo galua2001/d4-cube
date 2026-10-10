@@ -1,4 +1,5 @@
 // Web Audio API를 활용한 무지연 사운드 및 BGM 제어
+import { getCurrentLang, Lang } from '../i18n/translations';
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
@@ -233,30 +234,37 @@ class SoundEngine {
   }
 
   /**
-   * 튜토리얼 친절하고 부드러운 한국어 음성(TTS) 나레이션
+   * 튜토리얼 다국어 음성(TTS) 나레이션 (EN / KO 지원)
    */
-  public speak(text: string) {
+  public speak(text: string, lang?: Lang) {
     if (!this.sfxEnabled) return;
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
     try {
-      window.speechSynthesis.cancel(); // 이전 음성 중단
+      window.speechSynthesis.cancel();
+      const currentLang = lang || getCurrentLang();
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'ko-KR';
-      utter.rate = 1.04; // 늘어지지 않고 경쾌하고 생생한 한국어 구어체 속도
-      utter.pitch = 1.0; // 과도한 피치 변형 없이 편안하고 자연스러운 한국어 음조
+      utter.rate = currentLang === 'en' ? 0.98 : 1.04;
+      utter.pitch = 1.0;
+      utter.lang = currentLang === 'en' ? 'en-US' : 'ko-KR';
 
-      // 고품질 자연스러운 한국어(Natural / Neural / Google 한국의 / SunHi) 우선 탐색
       const voices = window.speechSynthesis.getVoices();
-      const koVoices = voices.filter(v => v.lang.startsWith('ko') || v.lang.replace('_', '-').includes('ko-KR'));
-      const preferredVoice = koVoices.find(v => /natural/i.test(v.name))
-        || koVoices.find(v => /neural/i.test(v.name))
-        || koVoices.find(v => /google\s*한국|google.*korean/i.test(v.name) || /google/i.test(v.name))
-        || koVoices.find(v => /sunhi|heami|yuna/i.test(v.name))
-        || koVoices[0];
-
-      if (preferredVoice) {
-        utter.voice = preferredVoice;
+      if (currentLang === 'en') {
+        const enVoices = voices.filter(v => v.lang.startsWith('en') || v.lang.replace('_', '-').includes('en-US'));
+        const preferredVoice = enVoices.find(v => /natural/i.test(v.name))
+          || enVoices.find(v => /neural/i.test(v.name))
+          || enVoices.find(v => /google\s*us\s*english|google.*english/i.test(v.name) || /google/i.test(v.name))
+          || enVoices.find(v => /samantha|karen|daniel|zira/i.test(v.name))
+          || enVoices[0];
+        if (preferredVoice) utter.voice = preferredVoice;
+      } else {
+        const koVoices = voices.filter(v => v.lang.startsWith('ko') || v.lang.replace('_', '-').includes('ko-KR'));
+        const preferredVoice = koVoices.find(v => /natural/i.test(v.name))
+          || koVoices.find(v => /neural/i.test(v.name))
+          || koVoices.find(v => /google\s*한국|google.*korean/i.test(v.name) || /google/i.test(v.name))
+          || koVoices.find(v => /sunhi|heami|yuna/i.test(v.name))
+          || koVoices[0];
+        if (preferredVoice) utter.voice = preferredVoice;
       }
 
       window.speechSynthesis.speak(utter);

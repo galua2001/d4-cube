@@ -11,9 +11,11 @@ import {
   D4_EXAMPLE_STEPS
 } from './tutorialModal';
 import { D4, composeOps } from '../core/group';
+import { setLang } from '../i18n/translations';
 
 describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실전 예제)', () => {
   beforeEach(() => {
+    setLang('ko');
     const store: Record<string, string> = {};
     const mockStorage = {
       getItem: (k: string) => store[k] || null,
