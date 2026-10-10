@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && node scripts/sync-to-unitess.js",
+    "build:sync": "npm run build",
+    "sync:unitess": "node scripts/sync-to-unitess.js",
     "preview": "vite preview",
     "test": "vitest run"
   },

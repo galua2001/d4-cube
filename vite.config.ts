@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/d4-cube/',
+  base: './',
   server: {
     port: 3000,
     host: true,
