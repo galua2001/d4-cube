@@ -440,7 +440,7 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
       expect(bubbleEl).not.toBeNull();
 
       // 1단계 서브 시연 1: 11 가로 밀기 시연
-      expect(handEl?.classList.contains('hand-anim-cell-swipe-h')).toBe(true);
+      expect(handEl?.classList.contains('hand-anim-step1-swipe-h')).toBe(true);
       expect(bubbleEl?.textContent).toContain('11 가로');
 
       // 1단계 서브 시연 2: 12 세로 밀기 시연

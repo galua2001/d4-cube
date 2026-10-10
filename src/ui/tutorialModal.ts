@@ -336,6 +336,11 @@ export class TutorialModalController {
     this.clearV4AnimTimers();
     this.clearD4AnimTimers();
     this.isOpen = false;
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {}
+    }
     if (typeof document !== 'undefined') {
       const overlay = document.getElementById('tutorial-modal-overlay');
       if (overlay) {
@@ -777,7 +782,7 @@ export class TutorialModalController {
           const demoIdx = subStep !== undefined ? subStep : this.step1SubStep;
           if (demoIdx === 0) {
             this.positionHandAtCell(0); // 11 (1행 1열, idx 0) 타일 정중앙
-            hand.classList.add('hand-anim-cell-swipe-h');
+            hand.classList.add('hand-anim-step1-swipe-h');
             hand.classList.remove('playing');
             icon.textContent = '👆';
             bubble.textContent = '11 가로 쓱 밀기 (↔)';
@@ -1744,7 +1749,7 @@ export class TutorialModalController {
         this.goToStep1SubStep(this.step1SubStep, false);
         this.startStep1DemoLoop();
         if (btnActionText) btnActionText.textContent = '다음 (1/3) ➔';
-        soundEngine.speak('난이도와 모드에 따라 행과 열의 회전과 반사로 뒤섞인 모든 강아지들을, 행과 열 변환만으로 모두 처음의 강아지로 만드는 것이 목적이에요.');
+        soundEngine.speak('뒤섞인 강아지들을 행과 열 변환을 이용해 원래 모습으로 되돌려 놓는 퍼즐이에요! 아래 시연을 함께 확인해 볼까요?');
         break;
 
       case 2:
@@ -1755,7 +1760,7 @@ export class TutorialModalController {
         this.renderMovePills(V4_EXAMPLE_STEPS, this.v4SubStep, (idx) => this.goToV4SubStep(idx));
         this.goToV4SubStep(this.v4SubStep, false);
         if (btnActionText) btnActionText.textContent = '다음 (2/3) ➔';
-        soundEngine.speak('V4 모드에서는 0도, 180도, X축 대칭, Y축 대칭 변환만 사용해요. 위의 수 버튼을 눌러 4수 풀이 과정을 확인해 보세요.');
+        soundEngine.speak('V4 모드는 회전과 가로 세로 반사 대칭을 활용하는 모드예요. 위의 수 버튼을 눌러서 4수 만에 풀리는 과정을 직접 확인해 보세요!');
         break;
 
       case 3:
@@ -1766,7 +1771,7 @@ export class TutorialModalController {
         this.renderMovePills(D4_EXAMPLE_STEPS, this.d4SubStep, (idx) => this.goToD4SubStep(idx));
         this.goToD4SubStep(this.d4SubStep, false);
         if (btnActionText) btnActionText.textContent = '🎮 실전 퍼즐 시작하기';
-        soundEngine.speak('D4 모드에서는 회전 네 가지와 반사 네 가지 총 여덟 가지 대칭 변환을 모두 사용해요. 대각선 반사와 회전으로 단 5수 만에 완성하는 묘수 풀이를 보여드릴게요.');
+        soundEngine.speak('D4 모드는 회전 4종과 반사 4종, 총 8가지 변환을 모두 다뤄요. 대각선 반사와 회전이 어우러진 멋진 5수 묘수 풀이를 함께 볼까요?');
         break;
     }
   }

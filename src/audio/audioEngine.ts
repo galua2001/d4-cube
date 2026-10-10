@@ -243,15 +243,16 @@ class SoundEngine {
       window.speechSynthesis.cancel(); // 이전 음성 중단
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = 'ko-KR';
-      utter.rate = 0.93; // 너무 빠르지 않고 나긋나긋하며 부드러운 속도
-      utter.pitch = 1.0; // 자연스러운 억양
+      utter.rate = 1.0; // 늘어지는 기계음 제거 및 자연스러운 한국어 표준 발화 속도
+      utter.pitch = 1.02; // 생기 있고 자연스러운 표준 한국어 음조
 
-      // 자연스러운 한국어 여성/Google/Heami/Natural 음성 우선 탐색 로직
+      // 고품질 자연스러운 한국어(Natural / Neural / Google 한국의 / SunHi) 우선 탐색
       const voices = window.speechSynthesis.getVoices();
       const koVoices = voices.filter(v => v.lang.startsWith('ko') || v.lang.replace('_', '-').includes('ko-KR'));
       const preferredVoice = koVoices.find(v => /natural/i.test(v.name))
-        || koVoices.find(v => /google/i.test(v.name))
-        || koVoices.find(v => /heami|sunhi|yuna|female/i.test(v.name))
+        || koVoices.find(v => /neural/i.test(v.name))
+        || koVoices.find(v => /google\s*한국|google.*korean/i.test(v.name) || /google/i.test(v.name))
+        || koVoices.find(v => /sunhi|heami|yuna/i.test(v.name))
         || koVoices[0];
 
       if (preferredVoice) {
