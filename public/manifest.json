@@ -1,7 +1,7 @@
 {
-  "name": "D4 행렬 큐브",
-  "short_name": "D4Cube",
-  "description": "D4 군론 대칭 수학 기반 3×3 행렬 큐브 퍼즐",
+  "name": "D4 갈루아 큐브",
+  "short_name": "갈루아 큐브",
+  "description": "D4 군론 대칭 수학 기반 3×3 갈루아 큐브 퍼즐",
   "id": "./",
   "start_url": "./",
   "scope": "./",

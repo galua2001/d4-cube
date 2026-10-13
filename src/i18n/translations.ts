@@ -54,7 +54,8 @@ export function onLangChange(cb: (lang: Lang) => void): () => void {
 export const translations: Record<Lang, Record<string, any>> = {
   en: {
     // Header & Navigation
-    'header.title': 'Matrix Cube',
+    'title': 'Galois Cube',
+    'header.title': 'Galois Cube',
     'header.pwaInstall': '📱 Install App',
     'header.pwaInstallTitle': 'Install as App on Mobile',
     'header.tutorial': '🎓 Tutorial',
@@ -239,7 +240,7 @@ export const translations: Record<Lang, Record<string, any>> = {
 
     'about.introCard1Badge': '🧩 Concept Reimagined',
     'about.introCard1Title': '3D Rubiks Cube Reinterpreted into 2D Matrix Symmetry Group',
-    'about.introCard1Desc': 'Traditional 3D Rubiks cubes present spatial complexity and awkward touch controls on mobile. Matrix Cube innovatively reinterprets rotations as symmetry transformations of an N × N planar matrix, playable via intuitive tap and swipe gestures.',
+    'about.introCard1Desc': 'Traditional 3D Rubiks cubes present spatial complexity and awkward touch controls on mobile. Galois Cube innovatively reinterprets rotations as symmetry transformations of an N × N planar matrix, playable via intuitive tap and swipe gestures.',
 
     'about.introCard2Badge': '🐕 Visual Appeal',
     'about.introCard2Title': 'Intuitive Perception with Cute Corgi Dogs',
@@ -247,7 +248,7 @@ export const translations: Record<Lang, Record<string, any>> = {
 
     'about.introCard3Badge': '📱 Seamless PWA',
     'about.introCard3Title': 'Zero Installation & Flawless Offline Play',
-    'about.introCard3Desc': 'Equipped with Progressive Web App (PWA) technology, Matrix Cube installs directly to your home screen without app stores and runs completely offline with 100% smooth performance.',
+    'about.introCard3Desc': 'Equipped with Progressive Web App (PWA) technology, Galois Cube installs directly to your home screen without app stores and runs completely offline with 100% smooth performance.',
 
     'about.mathCard1Badge': 'Abstract Algebra (Group Theory)',
     'about.mathCard1Title': 'Dihedral Group D₄ of the Square',
@@ -266,8 +267,8 @@ export const translations: Record<Lang, Record<string, any>> = {
     'about.mathCard3Desc': '- C₂ Mode: Cyclic group using only 180° rotations (Beginner entry)\n- V₄ Mode: Klein four-group (Horizontal/Vertical reflections & 180° rotation, Abelian)\n- D₄ Mode: Full 8-element dihedral group (Ultimate master challenge)',
 
     'about.god8Card1Badge': '⚡ Theorem & Mathematical Proof',
-    'about.god8Card1Title': "Matrix Cube's God's Number is Exactly 8",
-    'about.god8Card1Desc': "Just as the 3D Rubik's cube was proven to have God's Number 20, any state in the 3×3 Matrix Cube is mathematically guaranteed to be solvable within at most 8 moves. This was comprehensively proven and verified using Bidirectional BFS.",
+    'about.god8Card1Title': "Galois Cube's God's Number is Exactly 8",
+    'about.god8Card1Desc': "Just as the 3D Rubik's cube was proven to have God's Number 20, any state in the 3×3 Galois Cube is mathematically guaranteed to be solvable within at most 8 moves. This was comprehensively proven and verified using Bidirectional BFS.",
 
     'about.god8Card2Badge': 'Ultra-Fast Optimal Solver',
     'about.god8Card2Title': 'Bitmask Bidirectional BFS Engine',
@@ -288,7 +289,8 @@ export const translations: Record<Lang, Record<string, any>> = {
 
   ko: {
     // Header & Navigation
-    'header.title': '행렬 큐브',
+    'title': '갈루아 큐브',
+    'header.title': '갈루아 큐브',
     'header.pwaInstall': '📱 앱설치',
     'header.pwaInstallTitle': '스마트폰에 앱으로 설치',
     'header.tutorial': '🎓 튜토리얼',
@@ -473,7 +475,7 @@ export const translations: Record<Lang, Record<string, any>> = {
 
     'about.introCard1Badge': '🧩 개념의 재해석',
     'about.introCard1Title': '루빅스 큐브의 3차원 회전을 2차원 행렬 대칭군으로',
-    'about.introCard1Desc': '기존의 3차원 루빅스 큐브는 공간 조작이 복잡하고 모바일 터치 제어가 어렵다는 한계가 있었습니다. 행렬 큐브(Matrix Cube)는 이를 N × N 평면 행렬의 대칭 변환으로 혁신적으로 재해석하여, 모바일 화면에서 직관적인 탭·스와이프 제스처만으로 즐길 수 있는 신개념 수학 퍼즐입니다.',
+    'about.introCard1Desc': '기존의 3차원 루빅스 큐브는 공간 조작이 복잡하고 모바일 터치 제어가 어렵다는 한계가 있었습니다. 갈루아 큐브(Galois Cube)는 이를 N × N 평면 행렬의 대칭 변환으로 혁신적으로 재해석하여, 모바일 화면에서 직관적인 탭·스와이프 제스처만으로 즐길 수 있는 신개념 수학 퍼즐입니다.',
 
     'about.introCard2Badge': '🐕 감성적 비주얼',
     'about.introCard2Title': '귀여운 웰시코기 강아지와 함께하는 직관적 인지',
@@ -500,8 +502,8 @@ export const translations: Record<Lang, Record<string, any>> = {
     'about.mathCard3Desc': '- C₂ 모드: 180도 회전만 사용하는 순환군 (가장 쉬운 입문)\n- V₄ 모드: 클라인 4원군 (가로·세로 반전 및 180도 회전, 가환군)\n- D₄ 모드: 완전한 8개 원소 정사면군 (본격적인 최상위 도전)',
 
     'about.god8Card1Badge': '⚡ 수학적 정리 & 증명',
-    'about.god8Card1Title': "행렬 큐브의 '신의 숫자'는 단 8수 (God's Number 8)",
-    'about.god8Card1Desc': "루빅스 큐브의 모든 배치가 최대 20수 이내에 풀린다는 사실이 '신의 숫자 20'으로 증명되었듯, 3×3 행렬 큐브는 어떠한 상태에서 시작하더라도 최단 8수 이내에 100% 원상 복원이 가능함을 양방향 BFS 알고리즘을 통해 수학적으로 규명 및 전수 검증했습니다.",
+    'about.god8Card1Title': "갈루아 큐브의 '신의 숫자'는 단 8수 (God's Number 8)",
+    'about.god8Card1Desc': "루빅스 큐브의 모든 배치가 최대 20수 이내에 풀린다는 사실이 '신의 숫자 20'으로 증명되었듯, 3×3 갈루아 큐브는 어떠한 상태에서 시작하더라도 최단 8수 이내에 100% 원상 복원이 가능함을 양방향 BFS 알고리즘을 통해 수학적으로 규명 및 전수 검증했습니다.",
 
     'about.god8Card2Badge': '초고속 최단수 솔버',
     'about.god8Card2Title': '비트마스크 양방향 BFS 엔진',

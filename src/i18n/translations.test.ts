@@ -48,12 +48,12 @@ describe('i18n 다국어 번역 시스템 (translations.ts)', () => {
 
   it('t() 함수가 현재 언어에 맞는 텍스트를 반환해야 함', () => {
     setLang('en');
-    expect(t('header.title')).toBe('Matrix Cube');
+    expect(t('header.title')).toBe('Galois Cube');
     expect(t('controls.undo')).toBe('↩ Undo');
     expect(t('tutorial.next1')).toBe('Next (1/3) ➔');
 
     setLang('ko');
-    expect(t('header.title')).toBe('행렬 큐브');
+    expect(t('header.title')).toBe('갈루아 큐브');
     expect(t('controls.undo')).toBe('↩ 되돌리기');
     expect(t('tutorial.next1')).toBe('다음 (1/3) ➔');
   });

@@ -1,5 +1,5 @@
 /**
- * 행렬 큐브 (Matrix Cube) PWA 매니저
+ * 갈루아 큐브 (Galois Cube) PWA 매니저
  * unitess에서 검증된 네이티브 앱 설치 프롬프트 및 설치 배너 엔진
  */
 
