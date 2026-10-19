@@ -68,6 +68,9 @@ export const translations: Record<Lang, Record<string, any>> = {
     'header.sfx': 'SFX',
     'header.langToggle': '🌐 EN | KO',
     'header.langToggleTitle': 'Switch Language (EN / KO)',
+    'header.themeToggleTitle': 'Switch Character Theme (Corgi / Galois)',
+    'header.themeDog': 'Corgi',
+    'header.themeGalua': 'Galois',
 
     // Settings
     'settings.difficulty': '🎯 Difficulty',
@@ -303,6 +306,9 @@ export const translations: Record<Lang, Record<string, any>> = {
     'header.sfx': 'SFX',
     'header.langToggle': '🌐 EN | KO',
     'header.langToggleTitle': '언어 변경 (EN / KO)',
+    'header.themeToggleTitle': '캐릭터 테마 변경 (강아지 / 갈루아 소년)',
+    'header.themeDog': '강아지',
+    'header.themeGalua': '갈루아',
 
     // Settings
     'settings.difficulty': '🎯 난이도',

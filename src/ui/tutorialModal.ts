@@ -1,7 +1,8 @@
 import { D4Op, D4, composeOps } from '../core/group';
-import { renderDogTileCanvas } from './tileRenderer';
+import { renderCharacterTileCanvas } from './tileRenderer';
 import { soundEngine } from '../audio/audioEngine';
 import { t, onLangChange } from '../i18n/translations';
+import { getThemeImages, onThemeChange } from '../theme/characterTheme';
 
 export const TUTORIAL_STORAGE_KEY = 'matrix_cube_tutorial_completed';
 
@@ -291,8 +292,12 @@ export class TutorialModalController {
   public boardOps: D4Op[] = Array(9).fill(D4.ID);
   public cell11Mode: 'row' | 'col' = 'row';
 
-  private imgDogFront: HTMLImageElement | null = null;
-  private imgDogBack: HTMLImageElement | null = null;
+  public get imgDogFront(): HTMLImageElement {
+    return getThemeImages().front;
+  }
+  public get imgDogBack(): HTMLImageElement {
+    return getThemeImages().back;
+  }
   private autoPlayTimer: any = null;
   private step1Timer: any = null;
   private step1AnimTimers: any[] = [];
@@ -305,20 +310,12 @@ export class TutorialModalController {
   public isAutoPlaying = false;
 
   constructor() {
-    if (typeof Image !== 'undefined') {
-      this.imgDogFront = new Image();
-      this.imgDogBack = new Image();
-      this.imgDogFront.src = 'assets/dog_front.png';
-      this.imgDogBack.src = 'assets/dog_back.png';
-
-      const onImgLoad = () => {
-        if (this.isOpen) {
-          this.renderBoard();
-        }
-      };
-      this.imgDogFront.onload = onImgLoad;
-      this.imgDogBack.onload = onImgLoad;
-    }
+    // 캐릭터 테마 변경 시 튜토리얼 보드 실시간 갱신
+    onThemeChange(() => {
+      if (this.isOpen) {
+        this.renderBoard();
+      }
+    });
 
     onLangChange(() => {
       if (this.isOpen) {
@@ -1806,6 +1803,7 @@ export class TutorialModalController {
 
   public renderBoard(): void {
     if (typeof document === 'undefined') return;
+    const { front, back } = getThemeImages();
     for (let i = 0; i < 9; i++) {
       const cell = document.getElementById(`tut-cell-${i}`);
       if (!cell) continue;
@@ -1814,8 +1812,8 @@ export class TutorialModalController {
       const badge = typeof cell.querySelector === 'function' ? (cell.querySelector('.tut-cell-badge') as HTMLElement) : null;
       const op = this.boardOps[i] || D4.ID;
 
-      if (canvas && this.imgDogFront && this.imgDogBack) {
-        renderDogTileCanvas(canvas, op, this.imgDogFront, this.imgDogBack);
+      if (canvas) {
+        renderCharacterTileCanvas(canvas, op, front, back);
       }
 
       if (badge) {

@@ -5,7 +5,7 @@ import { solveBoard, MoveStep } from './core/solver';
 import { soundEngine } from './audio/audioEngine';
 import { campaignManager } from './game/campaign';
 import { recordManager, formatTime } from './game/recordManager';
-import { renderDogTileCanvas } from './ui/tileRenderer';
+import { renderCharacterTileCanvas } from './ui/tileRenderer';
 import { GestureRecognizer } from './ui/gesture';
 import { solutionInlinePanel } from './ui/solutionModal';
 import { showAboutModal } from './ui/aboutModal';
@@ -13,6 +13,13 @@ import { showTutorialModal, isTutorialCompleted } from './ui/tutorialModal';
 import { victoryManager } from './ui/victoryEffect';
 import { initPWAManager } from './pwaManager';
 import { t, getCurrentLang, setLang, onLangChange, Lang } from './i18n/translations';
+import {
+  getCurrentTheme,
+  toggleTheme,
+  onThemeChange,
+  getThemeImages,
+  preloadThemeImages
+} from './theme/characterTheme';
 
 class MatrixCubeApp {
   private boardSize = 3;
@@ -25,9 +32,6 @@ class MatrixCubeApp {
   private isAnimating = false;
   private isGameStarted = false;
   private isGuideActive = false; // 조작 가이드 표시 여부
-
-  private imgDogFront = new Image();
-  private imgDogBack = new Image();
 
   private boardGrid!: HTMLElement;
   private gestureCanvas!: HTMLCanvasElement;
@@ -49,6 +53,12 @@ class MatrixCubeApp {
       this.updateBoard();
       this.updateBestRecordBadge();
     });
+
+    // 캐릭터 테마 변경 시 타일 실시간 갱신
+    onThemeChange(() => {
+      this.updateThemeButton();
+      this.updateBoard();
+    });
   }
 
   private initBoardOps() {
@@ -56,12 +66,7 @@ class MatrixCubeApp {
   }
 
   private initImages() {
-    this.imgDogFront.src = 'assets/dog_front.png';
-    this.imgDogBack.src = 'assets/dog_back.png';
-
-    const onImgLoad = () => this.updateBoard();
-    this.imgDogFront.onload = onImgLoad;
-    this.imgDogBack.onload = onImgLoad;
+    preloadThemeImages(() => this.updateBoard());
   }
 
   private getGroupName(grp: SymmetryGroupKey): string {
@@ -76,11 +81,17 @@ class MatrixCubeApp {
   private renderLayout() {
     const app = document.getElementById('app')!;
     const curLang = getCurrentLang();
+    const curTheme = getCurrentTheme();
     app.innerHTML = `
       <div class="header-bar">
         <div class="header-top-row">
           <div class="header-title">${t('header.title')}</div>
           <div style="display:flex; align-items:center; gap:6px;">
+            <button id="btn-toggle-theme" class="btn-theme-toggle" title="${t('header.themeToggleTitle')}">
+              <span class="theme-opt theme-opt-dog ${curTheme === 'dog' ? 'active-theme' : ''}">🐶 ${t('header.themeDog')}</span>
+              <span class="theme-divider">|</span>
+              <span class="theme-opt theme-opt-galua ${curTheme === 'galua' ? 'active-theme' : ''}">🧑‍🎓 ${t('header.themeGalua')}</span>
+            </button>
             <button id="btn-toggle-lang" class="btn-lang-toggle" title="${t('header.langToggleTitle')}">
               🌐 <span class="${curLang === 'en' ? 'active-lang' : ''}">EN</span> | <span class="${curLang === 'ko' ? 'active-lang' : ''}">KO</span>
             </button>
@@ -292,7 +303,23 @@ class MatrixCubeApp {
     }, 1200);
   }
 
+  private updateThemeButton() {
+    const btnTheme = document.getElementById('btn-toggle-theme');
+    if (!btnTheme) return;
+    const curTheme = getCurrentTheme();
+    const dogOpt = btnTheme.querySelector('.theme-opt-dog');
+    const galuaOpt = btnTheme.querySelector('.theme-opt-galua');
+    if (dogOpt) dogOpt.classList.toggle('active-theme', curTheme === 'dog');
+    if (galuaOpt) galuaOpt.classList.toggle('active-theme', curTheme === 'galua');
+  }
+
   private bindControls() {
+    // 캐릭터 테마 전환 버튼 (강아지 <-> 갈루아 소년)
+    document.getElementById('btn-toggle-theme')?.addEventListener('click', () => {
+      soundEngine.playTap();
+      toggleTheme();
+    });
+
     // 언어 전환 버튼 (EN <-> KO)
     document.getElementById('btn-toggle-lang')?.addEventListener('click', () => {
       soundEngine.playTap();
@@ -880,6 +907,7 @@ class MatrixCubeApp {
   }
 
   private updateBoard() {
+    const { front, back } = getThemeImages();
     const total = this.boardSize * this.boardSize;
     for (let i = 0; i < total; i++) {
       const box = this.boardGrid.children[i];
@@ -888,7 +916,7 @@ class MatrixCubeApp {
       if (!canvas) continue;
 
       const op = this.currentOps[i];
-      renderDogTileCanvas(canvas, op, this.imgDogFront, this.imgDogBack);
+      renderCharacterTileCanvas(canvas, op, front, back);
 
       // 오른쪽 하단 뱃지 텍스트 갱신
       const badge = box.querySelector('.cell-state-badge') as HTMLElement;
