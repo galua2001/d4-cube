@@ -564,61 +564,77 @@ class MatrixCubeApp {
     const prevOps = [...this.currentOps];
     const nextOps = applyLineMoveGeneric(this.currentOps, lineCells, op);
 
-    const FLIP_STEP_MS = 180;
-    const ROT_ANIM_MS = 320;
-    const easeIn = 'cubic-bezier(0.4, 0, 0.7, 0.2)';
-    const easeOut = 'cubic-bezier(0.2, 0.8, 0.3, 1)';
-    const easeSmooth = 'cubic-bezier(0.25, 1, 0.5, 1)';
+    const FLIP_FOLD_MS = 200;
+    const FLIP_UNFOLD_MS = 220;
+    const ROT_ANIM_MS = 360;
+
+    const easeFold = 'cubic-bezier(0.3, 0, 0.8, 0.15)';
+    const easeUnfold = 'cubic-bezier(0.15, 0.85, 0.35, 1.2)';
+    const neonShadow = '0 16px 32px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.4)';
+    const sheenFilter = 'brightness(1.15)';
 
     if (isFlip) {
       let foldTransform = '';
       let unfoldStart = '';
+      let unfoldEnd = '';
 
       if (op === 'MY') {
-        foldTransform = 'perspective(900px) scale(0.92) rotateY(90deg)';
-        unfoldStart = 'perspective(900px) scale(0.92) rotateY(-90deg)';
+        foldTransform = 'perspective(1000px) translateZ(35px) scale(1.04) rotateY(90deg)';
+        unfoldStart = 'perspective(1000px) translateZ(35px) scale(1.04) rotateY(-90deg)';
+        unfoldEnd = 'perspective(1000px) translateZ(0px) scale(1) rotateY(0deg)';
       } else if (op === 'MX') {
-        foldTransform = 'perspective(900px) scale(0.92) rotateX(90deg)';
-        unfoldStart = 'perspective(900px) scale(0.92) rotateX(-90deg)';
+        foldTransform = 'perspective(1000px) translateZ(35px) scale(1.04) rotateX(90deg)';
+        unfoldStart = 'perspective(1000px) translateZ(35px) scale(1.04) rotateX(-90deg)';
+        unfoldEnd = 'perspective(1000px) translateZ(0px) scale(1) rotateX(0deg)';
       } else if (op === 'MD') {
-        foldTransform = 'perspective(900px) scale(0.92) rotate3d(1, 1, 0, 90deg)';
-        unfoldStart = 'perspective(900px) scale(0.92) rotate3d(1, 1, 0, -90deg)';
+        foldTransform = 'perspective(1000px) translateZ(35px) scale(1.04) rotate3d(1, 1, 0, 90deg)';
+        unfoldStart = 'perspective(1000px) translateZ(35px) scale(1.04) rotate3d(1, 1, 0, -90deg)';
+        unfoldEnd = 'perspective(1000px) translateZ(0px) scale(1) rotate3d(1, 1, 0, 0deg)';
       } else if (op === 'MAD') {
-        foldTransform = 'perspective(900px) scale(0.92) rotate3d(-1, 1, 0, 90deg)';
-        unfoldStart = 'perspective(900px) scale(0.92) rotate3d(-1, 1, 0, -90deg)';
+        foldTransform = 'perspective(1000px) translateZ(35px) scale(1.04) rotate3d(-1, 1, 0, 90deg)';
+        unfoldStart = 'perspective(1000px) translateZ(35px) scale(1.04) rotate3d(-1, 1, 0, -90deg)';
+        unfoldEnd = 'perspective(1000px) translateZ(0px) scale(1) rotate3d(-1, 1, 0, 0deg)';
       }
 
-      // 1단계: 0도 -> 90도 (화면에 수직으로 접힘)
+      // 1단계: 0도 -> 90도 (공중으로 솟구치며 수직으로 젖혀짐 + 입체 그림자 및 광택)
       lineCells.forEach(cellIdx => {
         const box = this.boardGrid.children[cellIdx] as HTMLElement;
         if (box) {
-          box.style.transition = `transform ${FLIP_STEP_MS}ms ${easeIn}`;
+          box.style.zIndex = '30';
+          box.style.transition = `transform ${FLIP_FOLD_MS}ms ${easeFold}, box-shadow ${FLIP_FOLD_MS}ms ${easeFold}, filter ${FLIP_FOLD_MS}ms ${easeFold}`;
           box.style.transform = foldTransform;
+          box.style.boxShadow = neonShadow;
+          box.style.filter = sheenFilter;
         }
       });
 
-      // 180ms 지점: 두께 0 타이밍에 상태 변경 및 보드 갱신
+      // 200ms 지점: 두께 0 타이밍에 상태 변경 및 보드 갱신
       setTimeout(() => {
         this.currentOps = nextOps;
         this.updateBoard();
 
-        // 반대편 -90도로 즉시 스냅 (transition: none)
+        // 반대편 -90도로 즉시 스냅 (transition: none으로 공중 및 그림자 상태 유지)
         lineCells.forEach(cellIdx => {
           const box = this.boardGrid.children[cellIdx] as HTMLElement;
           if (box) {
+            box.style.zIndex = '30';
             box.style.transition = 'none';
             box.style.transform = unfoldStart;
+            box.style.boxShadow = neonShadow;
+            box.style.filter = sheenFilter;
           }
         });
 
-        // 2단계: -90도 -> 0도 (자연스럽게 펼쳐짐)
+        // 2단계: -90도 -> 0도 (오버슈트 스프링 바운스로 부드럽게 지면에 착지)
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             lineCells.forEach(cellIdx => {
               const box = this.boardGrid.children[cellIdx] as HTMLElement;
               if (box) {
-                box.style.transition = `transform ${FLIP_STEP_MS}ms ${easeOut}`;
-                box.style.transform = '';
+                box.style.transition = `transform ${FLIP_UNFOLD_MS}ms ${easeUnfold}, box-shadow ${FLIP_UNFOLD_MS}ms ${easeUnfold}, filter ${FLIP_UNFOLD_MS}ms ${easeUnfold}`;
+                box.style.transform = unfoldEnd;
+                box.style.boxShadow = '';
+                box.style.filter = 'brightness(1)';
               }
             });
 
@@ -628,30 +644,30 @@ class MatrixCubeApp {
                 if (box) {
                   box.style.transition = '';
                   box.style.transform = '';
+                  box.style.boxShadow = '';
+                  box.style.filter = '';
+                  box.style.zIndex = '';
                 }
               });
 
               this.finalizeMove(lineId, op, prevOps, recordHistory);
-            }, FLIP_STEP_MS);
+            }, FLIP_UNFOLD_MS);
           });
         });
-      }, FLIP_STEP_MS);
+      }, FLIP_FOLD_MS);
 
     } else if (isRot) {
-      let rotTransform = '';
-      if (op === 'R90') {
-        rotTransform = 'perspective(900px) scale(0.94) rotateZ(90deg)';
-      } else if (op === 'R180') {
-        rotTransform = 'perspective(900px) scale(0.94) rotateZ(180deg)';
-      } else if (op === 'R270') {
-        rotTransform = 'perspective(900px) scale(0.94) rotateZ(-90deg)';
-      }
+      let animClass = '';
+      if (op === 'R90') animClass = 'tile-anim-r90';
+      else if (op === 'R180') animClass = 'tile-anim-r180';
+      else if (op === 'R270') animClass = 'tile-anim-r270';
 
       lineCells.forEach(cellIdx => {
         const box = this.boardGrid.children[cellIdx] as HTMLElement;
         if (box) {
-          box.style.transition = `transform ${ROT_ANIM_MS}ms ${easeSmooth}`;
-          box.style.transform = rotTransform;
+          box.classList.remove('tile-anim-r90', 'tile-anim-r180', 'tile-anim-r270');
+          void box.offsetWidth;
+          box.classList.add(animClass);
         }
       });
 
@@ -662,16 +678,13 @@ class MatrixCubeApp {
         lineCells.forEach(cellIdx => {
           const box = this.boardGrid.children[cellIdx] as HTMLElement;
           if (box) {
-            box.style.transition = 'none';
+            box.classList.remove('tile-anim-r90', 'tile-anim-r180', 'tile-anim-r270');
+            box.style.animation = '';
             box.style.transform = '';
+            box.style.boxShadow = '';
+            box.style.filter = '';
+            box.style.zIndex = '';
           }
-        });
-
-        requestAnimationFrame(() => {
-          lineCells.forEach(cellIdx => {
-            const box = this.boardGrid.children[cellIdx] as HTMLElement;
-            if (box) box.style.transition = '';
-          });
         });
 
         this.finalizeMove(lineId, op, prevOps, recordHistory);
