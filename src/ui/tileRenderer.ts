@@ -31,38 +31,52 @@ export function renderCharacterTileCanvas(
 
   // 대칭 상태에 따라 앞면 또는 뒷면 이미지 선택
   const isFlipped = op === 'MX' || op === 'MY' || op === 'MD' || op === 'MAD';
-  const img = isFlipped ? (imgBack && imgBack.complete ? imgBack : imgFront) : imgFront;
+  const hasBackImage = Boolean(imgBack && imgBack.complete && imgBack.naturalWidth !== 0);
+  const img = isFlipped ? (hasBackImage ? imgBack : imgFront) : imgFront;
 
   ctx.save();
   ctx.translate(w / 2, h / 2);
 
-  // 연산별 2D Canvas 변환 매핑
-  switch (op) {
-    case 'R90':
-      ctx.rotate((90 * Math.PI) / 180);
-      break;
-    case 'R180':
-      ctx.rotate((180 * Math.PI) / 180);
-      break;
-    case 'R270':
-      ctx.rotate((270 * Math.PI) / 180);
-      break;
-    case 'MX':
-      ctx.scale(1, -1);
-      break;
-    case 'MY':
+  if (!isFlipped) {
+    // [앞면: 순수 회전군 C4]
+    switch (op) {
+      case 'R90':
+        ctx.rotate((90 * Math.PI) / 180);
+        break;
+      case 'R180':
+        ctx.rotate((180 * Math.PI) / 180);
+        break;
+      case 'R270':
+        ctx.rotate((270 * Math.PI) / 180);
+        break;
+      case 'ID':
+      default:
+        break;
+    }
+  } else {
+    // [뒷면: MY 기준 순수 회전 분해 (거울 반전 텍스트 왜곡 방지)]
+    // imgBack이 없을 때(폴백)만 기하학적 수평 반전 scale(-1, 1) 적용
+    if (!hasBackImage) {
       ctx.scale(-1, 1);
-      break;
-    case 'MD':
-      ctx.rotate((90 * Math.PI) / 180);
-      ctx.scale(-1, 1);
-      break;
-    case 'MAD':
-      ctx.rotate((-90 * Math.PI) / 180);
-      ctx.scale(-1, 1);
-      break;
-    default:
-      break;
+    }
+
+    switch (op) {
+      case 'MY':
+        // MY는 뒷면 스프라이트의 기본 기준 상태 (0도 회전)
+        break;
+      case 'MX':
+        // MX = R180 * MY
+        ctx.rotate((180 * Math.PI) / 180);
+        break;
+      case 'MD':
+        // MD = R270 * MY (반시계 90도 회전)
+        ctx.rotate((-90 * Math.PI) / 180);
+        break;
+      case 'MAD':
+        // MAD = R90 * MY (시계 90도 회전)
+        ctx.rotate((90 * Math.PI) / 180);
+        break;
+    }
   }
 
   // 타일 중앙 정렬로 그리기

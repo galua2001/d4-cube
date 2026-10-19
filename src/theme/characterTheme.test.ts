@@ -141,8 +141,8 @@ describe('Character Theme System (characterTheme.ts & tileRenderer.ts)', () => {
     renderCharacterTileCanvas(mockCanvas, D4.R90, mockFront, mockBack);
     expect(mockContext.rotate).toHaveBeenCalled();
 
-    // MX 반전 연산 (대칭)
+    // MX 반전 연산 (대칭: 뒷면 이미지 기준 180도 회전)
     renderCharacterTileCanvas(mockCanvas, D4.MX, mockFront, mockBack);
-    expect(mockContext.scale).toHaveBeenCalledWith(1, -1);
+    expect(mockContext.rotate).toHaveBeenCalledWith(Math.PI);
   });
 });

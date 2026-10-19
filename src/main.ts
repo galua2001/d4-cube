@@ -558,61 +558,107 @@ class MatrixCubeApp {
     const lineCellsList = generateLineCells(this.boardSize);
     const lineCells = lineCellsList[lineId] || [];
 
-    // 연산 op에 따른 정밀 3D 대칭/회전 애니메이션 매핑
-    let snapTransform = 'scale(0.92)';
-    if (op === 'MX') {
-      snapTransform = 'perspective(900px) scale(0.92) rotateX(180deg)'; // 가로 X축 대칭 (상하 뒤집힘)
-    } else if (op === 'MY') {
-      snapTransform = 'perspective(900px) scale(0.92) rotateY(180deg)'; // 세로 Y축 대칭 (좌우 뒤집힘)
-    } else if (op === 'MD') {
-      snapTransform = 'perspective(900px) scale(0.92) rotate3d(1, 1, 0, 180deg)'; // 주대각선 대칭
-    } else if (op === 'MAD') {
-      snapTransform = 'perspective(900px) scale(0.92) rotate3d(-1, 1, 0, 180deg)'; // 부대각선 대칭
-    } else if (op === 'R90') {
-      snapTransform = 'perspective(900px) scale(0.92) rotateZ(90deg)'; // 시계방향 90도 회전
-    } else if (op === 'R180') {
-      snapTransform = 'perspective(900px) scale(0.92) rotateZ(180deg)'; // 180도 회전
-    } else if (op === 'R270') {
-      snapTransform = 'perspective(900px) scale(0.92) rotateZ(270deg)'; // 시계방향 270도 회전
-    }
+    const isFlip = op === 'MX' || op === 'MY' || op === 'MD' || op === 'MAD';
+    const isRot = op === 'R90' || op === 'R180' || op === 'R270';
 
-    const ANIM_MS = 340;
+    const prevOps = [...this.currentOps];
+    const nextOps = applyLineMoveGeneric(this.currentOps, lineCells, op);
 
-    // 타일들에 회전/대칭 스냅 트랜스폼 애니메이션 적용
-    lineCells.forEach(cellIdx => {
-      const box = this.boardGrid.children[cellIdx] as HTMLElement;
-      if (box) {
-        box.style.transition = `transform ${ANIM_MS}ms cubic-bezier(0.2, 0.9, 0.3, 1)`;
-        box.style.transform = snapTransform;
+    const FLIP_STEP_MS = 180;
+    const ROT_ANIM_MS = 320;
+    const easeIn = 'cubic-bezier(0.4, 0, 0.7, 0.2)';
+    const easeOut = 'cubic-bezier(0.2, 0.8, 0.3, 1)';
+    const easeSmooth = 'cubic-bezier(0.25, 1, 0.5, 1)';
+
+    if (isFlip) {
+      let foldTransform = '';
+      let unfoldStart = '';
+
+      if (op === 'MY') {
+        foldTransform = 'perspective(900px) scale(0.92) rotateY(90deg)';
+        unfoldStart = 'perspective(900px) scale(0.92) rotateY(-90deg)';
+      } else if (op === 'MX') {
+        foldTransform = 'perspective(900px) scale(0.92) rotateX(90deg)';
+        unfoldStart = 'perspective(900px) scale(0.92) rotateX(-90deg)';
+      } else if (op === 'MD') {
+        foldTransform = 'perspective(900px) scale(0.92) rotate3d(1, 1, 0, 90deg)';
+        unfoldStart = 'perspective(900px) scale(0.92) rotate3d(1, 1, 0, -90deg)';
+      } else if (op === 'MAD') {
+        foldTransform = 'perspective(900px) scale(0.92) rotate3d(-1, 1, 0, 90deg)';
+        unfoldStart = 'perspective(900px) scale(0.92) rotate3d(-1, 1, 0, -90deg)';
       }
-    });
 
-    setTimeout(() => {
-      try {
-        const prevOps = [...this.currentOps];
-
-        // 대수적 라인 연산 적용
-        this.currentOps = applyLineMoveGeneric(this.currentOps, lineCells, op);
-
-        if (recordHistory) {
-          // 첫 조작 시 초시계 시작
-          if (!this.isGameStarted) {
-            this.isGameStarted = true;
-            recordManager.startTimer((formatted) => {
-              const timerEl = document.getElementById('label-timer');
-              if (timerEl) timerEl.innerText = formatted;
-            });
-          }
-
-          this.moveHistory.push({ lineId, op, prevOps });
-          this.movesCount++;
-          this.updateMovesLabel();
+      // 1단계: 0도 -> 90도 (화면에 수직으로 접힘)
+      lineCells.forEach(cellIdx => {
+        const box = this.boardGrid.children[cellIdx] as HTMLElement;
+        if (box) {
+          box.style.transition = `transform ${FLIP_STEP_MS}ms ${easeIn}`;
+          box.style.transform = foldTransform;
         }
+      });
 
-        // 보드 Canvas 상태 및 텍스트 갱신
+      // 180ms 지점: 두께 0 타이밍에 상태 변경 및 보드 갱신
+      setTimeout(() => {
+        this.currentOps = nextOps;
         this.updateBoard();
 
-        // 트랜지션 해제 후 원래 위치로 즉시 스냅 (깜빡임 없음)
+        // 반대편 -90도로 즉시 스냅 (transition: none)
+        lineCells.forEach(cellIdx => {
+          const box = this.boardGrid.children[cellIdx] as HTMLElement;
+          if (box) {
+            box.style.transition = 'none';
+            box.style.transform = unfoldStart;
+          }
+        });
+
+        // 2단계: -90도 -> 0도 (자연스럽게 펼쳐짐)
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            lineCells.forEach(cellIdx => {
+              const box = this.boardGrid.children[cellIdx] as HTMLElement;
+              if (box) {
+                box.style.transition = `transform ${FLIP_STEP_MS}ms ${easeOut}`;
+                box.style.transform = '';
+              }
+            });
+
+            setTimeout(() => {
+              lineCells.forEach(cellIdx => {
+                const box = this.boardGrid.children[cellIdx] as HTMLElement;
+                if (box) {
+                  box.style.transition = '';
+                  box.style.transform = '';
+                }
+              });
+
+              this.finalizeMove(lineId, op, prevOps, recordHistory);
+            }, FLIP_STEP_MS);
+          });
+        });
+      }, FLIP_STEP_MS);
+
+    } else if (isRot) {
+      let rotTransform = '';
+      if (op === 'R90') {
+        rotTransform = 'perspective(900px) scale(0.94) rotateZ(90deg)';
+      } else if (op === 'R180') {
+        rotTransform = 'perspective(900px) scale(0.94) rotateZ(180deg)';
+      } else if (op === 'R270') {
+        rotTransform = 'perspective(900px) scale(0.94) rotateZ(-90deg)';
+      }
+
+      lineCells.forEach(cellIdx => {
+        const box = this.boardGrid.children[cellIdx] as HTMLElement;
+        if (box) {
+          box.style.transition = `transform ${ROT_ANIM_MS}ms ${easeSmooth}`;
+          box.style.transform = rotTransform;
+        }
+      });
+
+      setTimeout(() => {
+        this.currentOps = nextOps;
+        this.updateBoard();
+
         lineCells.forEach(cellIdx => {
           const box = this.boardGrid.children[cellIdx] as HTMLElement;
           if (box) {
@@ -622,20 +668,43 @@ class MatrixCubeApp {
         });
 
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            lineCells.forEach(cellIdx => {
-              const box = this.boardGrid.children[cellIdx] as HTMLElement;
-              if (box) box.style.transition = '';
-            });
+          lineCells.forEach(cellIdx => {
+            const box = this.boardGrid.children[cellIdx] as HTMLElement;
+            if (box) box.style.transition = '';
           });
         });
 
-        this.checkWinCondition();
-      } finally {
-        this.isAnimating = false;
-        this.gestureRecognizer.setLocked(false);
+        this.finalizeMove(lineId, op, prevOps, recordHistory);
+      }, ROT_ANIM_MS);
+
+    } else {
+      this.currentOps = nextOps;
+      this.updateBoard();
+      this.finalizeMove(lineId, op, prevOps, recordHistory);
+    }
+  }
+
+  private finalizeMove(lineId: number, op: D4Op, prevOps: D4Op[], recordHistory: boolean) {
+    try {
+      if (recordHistory) {
+        if (!this.isGameStarted) {
+          this.isGameStarted = true;
+          recordManager.startTimer((formatted) => {
+            const timerEl = document.getElementById('label-timer');
+            if (timerEl) timerEl.innerText = formatted;
+          });
+        }
+
+        this.moveHistory.push({ lineId, op, prevOps });
+        this.movesCount++;
+        this.updateMovesLabel();
       }
-    }, ANIM_MS);
+
+      this.checkWinCondition();
+    } finally {
+      this.isAnimating = false;
+      this.gestureRecognizer.setLocked(false);
+    }
   }
 
   private undoMove() {
