@@ -194,8 +194,8 @@ class MatrixCubeApp {
 
       const canvas = document.createElement('canvas');
       canvas.className = 'cell-canvas';
-      canvas.width = 100;
-      canvas.height = 100;
+      canvas.width = 300;
+      canvas.height = 300;
       box.appendChild(canvas);
 
       const r = Math.floor(i / this.boardSize);

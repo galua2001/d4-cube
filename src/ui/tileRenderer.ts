@@ -24,6 +24,9 @@ export function renderCharacterTileCanvas(
   const w = canvas.width;
   const h = canvas.height;
 
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
   ctx.clearRect(0, 0, w, h);
 
   // 대칭 상태에 따라 앞면 또는 뒷면 이미지 선택
