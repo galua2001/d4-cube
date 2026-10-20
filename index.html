@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
   <head>
+    <script>
+      (function() {
+        var saved = localStorage.getItem('galois_cube_color_mode') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
@@ -9,25 +15,25 @@
     <title>D4 갈루아 큐브</title>
     
     <!-- PWA 메타 태그 -->
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="theme-color" content="#f8fafc" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="D4 갈루아 큐브" />
     
     <!-- 아이콘 및 매니페스트 -->
     <link rel="manifest" href="manifest.json" />
     <link rel="icon" type="image/png" href="icon-192.png" />
     <link rel="apple-touch-icon" href="icon-192.png" />
-    <script type="module" crossorigin src="./assets/index-CTOJuc5k.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DTkWkKoM.css">
+    <script type="module" crossorigin src="./assets/index-CLxOFQMU.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-0TsubfRX.css">
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app"></div>
     <script>
       // Service Worker 등록 및 캐시 강제 무효화
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js?v=20261013_1115').then((reg) => {
+          navigator.serviceWorker.register('sw.js?v=20261019_1815').then((reg) => {
             reg.update();
           }).catch(() => {});
         });
