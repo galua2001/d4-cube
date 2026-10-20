@@ -71,10 +71,13 @@ export const translations: Record<Lang, Record<string, any>> = {
     'header.themeToggleTitle': 'Switch Character Theme (Corgi / Galois)',
     'header.themeDog': 'Corgi',
     'header.themeGalua': 'Galois',
+    'header.colorLight': 'Light',
+    'header.colorDark': 'Dark',
+    'header.colorToggleTitle': 'Toggle Light/Dark Theme',
 
     // Settings
     'settings.difficulty': '🎯 Difficulty',
-    'settings.movesSuffix': ' Moves',
+    'settings.movesSuffix': 'M',
     'settings.sizeTitle': 'Cycle Board Size (3×3 ➔ 4×4 ➔ 5×5)',
     'settings.diagOn': '⚡ Diag ON',
     'settings.diagOff': '⚡ Diag OFF',
@@ -309,6 +312,9 @@ export const translations: Record<Lang, Record<string, any>> = {
     'header.themeToggleTitle': '캐릭터 테마 변경 (강아지 / 갈루아 소년)',
     'header.themeDog': '강아지',
     'header.themeGalua': '갈루아',
+    'header.colorLight': '밝게',
+    'header.colorDark': '어둡게',
+    'header.colorToggleTitle': '밝은 화면 / 어두운 화면 전환',
 
     // Settings
     'settings.difficulty': '🎯 난이도',

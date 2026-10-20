@@ -20,6 +20,11 @@ import {
   getThemeImages,
   preloadThemeImages
 } from './theme/characterTheme';
+import {
+  getColorMode,
+  toggleColorMode,
+  onColorModeChange
+} from './theme/colorTheme';
 
 class MatrixCubeApp {
   private boardSize = 3;
@@ -59,6 +64,10 @@ class MatrixCubeApp {
       this.updateThemeButton();
       this.updateBoard();
     });
+
+    onColorModeChange(() => {
+      this.updateColorModeButton();
+    });
   }
 
   private initBoardOps() {
@@ -82,12 +91,18 @@ class MatrixCubeApp {
     const app = document.getElementById('app')!;
     const curLang = getCurrentLang();
     const curTheme = getCurrentTheme();
+    const curColorMode = getColorMode();
     app.innerHTML = `
       <div class="header-bar">
         <div class="header-top-row">
           <div class="header-title">${t('header.title')}</div>
           <div style="display:flex; align-items:center; gap:6px;">
-            <button id="btn-toggle-theme" class="btn-theme-toggle" title="${t('header.themeToggleTitle')}">
+            <button id="btn-toggle-colormode" class="btn-colormode-toggle" title="${t('header.colorToggleTitle')}">
+              <span class="color-opt color-opt-light ${curColorMode === 'light' ? 'active-color' : ''}">☀️ ${t('header.colorLight')}</span>
+              <span class="color-divider">|</span>
+              <span class="color-opt color-opt-dark ${curColorMode === 'dark' ? 'active-color' : ''}">🌙 ${t('header.colorDark')}</span>
+            </button>
+            <button id="btn-toggle-theme" class="btn-theme-toggle"  title="${t('header.themeToggleTitle')}">
               <span class="theme-opt theme-opt-dog ${curTheme === 'dog' ? 'active-theme' : ''}">🐶 ${t('header.themeDog')}</span>
               <span class="theme-divider">|</span>
               <span class="theme-opt theme-opt-galua ${curTheme === 'galua' ? 'active-theme' : ''}">🧑‍🎓 ${t('header.themeGalua')}</span>
@@ -303,6 +318,16 @@ class MatrixCubeApp {
     }, 1200);
   }
 
+  private updateColorModeButton() {
+    const btnColor = document.getElementById('btn-toggle-colormode');
+    if (!btnColor) return;
+    const curColor = getColorMode();
+    const lightOpt = btnColor.querySelector('.color-opt-light');
+    const darkOpt = btnColor.querySelector('.color-opt-dark');
+    if (lightOpt) lightOpt.classList.toggle('active-color', curColor === 'light');
+    if (darkOpt) darkOpt.classList.toggle('active-color', curColor === 'dark');
+  }
+
   private updateThemeButton() {
     const btnTheme = document.getElementById('btn-toggle-theme');
     if (!btnTheme) return;
@@ -314,6 +339,12 @@ class MatrixCubeApp {
   }
 
   private bindControls() {
+    // 라이트 / 다크 테마 전환 버튼 (☀️ Light ↔ 🌙 Dark)
+    document.getElementById('btn-toggle-colormode')?.addEventListener('click', () => {
+      soundEngine.playTap();
+      toggleColorMode();
+    });
+
     // 캐릭터 테마 전환 버튼 (강아지 <-> 갈루아 소년)
     document.getElementById('btn-toggle-theme')?.addEventListener('click', () => {
       soundEngine.playTap();

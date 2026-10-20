@@ -84,6 +84,9 @@ describe('i18n 다국어 번역 시스템 (translations.ts)', () => {
     // 주요 키들이 양쪽 모두에 존재하는지 검증
     const requiredKeys = [
       'header.title',
+      'header.colorLight',
+      'header.colorDark',
+      'header.colorToggleTitle',
       'settings.difficulty',
       'controls.undo',
       'controls.hint',

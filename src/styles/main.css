@@ -1,11 +1,49 @@
-:root {
+:root, [data-theme="light"], html[data-theme="light"] {
+  --bg-color: #f8fafc;
+  --card-bg: #ffffff;
+  --card-bg-glass: rgba(255, 255, 255, 0.9);
+  --border-color: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --accent-color: #0284c7;
+  --accent-hover: #0369a1;
+  --board-bg: #f1f5f9;
+  --cell-bg: #ffffff;
+  --btn-bg: #f8fafc;
+  --btn-border: #cbd5e1;
+  --btn-icon-bg: #f1f5f9;
+  --btn-icon-color: #1e293b;
+  --btn-icon-border: #cbd5e1;
+  --btn-icon-hover: #e2e8f0;
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --board-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+  --subcard-bg: #f8fafc;
+  --subcard-border: #e2e8f0;
+}
+
+[data-theme="dark"], html[data-theme="dark"] {
   --bg-color: #0f172a;
   --card-bg: #1e293b;
+  --card-bg-glass: rgba(30, 41, 59, 0.9);
   --border-color: #334155;
-  --accent-color: #38bdf8;
-  --accent-hover: #0284c7;
+  --border-strong: #475569;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
+  --accent-color: #38bdf8;
+  --accent-hover: #0284c7;
+  --board-bg: #090d16;
+  --cell-bg: #1e293b;
+  --btn-bg: #1e293b;
+  --btn-border: #334155;
+  --btn-icon-bg: #334155;
+  --btn-icon-color: #ffffff;
+  --btn-icon-border: transparent;
+  --btn-icon-hover: #475569;
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --board-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  --subcard-bg: #0f172a;
+  --subcard-border: #334155;
 }
 
 * {
@@ -49,6 +87,7 @@ body {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
+  box-shadow: var(--card-shadow);
 }
 
 .header-top-row {
@@ -75,9 +114,9 @@ body {
 }
 
 .btn-icon {
-  background: #334155;
-  border: none;
-  color: white;
+  background: var(--btn-icon-bg);
+  border: 1px solid var(--btn-icon-border);
+  color: var(--btn-icon-color);
   padding: 6px 10px;
   border-radius: 8px;
   cursor: pointer;
@@ -93,7 +132,60 @@ body {
 }
 
 .btn-icon:hover {
-  background: #475569;
+  background: var(--btn-icon-hover);
+}
+
+/* 컬러 모드 토글 버튼 (☀️ Light ↔ 🌙 Dark) */
+.btn-colormode-toggle {
+  background: var(--card-bg);
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  padding: 4px 9px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  box-shadow: var(--card-shadow);
+  user-select: none;
+}
+
+.btn-colormode-toggle:hover {
+  border-color: var(--accent-color);
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+.btn-colormode-toggle:active {
+  transform: scale(0.97);
+}
+
+.btn-colormode-toggle .color-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.btn-colormode-toggle .color-opt.active-color {
+  opacity: 1;
+  color: var(--accent-color);
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(2, 132, 199, 0.35);
+}
+
+[data-theme="dark"] .btn-colormode-toggle .color-opt.active-color {
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.7);
+}
+
+.btn-colormode-toggle .color-divider {
+  color: var(--border-strong);
+  font-size: 0.72rem;
+  padding: 0 2px;
 }
 
 .btn-lang-toggle {
@@ -232,8 +324,8 @@ body {
   padding: 5px 3px;
   font-size: 0.78rem;
   font-weight: 600;
-  background: #0f172a;
-  border: 1px solid var(--border-color);
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
   color: var(--text-muted);
   border-radius: 6px;
   cursor: pointer;
@@ -264,8 +356,8 @@ body {
   padding: 5px 8px;
   font-size: 0.78rem;
   font-weight: 700;
-  background: #0f172a;
-  border: 1px solid var(--border-color);
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
   color: var(--text-muted);
   border-radius: 6px;
   cursor: pointer;
@@ -332,11 +424,11 @@ body {
   gap: 4px;
   width: 100%;
   height: 100%;
-  background: #090d16;
+  background: var(--board-bg);
   padding: 6px;
   border-radius: 16px;
-  border: 2px solid var(--border-color);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--border-strong);
+  box-shadow: var(--board-shadow);
   touch-action: none;
   perspective: 1000px;
   transform-style: preserve-3d;
@@ -348,7 +440,9 @@ body {
   height: 100%;
   border-radius: 8px;
   overflow: visible;
-  background: #1e293b;
+  background: var(--cell-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -633,9 +727,9 @@ body {
 .btn-action {
   flex: 1;
   padding: 10px 8px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  color: white;
+  background: var(--btn-bg);
+  border: 1px solid var(--border-strong);
+  color: var(--text-main);
   font-size: 0.9rem;
   font-weight: 600;
   border-radius: 10px;
@@ -661,6 +755,7 @@ body {
 .btn-action.primary {
   background: #0284c7;
   border-color: #38bdf8;
+  color: #ffffff !important;
 }
 
 .btn-action.primary:hover {
@@ -2491,3 +2586,250 @@ body {
 
 
 
+
+/* ============================================================================
+   라이트 모드 전용 세부 컴포넌트 & 모달 비주얼 고도화
+   ============================================================================ */
+
+[data-theme="light"] body {
+  background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+}
+
+[data-theme="light"] .settings-panel {
+  box-shadow: var(--card-shadow);
+}
+
+[data-theme="light"] .btn-pill.active {
+  background: var(--accent-color) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 10px rgba(2, 132, 199, 0.35);
+}
+
+[data-theme="light"] .btn-option-pill {
+  background: var(--btn-bg);
+  border-color: var(--border-strong);
+  color: var(--text-main);
+}
+
+[data-theme="light"] .btn-option-pill.active-diag {
+  background: var(--accent-color);
+  color: #ffffff;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px rgba(2, 132, 199, 0.3);
+}
+
+[data-theme="light"] .btn-lang-toggle {
+  background: var(--card-bg);
+  border-color: var(--border-strong);
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .btn-lang-toggle .active-lang {
+  color: var(--accent-color);
+}
+
+[data-theme="light"] .btn-theme-toggle {
+  background: var(--card-bg);
+  border-color: var(--border-strong);
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .btn-theme-toggle .theme-opt.active-theme {
+  color: var(--accent-color);
+}
+
+[data-theme="light"] .tile-switch-11,
+[data-theme="light"] .tut-tile-switch-11 {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(168, 85, 247, 0.65);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .modal-overlay {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="light"] .modal-content {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+  color: #0f172a;
+}
+
+[data-theme="light"] .modal-tab-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+[data-theme="light"] .modal-tab-btn.active {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(2, 132, 199, 0.35);
+}
+
+[data-theme="light"] .about-card {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .about-card.highlight {
+  background: linear-gradient(145deg, #fefce8, #f8fafc);
+  border-color: #facc15;
+}
+
+[data-theme="light"] .about-card-title {
+  color: #0f172a;
+}
+
+[data-theme="light"] .about-desc,
+[data-theme="light"] .about-list {
+  color: #475569;
+}
+
+[data-theme="light"] .solution-step {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .solution-step-card {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .solution-step-card:hover {
+  border-color: #94a3b8;
+}
+
+[data-theme="light"] .step-op-code {
+  background: #e2e8f0;
+  color: #b45309;
+}
+
+[data-theme="light"] .btn-math-why {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #b45309;
+}
+
+[data-theme="light"] .math-report-box {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+[data-theme="light"] .math-report-title {
+  color: #b45309;
+}
+
+[data-theme="light"] .theory-section {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+/* 튜토리얼 모달 라이트 테마 */
+[data-theme="light"] .tutorial-overlay {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="light"] .tutorial-card {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  color: #0f172a;
+}
+
+[data-theme="light"] .tutorial-header {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .tutorial-header-title {
+  color: #0f172a;
+}
+
+[data-theme="light"] .tutorial-header-close {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+[data-theme="light"] .tutorial-header-close:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+[data-theme="light"] .tut-step-item {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .tut-step-item.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+[data-theme="light"] .tut-step-item.completed {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+}
+
+[data-theme="light"] .tut-step-title {
+  color: #0f172a;
+}
+
+[data-theme="light"] .tut-step-desc {
+  color: #475569;
+}
+
+[data-theme="light"] .tutorial-board-container {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .tut-cell-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .tutorial-footer {
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .tut-btn-prev {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+[data-theme="light"] .tut-btn-next {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+}
+
+[data-theme="light"] .tut-callout {
+  background: #f0f9ff;
+  border-left: 3px solid #0284c7;
+  color: #0369a1;
+}
+
+@media (max-width: 480px) {
+  .header-top-row {
+    gap: 4px;
+  }
+  .header-title {
+    font-size: 0.95rem;
+  }
+  .btn-colormode-toggle,
+  .btn-theme-toggle,
+  .btn-lang-toggle {
+    padding: 3px 5px !important;
+    font-size: 0.70rem !important;
+    gap: 2px !important;
+  }
+}

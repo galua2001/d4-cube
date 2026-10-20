@@ -1,5 +1,5 @@
-// 표준 PWA Service Worker (v20261013_1115)
-const CACHE_NAME = 'galois-cube-v20261013_1115';
+// 표준 PWA Service Worker (v20261019_1815)
+const CACHE_NAME = 'galois-cube-v20261019_1815';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
