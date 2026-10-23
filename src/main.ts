@@ -1,7 +1,8 @@
 import './styles/main.css';
-import { D4Op, D4, SymmetryGroupKey, SYMMETRY_GROUPS } from './core/group';
+import { D4Op, D4, SymmetryGroupKey } from './core/group';
 import { generateLines, generateLineCells, LineTarget, applyLineMoveGeneric } from './core/board';
 import { solveBoard, MoveStep } from './core/solver';
+import { getMaxGodNumber, generateExactKScramble } from './game/scrambler';
 import { soundEngine } from './audio/audioEngine';
 import { campaignManager } from './game/campaign';
 import { recordManager, formatTime } from './game/recordManager';
@@ -408,7 +409,7 @@ class MatrixCubeApp {
     });
 
     // 난이도(N수) 버튼 목록 초기 렌더링
-    this.renderDifficultyButtons();
+    this.updateDifficultyButtons();
 
     document.getElementById('btn-undo')?.addEventListener('click', () => {
       this.undoMove();
@@ -449,6 +450,7 @@ class MatrixCubeApp {
       btnDiag.title = this.isDiagonalEnabled ? t('settings.diagTitleOn') : t('settings.diagTitleOff');
     }
 
+    this.updateDifficultyButtons();
     soundEngine.playTap();
     this.rebuildBoardDOM();
     this.updateBoard();
@@ -503,22 +505,31 @@ class MatrixCubeApp {
     }
   }
 
-  /**
-   * 대칭군 모드에 따라 난이도(N수) 버튼 목록을 동적으로 구성 (V4: 2~4수, D4: 3~8수, C2: 2~3수)
+    /**
+   * 대칭군 모드 및 대각선 활성화에 따라 난이도(N수) 버튼 목록을 동적으로 구성
+   * maxMoves = getMaxGodNumber(this.currentGroup, this.isDiagonalEnabled, this.boardSize)
+   * moves > maxMoves인 버튼은 style.display = 'none'으로 깔끔하게 비노출.
+   * 현재 this.scrambleMoves > maxMoves라면 자동으로 maxMoves로 클램프하고 활성 버튼 갱신.
    */
-  private renderDifficultyButtons() {
+  private updateDifficultyButtons() {
     const groupEl = document.getElementById('moves-button-group');
     if (!groupEl) return;
 
+    const maxMoves = getMaxGodNumber(this.currentGroup, this.isDiagonalEnabled, this.boardSize);
+
     let movesList: number[] = [3, 4, 5, 6, 7, 8];
     if (this.currentGroup === 'V4') {
-      movesList = [2, 3, 4];
+      movesList = [2, 3, 4, 5, 6];
     } else if (this.currentGroup === 'C2') {
-      movesList = [2, 3];
+      movesList = [2, 3, 4, 5];
     }
 
-    if (!movesList.includes(this.scrambleMoves)) {
-      this.scrambleMoves = movesList[0];
+    if (this.scrambleMoves > maxMoves) {
+      this.scrambleMoves = maxMoves;
+    }
+    const validMoves = movesList.filter(m => m <= maxMoves);
+    if (!validMoves.includes(this.scrambleMoves)) {
+      this.scrambleMoves = validMoves[0] || 3;
     }
 
     groupEl.innerHTML = '';
@@ -527,14 +538,20 @@ class MatrixCubeApp {
       btn.className = `btn-pill ${m === this.scrambleMoves ? 'active' : ''}`;
       btn.dataset.moves = String(m);
       btn.innerText = `${m}${t('settings.movesSuffix')}`;
-      btn.addEventListener('click', () => {
-        this.scrambleMoves = m;
-        groupEl.querySelectorAll('.btn-pill').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.updateStatusInfo();
-        this.updateBestRecordBadge();
-        this.scrambleBoard();
-      });
+
+      if (m > maxMoves) {
+        btn.style.display = 'none';
+        btn.disabled = true;
+      } else {
+        btn.addEventListener('click', () => {
+          this.scrambleMoves = m;
+          groupEl.querySelectorAll('.btn-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.updateStatusInfo();
+          this.updateBestRecordBadge();
+          this.scrambleBoard();
+        });
+      }
       groupEl.appendChild(btn);
     });
 
@@ -555,7 +572,7 @@ class MatrixCubeApp {
     });
 
     // 대칭군 변경 시 해당 군에 맞는 난이도 버튼 목록 즉시 갱신 (V4: 2~4수)
-    this.renderDifficultyButtons();
+    this.updateDifficultyButtons();
     this.scrambleBoard();
   }
 
@@ -768,70 +785,12 @@ class MatrixCubeApp {
     const timerEl = document.getElementById('label-timer');
     if (timerEl) timerEl.innerText = '00:00.0';
 
-    const lines = generateLines(this.boardSize);
-    const lineCellsList = generateLineCells(this.boardSize);
-    const groupDef = SYMMETRY_GROUPS[this.currentGroup];
-    const validOps = groupDef.ops.filter(o => o !== D4.ID);
-
-    // 대각선 변환 활성화 여부에 따라 사용 가능한 라인 범위 결정 (대각선 OFF시 오직 행과 열만 섞음)
-    const maxLineIdx = this.isDiagonalEnabled ? lines.length : this.boardSize * 2;
-
-    const targetMoves = this.scrambleMoves;
-    let ops = Array(this.boardSize * this.boardSize).fill(D4.ID);
-    let bestCandidate: D4Op[] | null = null;
-    let bestDistDiff = 999;
-
-    // 3x3 보드는 고속 BFS 솔버로 최단 거리가 정확히 targetMoves 수와 일치하는 퍼즐만 엄선 출제
-    const maxAttempts = this.boardSize === 3 ? 150 : 20;
-
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      let candidate = Array(this.boardSize * this.boardSize).fill(D4.ID);
-      let lastLineId = -1;
-
-      for (let i = 0; i < targetMoves; i++) {
-        let lineId = Math.floor(Math.random() * maxLineIdx);
-        // 연속 동일 라인 적용 방지로 무의미한 상쇄 최소화
-        if (targetMoves > 1 && lineId === lastLineId) {
-          lineId = (lineId + 1) % maxLineIdx;
-        }
-        lastLineId = lineId;
-        const randOp = validOps[Math.floor(Math.random() * validOps.length)];
-        candidate = applyLineMoveGeneric(candidate, lineCellsList[lineId], randOp);
-      }
-
-      if (candidate.every(o => o === D4.ID)) {
-        continue;
-      }
-
-      if (this.boardSize === 3) {
-        const steps = solveBoard(candidate, this.boardSize, this.currentGroup, this.isDiagonalEnabled);
-        if (steps.length === targetMoves) {
-          // 정확히 최소 수(k수) 보장 달성! 즉시 확정!
-          ops = candidate;
-          bestCandidate = null;
-          break;
-        } else if (steps.length > 0) {
-          const diff = Math.abs(steps.length - targetMoves);
-          if (diff < bestDistDiff) {
-            bestDistDiff = diff;
-            bestCandidate = candidate;
-          }
-        }
-      } else {
-        ops = candidate;
-        break;
-      }
-    }
-
-    if (bestCandidate && ops.every(o => o === D4.ID)) {
-      ops = bestCandidate;
-    }
-
-    if (ops.every(o => o === D4.ID)) {
-      const lineId = Math.floor(Math.random() * maxLineIdx);
-      const randOp = validOps[Math.floor(Math.random() * validOps.length)];
-      ops = applyLineMoveGeneric(ops, lineCellsList[lineId], randOp);
-    }
+    const ops = generateExactKScramble(
+      this.scrambleMoves,
+      this.currentGroup,
+      this.isDiagonalEnabled,
+      this.boardSize
+    );
 
     this.currentOps = ops;
     this.moveHistory = [];
