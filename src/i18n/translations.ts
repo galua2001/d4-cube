@@ -196,7 +196,7 @@ export const translations: Record<Lang, Record<string, any>> = {
     // Tutorial Step 3
     'tutorial.step3Name': 'STEP 3. [D4 Practice] Dihedral Group D4 5-Move Master Solution',
     'tutorial.step3Main': 'D4 mode uses 8 transformations: 4 rotations (0°, 90°, 180°, 270°) and 4 reflections (Horizontal, Vertical, Main Diag, Anti-Diag)!',
-    'tutorial.step3Sub': '👆 Press [Move 1] ~ [Move 5] buttons or [▶ Step by Step] to see the 5-move brilliant solution in real time!',
+    'tutorial.step3Sub': '👆 Press [Move 1] ~ [Move 5] buttons or [▶ Step by Step]! 💡 [D4 3-Stage Rotation]: Tap (<0.25s) ➔ 90° | Medium Hold (0.3s) ➔ 180° | Long Press (>0.5s) ➔ 270° (1 Move!)',
     'tutorial.step3TTS': 'D4 mode uses rotations and diagonal symmetries. Enjoy this fascinating five-move solution!',
 
     'tutorial.d4Step0Label': 'Initial',
@@ -209,13 +209,13 @@ export const translations: Record<Lang, Record<string, any>> = {
     'tutorial.d4Step1Badge': '⚡ Move 1: Row 1 90° Rotation',
     'tutorial.d4Step1Text': 'Tap Row 1 Col 1 (11) once 👆 (R90)',
     'tutorial.d4Step1Desc': 'Row 1 rotates 90° clockwise, solving the first tile to 0!',
-    'tutorial.d4Step1Bubble': '11 Tap Once (Row 1 90° Rotation)',
+    'tutorial.d4Step1Bubble': '11 Short Tap (<0.25s) ➔ Row 1 90°',
 
     'tutorial.d4Step2Label': 'Move 2',
     'tutorial.d4Step2Badge': '⚡ Move 2: Row 3 180° Rotation',
-    'tutorial.d4Step2Text': 'Double-tap Row 3 Col 1 (31) 👆👆 (R180)',
+    'tutorial.d4Step2Text': 'Medium hold Row 3 Col 1 (31) (0.3s) ⏱️ (R180)',
     'tutorial.d4Step2Desc': 'Applying 180° to Row 3 cancels the first tile of Row 3 back to 0!',
-    'tutorial.d4Step2Bubble': '31 Double Click (Row 3 180° Rotation)',
+    'tutorial.d4Step2Bubble': '31 Medium Hold (0.3s) ➔ Row 3 180° Rotation (R180)',
 
     'tutorial.d4Step3Label': 'Move 3',
     'tutorial.d4Step3Badge': '⚡ Move 3: Col 3 Vertical Reflection',
@@ -437,7 +437,7 @@ export const translations: Record<Lang, Record<string, any>> = {
     // Tutorial Step 3
     'tutorial.step3Name': 'STEP 3. [D4 실전] 8차 정이면체군 D4 5수 묘수 풀이',
     'tutorial.step3Main': 'D4 모드는 회전 4종(0°, 90°, 180°, 270°)과 반사 4종(가로, 세로, 주대각, 부대각) 총 8가지 변환을 사용해요!',
-    'tutorial.step3Sub': '👆 위의 [1수] ~ [5수] 버튼이나 [▶ 한 수씩 보기]를 누르면 대각선과 회전이 어우러진 5수 묘수 풀이가 실시간으로 펼쳐져요!',
+    'tutorial.step3Sub': '👆 [1수] ~ [5수] 버튼이나 [▶ 한 수씩 보기] 클릭! 💡 [D4 전용 3단계 회전]: 한 번 톡 ➔ 90° | 중간 누름(0.3초) ➔ 180° | 길게 누름(0.5초) ➔ 270° (단 1수 해결!)',
     'tutorial.step3TTS': '디포 모드는 회전과 대각선 대칭까지 모두 사용해요. 다섯 수 만에 완성되는 신기한 해법을 함께 즐겨보세요!',
 
     'tutorial.d4Step0Label': '초기',
@@ -450,13 +450,13 @@ export const translations: Record<Lang, Record<string, any>> = {
     'tutorial.d4Step1Badge': '⚡ 1수: 1행 90° 회전',
     'tutorial.d4Step1Text': '1행 1열(11) 1회 탭 👆 (R90)',
     'tutorial.d4Step1Desc': '1행이 시계 방향 90° 회전되어 첫 번째 타일(1행 1열)이 0번 정위치 완성!',
-    'tutorial.d4Step1Bubble': '11 1회 탭 (1행 90° 회전)',
+    'tutorial.d4Step1Bubble': '11 한 번 톡 (<0.25초) ➔ 1행 90° 회전',
 
     'tutorial.d4Step2Label': '2수',
     'tutorial.d4Step2Badge': '⚡ 2수: 3행 180° 회전',
-    'tutorial.d4Step2Text': '3행 1열(31) 더블 탭 👆👆 (R180)',
+    'tutorial.d4Step2Text': '3행 1열(31) 중간 누름(0.3초) ⏱️ (R180)',
     'tutorial.d4Step2Desc': '3행에 180° 회전을 적용하여 3행 첫 번째 타일(3행 1열)이 0번으로 상쇄!',
-    'tutorial.d4Step2Bubble': '31 두 번 클릭 (3행 180° 회전)',
+    'tutorial.d4Step2Bubble': '31 중간 누름 (0.3초) ➔ 3행 180° 회전 (R180)',
 
     'tutorial.d4Step3Label': '3수',
     'tutorial.d4Step3Badge': '⚡ 3수: 3열 세로 반사',

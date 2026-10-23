@@ -538,7 +538,7 @@ export class TutorialModalController {
               <div class="tut-rule-item"><span>🎯</span> <span><b>게임 목표</b> : 뒤섞인 모든 타일을 <b>0번(항등원·정위치 앞면)</b>으로 완성</span></div>
               <div class="tut-rule-item"><span>📐</span> <span><b>행렬 컨트롤러</b> : 외곽 성분 타일(1~3행, 1~3열)을 조작하여 해당 라인의 행·열 대칭 변환</span></div>
               <div class="tut-rule-item"><span>🔄</span> <span><b>1행 1열 스위치</b> : [↔1행|↕1열] 탭으로 1행 ↔ 1열 조작 모드 자유 전환</span></div>
-              <div class="tut-rule-item"><span>🎮</span> <span><b>손동작 변환</b> : 탭(90°), 더블탭(180°), 롱프레스(270°), 가로밀기(MX), 세로밀기(MY), 대각밀기(MD)</span></div>
+              <div class="tut-rule-item"><span>🎮</span> <span><b>손동작 변환</b> : 톡(90°), 중간누름(180°), 길게누름(270°), 가로밀기(MX), 세로밀기(MY), 대각밀기(MD)</span></div>
               <div class="tut-rule-item"><span>⚡</span> <span><b>반사 + 반사 = 회전</b> : MX ∘ MY = R180 (클라인 4원군 V4)</span></div>
               <div class="tut-rule-item"><span>🌌</span> <span><b>8차 정이면체군 D4</b> : 회전 4종(0°, 90°, 180°, 270°) + 반사 4종(MX, MY, MD, MAD)</span></div>
               <div class="tut-rule-item"><span>🧩</span> <span><b>V4 4수 최단 해법</b> : 3행 R180 ➔ 3열 MY ➔ 2행 MY ➔ 1행 R180 완성!</span></div>

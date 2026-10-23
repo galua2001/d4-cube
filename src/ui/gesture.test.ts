@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { GestureRecognizer } from './gesture';
 
 describe('GestureRecognizer - allowDiagonal 및 컨트롤러 성분 매핑 검증', () => {
@@ -10,15 +10,20 @@ describe('GestureRecognizer - allowDiagonal 및 컨트롤러 성분 매핑 검�
     vi.stubGlobal('window', {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
+      getComputedStyle: vi.fn(() => ({ position: 'relative' })),
     });
 
     mockBoard = {
       addEventListener: vi.fn(),
+      appendChild: vi.fn(),
       getBoundingClientRect: vi.fn(() => ({ width: 300, height: 300, left: 0, top: 0 })),
+      setPointerCapture: vi.fn(),
     };
 
     mockCanvas = {
-      getContext: vi.fn(() => ({})),
+      getContext: vi.fn(() => ({
+        clearRect: vi.fn(),
+      })),
       width: 0,
       height: 0,
     };
@@ -78,5 +83,189 @@ describe('GestureRecognizer - allowDiagonal 및 컨트롤러 성분 매핑 검�
     gesture.setAllowDiagonal(true);
     expect(gesture.getLineForCell(3, 3)).toEqual({ type: 'diag', idx: 'main', label: '↖ 주대각선' });
     expect(gesture.getLineForCell(1, 3)).toEqual({ type: 'diag', idx: 'anti', label: '↗ 부대각선' });
+  });
+});
+
+describe('GestureRecognizer - 누르는 시간 기반 3단계 회전 조작 시스템 검증', () => {
+  let mockBoard: any;
+  let mockCanvas: any;
+  let callback: ReturnType<typeof vi.fn>;
+  let listeners: Record<string, Function> = {};
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    listeners = {};
+
+    vi.stubGlobal('window', {
+      addEventListener: vi.fn((event: string, handler: Function) => {
+        listeners[`window_${event}`] = handler;
+      }),
+      removeEventListener: vi.fn(),
+      getComputedStyle: vi.fn(() => ({ position: 'relative' })),
+      requestAnimationFrame: vi.fn((fn: Function) => setTimeout(fn, 16)),
+      cancelAnimationFrame: vi.fn((id: any) => clearTimeout(id)),
+    });
+
+    mockBoard = {
+      addEventListener: vi.fn((event: string, handler: Function) => {
+        listeners[`board_${event}`] = handler;
+      }),
+      appendChild: vi.fn(),
+      getBoundingClientRect: vi.fn(() => ({ width: 300, height: 300, left: 0, top: 0 })),
+      setPointerCapture: vi.fn(),
+      children: [],
+    };
+
+    mockCanvas = {
+      getContext: vi.fn(() => ({
+        clearRect: vi.fn(),
+      })),
+      width: 300,
+      height: 300,
+    };
+
+    callback = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it('1단계: 250ms 미만 누르고 손을 떼면 즉시 90도 회전(R90)이 단 1수로 발동해야 함', () => {
+    new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
+
+    // 0,0 셀 (1행) 누름 시작 (x=50, y=50)
+    listeners['board_pointerdown']({
+      clientX: 50,
+      clientY: 50,
+      pointerId: 1,
+      target: { closest: () => null, classList: { contains: () => false } },
+    });
+
+    // 150ms 경과 (250ms 미만)
+    vi.advanceTimersByTime(150);
+
+    // 손 뗌 (pointerup)
+    listeners['board_pointerup']({
+      clientX: 50,
+      clientY: 50,
+    });
+
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'row', idx: 0 }),
+      'R90',
+    );
+  });
+
+  it('2단계: 250ms 이상 550ms 미만 누르고 손을 떼면 즉시 180도 회전(R180)이 단 1수로 발동해야 함', () => {
+    new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
+
+    listeners['board_pointerdown']({
+      clientX: 50,
+      clientY: 50,
+      pointerId: 1,
+      target: { closest: () => null, classList: { contains: () => false } },
+    });
+
+    // 350ms 경과 (250ms <= t < 550ms)
+    vi.advanceTimersByTime(350);
+
+    listeners['board_pointerup']({
+      clientX: 50,
+      clientY: 50,
+    });
+
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'row', idx: 0 }),
+      'R180',
+    );
+  });
+
+  it('3단계: 550ms 이상 누르고 있으면 550ms 도달 즉시 270도 회전(R270)이 자동 발동하고 손 뗄 때 중복 발동하지 않아야 함', () => {
+    new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
+
+    listeners['board_pointerdown']({
+      clientX: 50,
+      clientY: 50,
+      pointerId: 1,
+      target: { closest: () => null, classList: { contains: () => false } },
+    });
+
+    // 550ms 경과 시 자동 발동!
+    vi.advanceTimersByTime(550);
+
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'row', idx: 0 }),
+      'R270',
+    );
+
+    // 사용자가 손가락을 뗄 때 (pointerup) 추가 호출이 없어야 함
+    listeners['board_pointerup']({
+      clientX: 50,
+      clientY: 50,
+    });
+
+    expect(callback).toHaveBeenCalledTimes(1); // 여전히 1회
+  });
+
+  it('35px 이상 이동 시 홀드 회전이 취소되고 스와이프 반사(MX)가 발동해야 함', () => {
+    new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
+
+    listeners['board_pointerdown']({
+      clientX: 50,
+      clientY: 50,
+      pointerId: 1,
+      target: { closest: () => null, classList: { contains: () => false } },
+    });
+
+    // 가로로 50px 이동 (35px 초과)
+    listeners['board_pointermove']({
+      clientX: 100,
+      clientY: 50,
+    });
+
+    // 600ms가 지나도 롱프레스(R270)가 발동하지 않아야 함
+    vi.advanceTimersByTime(600);
+    expect(callback).not.toHaveBeenCalled();
+
+    // 손 떼는 순간 가로 스와이프 (MX) 발동
+    listeners['board_pointerup']({
+      clientX: 100,
+      clientY: 50,
+    });
+
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'row', idx: 0 }),
+      'MX',
+    );
+  });
+
+  it('1행1열 스위치(.tile-switch-11) 조작 시 제스처가 무시되어야 함', () => {
+    new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
+
+    const switchElem = {
+      closest: (selector: string) => (selector === '.tile-switch-11' ? {} : null),
+      classList: { contains: (cls: string) => cls === 'tile-switch-11' },
+    };
+
+    listeners['board_pointerdown']({
+      clientX: 50,
+      clientY: 50,
+      pointerId: 1,
+      target: switchElem,
+    });
+
+    vi.advanceTimersByTime(600);
+    listeners['board_pointerup']({
+      clientX: 50,
+      clientY: 50,
+    });
+
+    expect(callback).not.toHaveBeenCalled();
   });
 });
