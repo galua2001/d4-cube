@@ -653,18 +653,15 @@ describe('TutorialModal & Group Theory Core Logic (3단계 슬라이드 및 실�
       vi.advanceTimersByTime(400); // 600ms 시점
       expect(cell0?.classList.contains('tut-cell-rotating-90')).toBe(false);
 
-      // 2수: 31 성분 두 번 톡톡 -> 3행 180° 회전 (각 90°씩 순차 회전)
+      // 2수: 31 성분 짧게 두 번 톡톡 -> 3행 180° 즉시 회전 (단 1수!)
       ctrl.goToD4SubStep(2);
       const cell6 = document.getElementById('tut-cell-6');
-      vi.advanceTimersByTime(200);
-      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(true);
-      vi.advanceTimersByTime(320); // 520ms 시점
-      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(false);
-      vi.advanceTimersByTime(100); // 620ms 시점: 2회차 톡
-      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(true);
+      vi.advanceTimersByTime(200); // 1회차 톡
+      vi.advanceTimersByTime(300); // 500ms 시점: 2회차 톡 완료 ➔ 180° 회전 (R180) 발동
+      expect(cell6?.classList.contains('tut-cell-rotating-180')).toBe(true);
       expect(ctrl.boardOps[6]).toBe(D4.ID);
-      vi.advanceTimersByTime(360); // 980ms 시점
-      expect(cell6?.classList.contains('tut-cell-rotating-90')).toBe(false);
+      vi.advanceTimersByTime(480); // 980ms 시점: 회전 애니메이션 클래스 제거
+      expect(cell6?.classList.contains('tut-cell-rotating-180')).toBe(false);
 
       // 3수: 13 성분 세로 쓱 그을 때 ➔ 3열 전체([2, 5, 8]) 손가락 이동 속도에 맞춰 천천히 세로 플립
       ctrl.goToD4SubStep(3);

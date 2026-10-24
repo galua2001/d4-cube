@@ -538,7 +538,7 @@ export class TutorialModalController {
               <div class="tut-rule-item"><span>🎯</span> <span><b>게임 목표</b> : 뒤섞인 모든 타일을 <b>0번(항등원·정위치 앞면)</b>으로 완성</span></div>
               <div class="tut-rule-item"><span>📐</span> <span><b>행렬 컨트롤러</b> : 외곽 성분 타일(1~3행, 1~3열)을 조작하여 해당 라인의 행·열 대칭 변환</span></div>
               <div class="tut-rule-item"><span>🔄</span> <span><b>1행 1열 스위치</b> : [↔1행|↕1열] 탭으로 1행 ↔ 1열 조작 모드 자유 전환</span></div>
-              <div class="tut-rule-item"><span>🎮</span> <span><b>손동작 변환</b> : 톡(90°), 중간누름(180°), 길게누름(270°), 가로밀기(MX), 세로밀기(MY), 대각밀기(MD)</span></div>
+              <div class="tut-rule-item"><span>🎮</span> <span><b>손동작 변환</b> : 탭(90°), 더블탭(180°, 단 1수!), 롱프레스(270°), 가로밀기(MX), 세로밀기(MY), 대각밀기(MD)</span></div>
               <div class="tut-rule-item"><span>⚡</span> <span><b>반사 + 반사 = 회전</b> : MX ∘ MY = R180 (클라인 4원군 V4)</span></div>
               <div class="tut-rule-item"><span>🌌</span> <span><b>8차 정이면체군 D4</b> : 회전 4종(0°, 90°, 180°, 270°) + 반사 4종(MX, MY, MD, MAD)</span></div>
               <div class="tut-rule-item"><span>🧩</span> <span><b>V4 4수 최단 해법</b> : 3행 R180 ➔ 3열 MY ➔ 2행 MY ➔ 1행 R180 완성!</span></div>
@@ -1492,45 +1492,51 @@ export class TutorialModalController {
       this.d4AnimTimers.push(t1, t2);
 
     } else if (this.d4SubStep === 2) {
-      // 2수: 3행 1열 두 번 톡톡 -> 3행 전체([6, 7, 8]) 180° 회전!
+      // 2수: 3행 1열 짧게 두 번 톡톡 ➔ 3행 전체([6, 7, 8]) 180° 즉시 회전 (단 1수!)
       this.boardOps = [...D4_EXAMPLE_STEPS[1].boardOps];
       this.renderBoard();
 
-      // [1회 톡] t = 200ms: 3행 90° 회전
+      // [1회 톡] t = 200ms: 첫 번째 톡 사운드
       const t1 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 2) {
-          this.addCellAnimClass([6, 7, 8], 'tut-cell-rotating-90');
-          this.boardOps[6] = composeOps(D4_EXAMPLE_STEPS[1].boardOps[6], D4.R90);
-          this.boardOps[7] = composeOps(D4_EXAMPLE_STEPS[1].boardOps[7], D4.R90);
-          this.boardOps[8] = composeOps(D4_EXAMPLE_STEPS[1].boardOps[8], D4.R90);
-          this.renderBoard();
           soundEngine.playTap();
         }
       }, 200);
 
+      // [2회 톡] t = 500ms: 두 번째 톡 완료 ➔ 3행 전체 180° 회전 (R180) 및 180° 뱃지 팝업
       const t2 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 2) {
-          this.removeCellAnimClass([6, 7, 8], 'tut-cell-rotating-90');
-        }
-      }, 520);
-
-      // [2회 톡] t = 620ms: 3행 추가 90° 회전 (총 180° 회전 완성!)
-      const t3 = setTimeout(() => {
-        if (this.currentStep === 3 && this.d4SubStep === 2) {
-          this.addCellAnimClass([6, 7, 8], 'tut-cell-rotating-90');
+          this.addCellAnimClass([6, 7, 8], 'tut-cell-rotating-180');
           this.boardOps = [...D4_EXAMPLE_STEPS[2].boardOps];
           this.renderBoard();
           soundEngine.playTap();
-        }
-      }, 620);
 
-      const t4 = setTimeout(() => {
+          // 180° 뱃지 팝업 연출
+          const wrapper = document.getElementById('tut-board-wrapper');
+          const cell6 = document.getElementById('tut-cell-6');
+          if (wrapper && cell6 && typeof cell6.getBoundingClientRect === 'function' && typeof wrapper.getBoundingClientRect === 'function') {
+            const cRect = cell6.getBoundingClientRect();
+            const wRect = wrapper.getBoundingClientRect();
+            const badge = document.createElement('div');
+            badge.className = 'double-tap-badge';
+            badge.textContent = '180°';
+            badge.style.left = `${(cRect.left + cRect.width / 2) - wRect.left}px`;
+            badge.style.top = `${(cRect.top + cRect.height / 2) - wRect.top}px`;
+            wrapper.appendChild(badge);
+            setTimeout(() => {
+              if (badge.parentElement) badge.parentElement.removeChild(badge);
+            }, 600);
+          }
+        }
+      }, 500);
+
+      const t3 = setTimeout(() => {
         if (this.currentStep === 3 && this.d4SubStep === 2) {
-          this.removeCellAnimClass([6, 7, 8], 'tut-cell-rotating-90');
+          this.removeCellAnimClass([6, 7, 8], 'tut-cell-rotating-180');
         }
       }, 980);
 
-      this.d4AnimTimers.push(t1, t2, t3, t4);
+      this.d4AnimTimers.push(t1, t2, t3);
 
     } else if (this.d4SubStep === 3) {
       // 3수: 13 성분 세로 쓱 그을 때 손가락 이동 속도에 맞춰 천천히 3열([2, 5, 8]) 세로 반사 플립!

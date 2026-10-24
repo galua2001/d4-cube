@@ -20,19 +20,24 @@ export class GestureRecognizer {
   // 1-1 성분의 현재 모드 ('row': 1행 변환 모드, 'col': 1열 변환 모드)
   private cell11Mode: 'row' | 'col' = 'row';
 
-  // 누름 시간 추적 및 홀드 회전 인디케이터 관리
+  // 누름 시간 추적 및 롱프레스 / 더블탭 관리
   private pointerDownTime = 0;
-  private holdTimer: ReturnType<typeof setTimeout> | null = null;
+  private longPressTimer: ReturnType<typeof setTimeout> | null = null;
+  private isLongPressTriggered = false;
   private animFrameId: number | null = null;
-  private isHoldTriggered = false;
 
+  // 더블탭 시스템 (240ms 윈도우 내 두 번째 탭 시 R180 단 1회 발동)
+  private pendingTap: { target: LineTarget; r: number; c: number } | null = null;
+  private singleTapTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // 인디케이터 DOM 요소
   private indicatorEl: HTMLElement | null = null;
   private ringFillEl: SVGCircleElement | null = null;
   private badgeEl: HTMLElement | null = null;
 
   // 임계값 상수
-  private readonly THRESHOLD_STAGE1 = 250; // ms: 90° (0 ~ 249ms)
-  private readonly THRESHOLD_STAGE2 = 550; // ms: 180° (250 ~ 549ms), 550ms 이상 시 R270 자동 발동
+  public readonly DOUBLE_TAP_WINDOW = 240; // ms: 더블탭 인식 시간 창 (240ms)
+  public readonly LONG_PRESS_MS = 500; // ms: 롱프레스 도달 시 R270 자동 발동
   private readonly SWIPE_DISTANCE_THRESHOLD = 35; // px: 스와이프 전환 기준
   private readonly CIRCUMFERENCE = 213.6; // 2 * Math.PI * 34 (r = 34)
 
@@ -68,6 +73,7 @@ export class GestureRecognizer {
     this.isLocked = locked;
     if (locked) {
       this.cancelHold();
+      this.clearPendingTap();
     }
   }
 
@@ -132,7 +138,7 @@ export class GestureRecognizer {
   }
 
   /**
-   * 실시간 홀드 인디케이터 DOM 요소를 준비합니다.
+   * 실시간 롱프레스 인디케이터 DOM 요소를 준비합니다.
    */
   private ensureIndicator(): void {
     if (this.indicatorEl || typeof document === 'undefined') return;
@@ -143,10 +149,9 @@ export class GestureRecognizer {
     indicator.innerHTML = `
       <svg class="hold-ring-svg" viewBox="0 0 80 80">
         <circle class="hold-ring-bg" cx="40" cy="40" r="34" />
-        <circle class="hold-ring-marker-250" cx="40" cy="40" r="34" />
         <circle class="hold-ring-fill" cx="40" cy="40" r="34" />
       </svg>
-      <div class="hold-badge">90°</div>
+      <div class="hold-badge">270°</div>
     `;
 
     if (this.boardEl && typeof this.boardEl.appendChild === 'function') {
@@ -175,7 +180,7 @@ export class GestureRecognizer {
     this.indicatorEl.style.top = `${y}px`;
     this.indicatorEl.className = 'hold-indicator active';
     this.ringFillEl.style.strokeDashoffset = `${this.CIRCUMFERENCE}`;
-    this.badgeEl.textContent = '90°';
+    this.badgeEl.textContent = '270°';
 
     this.startIndicatorLoop();
   }
@@ -187,32 +192,17 @@ export class GestureRecognizer {
     }
 
     const update = () => {
-      if (!this.isPointerDown || this.isHoldTriggered) return;
+      if (!this.isPointerDown || this.isLongPressTriggered) return;
 
       const elapsed = Date.now() - this.pointerDownTime;
-
-      const progress = Math.min(1, elapsed / this.THRESHOLD_STAGE2);
+      const progress = Math.min(1, elapsed / this.LONG_PRESS_MS);
       const offset = this.CIRCUMFERENCE * (1 - progress);
 
       if (this.ringFillEl) {
         this.ringFillEl.style.strokeDashoffset = `${offset.toFixed(1)}`;
       }
 
-      if (this.indicatorEl && this.badgeEl) {
-        if (elapsed >= this.THRESHOLD_STAGE1) {
-          if (!this.indicatorEl.classList.contains('stage-180')) {
-            this.indicatorEl.classList.add('stage-180');
-            this.badgeEl.textContent = '180°';
-          }
-        } else {
-          if (this.indicatorEl.classList.contains('stage-180')) {
-            this.indicatorEl.classList.remove('stage-180');
-            this.badgeEl.textContent = '90°';
-          }
-        }
-      }
-
-      if (elapsed < this.THRESHOLD_STAGE2 && typeof requestAnimationFrame === 'function') {
+      if (elapsed < this.LONG_PRESS_MS && typeof requestAnimationFrame === 'function') {
         this.animFrameId = requestAnimationFrame(update);
       }
     };
@@ -223,11 +213,12 @@ export class GestureRecognizer {
   }
 
   /**
-   * 3단계 550ms 도달 시 R270을 자동 발동하고 팝업 번쩍 효과를 연출합니다.
+   * 500ms 도달 시 R270을 자동 발동하고 골드 번쩍 연출을 진행합니다.
    */
-  private triggerStage3(): void {
-    if (!this.isPointerDown || this.isHoldTriggered) return;
-    this.isHoldTriggered = true;
+  private triggerLongPress(): void {
+    if (!this.isPointerDown || this.isLongPressTriggered) return;
+    this.isLongPressTriggered = true;
+    this.clearPendingTap();
 
     if (this.animFrameId && typeof cancelAnimationFrame === 'function') {
       cancelAnimationFrame(this.animFrameId);
@@ -239,7 +230,6 @@ export class GestureRecognizer {
     }
 
     if (this.indicatorEl && this.badgeEl) {
-      this.indicatorEl.classList.remove('stage-180');
       this.indicatorEl.classList.add('stage-270', 'triggered');
       this.badgeEl.textContent = '270°';
     }
@@ -254,9 +244,9 @@ export class GestureRecognizer {
   }
 
   private hideIndicator(): void {
-    if (this.holdTimer) {
-      clearTimeout(this.holdTimer);
-      this.holdTimer = null;
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
     }
     if (this.animFrameId && typeof cancelAnimationFrame === 'function') {
       cancelAnimationFrame(this.animFrameId);
@@ -269,6 +259,35 @@ export class GestureRecognizer {
 
   private cancelHold(): void {
     this.hideIndicator();
+  }
+
+  public clearPendingTap(): void {
+    if (this.singleTapTimer) {
+      clearTimeout(this.singleTapTimer);
+      this.singleTapTimer = null;
+    }
+    this.pendingTap = null;
+  }
+
+  /**
+   * 더블탭 시 '180°' 뱃지를 산뜻하게 팝업 연출합니다.
+   */
+  private showBadgePopup(x: number, y: number, text = '180°'): void {
+    if (!this.boardEl || typeof document === 'undefined') return;
+
+    const badge = document.createElement('div');
+    badge.className = 'double-tap-badge';
+    badge.textContent = text;
+    badge.style.left = `${x}px`;
+    badge.style.top = `${y}px`;
+
+    this.boardEl.appendChild(badge);
+
+    setTimeout(() => {
+      if (badge.parentElement) {
+        badge.parentElement.removeChild(badge);
+      }
+    }, 600);
   }
 
   private bindEvents() {
@@ -332,7 +351,7 @@ export class GestureRecognizer {
       }
 
       this.isPointerDown = true;
-      this.isHoldTriggered = false;
+      this.isLongPressTriggered = false;
       this.startCell = { r, c, target };
       const startX = e.clientX ?? 0;
       const startY = e.clientY ?? 0;
@@ -356,11 +375,11 @@ export class GestureRecognizer {
 
       this.showIndicator(centerX, centerY);
 
-      // 3단계(550ms) 자동 발동 타이머 가동
-      if (this.holdTimer) clearTimeout(this.holdTimer);
-      this.holdTimer = setTimeout(() => {
-        this.triggerStage3();
-      }, this.THRESHOLD_STAGE2);
+      // 500ms 도달 시 R270 자동 발동 타이머 가동
+      if (this.longPressTimer) clearTimeout(this.longPressTimer);
+      this.longPressTimer = setTimeout(() => {
+        this.triggerLongPress();
+      }, this.LONG_PRESS_MS);
     });
 
     this.boardEl.addEventListener('pointermove', (e: any) => {
@@ -369,22 +388,23 @@ export class GestureRecognizer {
       const curY = e.clientY ?? 0;
       this.points.push({ x: curX, y: curY });
 
-      // 35px 이상 이동 시 홀드 인디케이터 숨김 및 스와이프 제스처 모드로 전환
+      // 35px 이상 이동 시 롱프레스 취소, 인디케이터 숨김 및 스와이프 제스처 모드로 전환
       if (this.points.length > 0) {
         const start = this.points[0];
         const dist = Math.hypot(curX - start.x, curY - start.y);
         if (dist >= this.SWIPE_DISTANCE_THRESHOLD) {
-          if (this.holdTimer) {
-            clearTimeout(this.holdTimer);
-            this.holdTimer = null;
+          if (this.longPressTimer) {
+            clearTimeout(this.longPressTimer);
+            this.longPressTimer = null;
           }
           if (this.animFrameId && typeof cancelAnimationFrame === 'function') {
             cancelAnimationFrame(this.animFrameId);
             this.animFrameId = null;
           }
-          if (this.indicatorEl && !this.isHoldTriggered) {
+          if (this.indicatorEl && !this.isLongPressTriggered) {
             this.hideIndicator();
           }
+          this.clearPendingTap();
         }
       }
 
@@ -392,9 +412,9 @@ export class GestureRecognizer {
     });
 
     const handleEnd = (e: any) => {
-      if (this.holdTimer) {
-        clearTimeout(this.holdTimer);
-        this.holdTimer = null;
+      if (this.longPressTimer) {
+        clearTimeout(this.longPressTimer);
+        this.longPressTimer = null;
       }
       if (this.animFrameId && typeof cancelAnimationFrame === 'function') {
         cancelAnimationFrame(this.animFrameId);
@@ -410,9 +430,9 @@ export class GestureRecognizer {
 
       this.isPointerDown = false;
 
-      // 3단계(550ms)로 R270이 이미 자동 발동된 경우 추가 회전 없이 인디케이터만 정리
-      if (this.isHoldTriggered) {
-        this.isHoldTriggered = false;
+      // 500ms 롱프레스로 R270이 이미 자동 발동된 경우 추가 회전 없이 정리
+      if (this.isLongPressTriggered) {
+        this.isLongPressTriggered = false;
         this.hideIndicator();
         this.clearTrail();
         return;
@@ -426,29 +446,51 @@ export class GestureRecognizer {
       const dist = Math.hypot(dx, dy);
 
       const target = this.startCell.target;
-      const nowTime = Date.now();
-      const elapsed = nowTime - this.pointerDownTime;
+      const { r, c } = this.startCell;
+
+      let centerX = start.x;
+      let centerY = start.y;
+      if (typeof this.boardEl.getBoundingClientRect === 'function') {
+        const rect = this.boardEl.getBoundingClientRect();
+        centerX = start.x - rect.left;
+        centerY = start.y - rect.top;
+      }
 
       this.hideIndicator();
       this.clearTrail();
 
       // ========================================================
-      // 1. 누르는 시간(Press Duration) 기반 회전 판정 (이동거리 < 35px):
-      //    - 0 <= t < 250ms: 손 떼는 순간 즉시 R90 (1수)
-      //    - 250ms <= t < 550ms: 손 떼는 순간 즉시 R180 (1수)
+      // 1. 탭 및 더블탭 판정 (이동거리 < 35px):
+      //    - 240ms 이내 동일한 타일 재터치(pointerup) 시 ➔ R180 단 1수 즉시 발동 및 팝업 연출!
+      //    - 첫 번째 탭 ➔ 240ms 대기 후 R90 1수 발동 (두 번째 탭 없으면)
       // ========================================================
       if (dist < this.SWIPE_DISTANCE_THRESHOLD) {
-        if (elapsed < this.THRESHOLD_STAGE1) {
-          this.onAction(target, 'R90');
-        } else {
+        // 이미 대기 중인 pendingTap이 있고, 동일한 타일(r, c)인 경우 ➔ 더블 탭 성공!
+        if (this.pendingTap && this.pendingTap.r === r && this.pendingTap.c === c) {
+          this.clearPendingTap();
           this.onAction(target, 'R180');
+          this.showBadgePopup(centerX, centerY, '180°');
+          return;
         }
+
+        // 첫 번째 탭: 240ms 타이머 시작 및 pendingTap 등록
+        this.clearPendingTap();
+        this.pendingTap = { target, r, c };
+        this.singleTapTimer = setTimeout(() => {
+          if (this.pendingTap) {
+            this.onAction(this.pendingTap.target, 'R90');
+            this.pendingTap = null;
+          }
+          this.singleTapTimer = null;
+        }, this.DOUBLE_TAP_WINDOW);
+
         return;
       }
 
       // ========================================================
       // 2. 스와이프 제스처 판정 (이동거리 >= 35px)
       // ========================================================
+      this.clearPendingTap();
       const angleDeg = (Math.atan2(dy, dx) * 180) / Math.PI;
 
       // 가로 스와이프: 상하 반전 (MX)

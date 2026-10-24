@@ -86,7 +86,7 @@ describe('GestureRecognizer - allowDiagonal 및 컨트롤러 성분 매핑 검�
   });
 });
 
-describe('GestureRecognizer - 누르는 시간 기반 3단계 회전 조작 시스템 검증', () => {
+describe('GestureRecognizer - 더블탭 1수 R180 / 단일탭 R90 / 롱프레스 R270 시스템 검증', () => {
   let mockBoard: any;
   let mockCanvas: any;
   let callback: ReturnType<typeof vi.fn>;
@@ -132,7 +132,7 @@ describe('GestureRecognizer - 누르는 시간 기반 3단계 회전 조작 시�
     vi.unstubAllGlobals();
   });
 
-  it('1단계: 250ms 미만 누르고 손을 떼면 즉시 90도 회전(R90)이 단 1수로 발동해야 함', () => {
+  it('단일 탭(Single Tap): 손을 뗀 후 240ms 동안 추가 탭이 없으면 90도 회전(R90)이 단 1수로 발동해야 함', () => {
     new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
 
     // 0,0 셀 (1행) 누름 시작 (x=50, y=50)
@@ -143,15 +143,20 @@ describe('GestureRecognizer - 누르는 시간 기반 3단계 회전 조작 시�
       target: { closest: () => null, classList: { contains: () => false } },
     });
 
-    // 150ms 경과 (250ms 미만)
-    vi.advanceTimersByTime(150);
-
-    // 손 뗌 (pointerup)
+    // 50ms 후 손 뗌 (pointerup)
+    vi.advanceTimersByTime(50);
     listeners['board_pointerup']({
       clientX: 50,
       clientY: 50,
     });
 
+    // 더블탭 인식 대기 중이므로 아직 발동되지 않아야 함
+    expect(callback).not.toHaveBeenCalled();
+
+    // 240ms 경과 (윈도우 만료)
+    vi.advanceTimersByTime(240);
+
+    // R90 발동 확인
     expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'row', idx: 0 }),
@@ -159,32 +164,51 @@ describe('GestureRecognizer - 누르는 시간 기반 3단계 회전 조작 시�
     );
   });
 
-  it('2단계: 250ms 이상 550ms 미만 누르고 손을 떼면 즉시 180도 회전(R180)이 단 1수로 발동해야 함', () => {
+  it('더블 탭(Double Tap): 240ms 이내에 동일한 타일(r, c)을 다시 탭하면 R90 예약이 취소되고 즉시 180도 회전(R180)이 단 1수로 발동해야 함', () => {
     new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
 
+    // 첫 번째 탭 (누름 -> 뗌)
     listeners['board_pointerdown']({
       clientX: 50,
       clientY: 50,
       pointerId: 1,
       target: { closest: () => null, classList: { contains: () => false } },
     });
-
-    // 350ms 경과 (250ms <= t < 550ms)
-    vi.advanceTimersByTime(350);
-
+    vi.advanceTimersByTime(40);
     listeners['board_pointerup']({
       clientX: 50,
       clientY: 50,
     });
 
+    expect(callback).not.toHaveBeenCalled();
+
+    // 100ms 후 두 번째 탭 (240ms 윈도우 이내)
+    vi.advanceTimersByTime(100);
+    listeners['board_pointerdown']({
+      clientX: 50,
+      clientY: 50,
+      pointerId: 1,
+      target: { closest: () => null, classList: { contains: () => false } },
+    });
+    vi.advanceTimersByTime(40);
+    listeners['board_pointerup']({
+      clientX: 50,
+      clientY: 50,
+    });
+
+    // 즉시 R180이 단 1회 발동해야 함
     expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'row', idx: 0 }),
       'R180',
     );
+
+    // 이후 시간이 한참 지나도 R90이 추가 호출되지 않아야 함 (총 1회 유지)
+    vi.advanceTimersByTime(500);
+    expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('3단계: 550ms 이상 누르고 있으면 550ms 도달 즉시 270도 회전(R270)이 자동 발동하고 손 뗄 때 중복 발동하지 않아야 함', () => {
+  it('롱 프레스(Long Press): 500ms 이상 누르고 있으면 500ms 도달 즉시 270도 회전(R270)이 자동 발동하고 손 뗄 때 중복 발동하지 않아야 함', () => {
     new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
 
     listeners['board_pointerdown']({
@@ -194,8 +218,8 @@ describe('GestureRecognizer - 누르는 시간 기반 3단계 회전 조작 시�
       target: { closest: () => null, classList: { contains: () => false } },
     });
 
-    // 550ms 경과 시 자동 발동!
-    vi.advanceTimersByTime(550);
+    // 500ms 경과 시 즉시 자동 발동!
+    vi.advanceTimersByTime(500);
 
     expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith(
@@ -212,7 +236,7 @@ describe('GestureRecognizer - 누르는 시간 기반 3단계 회전 조작 시�
     expect(callback).toHaveBeenCalledTimes(1); // 여전히 1회
   });
 
-  it('35px 이상 이동 시 홀드 회전이 취소되고 스와이프 반사(MX)가 발동해야 함', () => {
+  it('35px 이상 이동 시 롱프레스 및 탭 예약이 취소되고 스와이프 반사(MX)가 발동해야 함', () => {
     new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
 
     listeners['board_pointerdown']({
@@ -228,7 +252,7 @@ describe('GestureRecognizer - 누르는 시간 기반 3단계 회전 조작 시�
       clientY: 50,
     });
 
-    // 600ms가 지나도 롱프레스(R270)가 발동하지 않아야 함
+    // 600ms가 지나도 롱프레스(R270)나 탭(R90)이 발동하지 않아야 함
     vi.advanceTimersByTime(600);
     expect(callback).not.toHaveBeenCalled();
 
