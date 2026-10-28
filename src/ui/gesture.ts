@@ -23,6 +23,7 @@ export class GestureRecognizer {
   // 누름 시간 추적 및 롱프레스 / 더블탭 관리
   private pointerDownTime = 0;
   private holdTimer: ReturnType<typeof setTimeout> | null = null;
+  private indicatorTimer: ReturnType<typeof setTimeout> | null = null;
   private isHoldTriggered = false;
   private animFrameId: number | null = null;
 
@@ -36,7 +37,8 @@ export class GestureRecognizer {
   private badgeEl: HTMLElement | null = null;
 
   // 임계값 상수
-  public readonly STAGE1_HOLD_MS = 250; // ms: 180° 전환 기준 누름 시간
+  public readonly INDICATOR_DELAY_MS = 220; // ms: 손대고 가만히 머물러 있을 때만 인디케이터 표시 (220ms 지연)
+  public readonly STAGE1_HOLD_MS = 250; // ms: 하위 호환용
   public readonly STAGE2_HOLD_MS = 550; // ms: 270° 도달 시 자동 발동 시간
   public readonly DOUBLE_TAP_WINDOW = 240; // ms: 더블탭 인식 시간 창 (240ms)
   public readonly LONG_PRESS_MS = 550; // 하위 호환용 (STAGE2_HOLD_MS와 동일)
@@ -151,10 +153,9 @@ export class GestureRecognizer {
     indicator.innerHTML = `
       <svg class="hold-ring-svg" viewBox="0 0 80 80">
         <circle class="hold-ring-bg" cx="40" cy="40" r="34" />
-        <circle class="hold-ring-marker-250" cx="40" cy="40" r="34" />
         <circle class="hold-ring-fill" cx="40" cy="40" r="34" />
       </svg>
-      <div class="hold-badge">90°</div>
+      <div class="hold-badge">270°</div>
     `;
 
     if (this.boardEl && typeof this.boardEl.appendChild === 'function') {
@@ -174,6 +175,7 @@ export class GestureRecognizer {
 
   /**
    * 터치된 셀 중심에 실시간 원형 게이지 인디케이터를 띄우고 루프를 가동합니다.
+   * (220ms 이상 누르고 있을 때만 호출됨)
    */
   private showIndicator(x: number, y: number): void {
     this.ensureIndicator();
@@ -181,15 +183,15 @@ export class GestureRecognizer {
 
     this.indicatorEl.style.left = `${x}px`;
     this.indicatorEl.style.top = `${y}px`;
-    this.indicatorEl.className = 'hold-indicator active';
+    this.indicatorEl.className = 'hold-indicator active stage-270';
     this.ringFillEl.style.strokeDashoffset = `${this.CIRCUMFERENCE}`;
-    this.badgeEl.textContent = '90°';
+    this.badgeEl.textContent = '270°';
 
     this.startIndicatorLoop();
   }
 
   /**
-   * 0 ~ 250ms (90° 스카이블루) ➔ 250 ~ 550ms (180° 퍼플) ➔ 550ms (270° 골드 자동 발동)
+   * 220ms 지연 후 550ms까지 원형 게이지가 차오르며 550ms 도달 시 270° 자동 발동
    */
   private startIndicatorLoop(): void {
     if (this.animFrameId && typeof cancelAnimationFrame === 'function') {
@@ -206,19 +208,6 @@ export class GestureRecognizer {
 
       if (this.ringFillEl) {
         this.ringFillEl.style.strokeDashoffset = `${offset.toFixed(1)}`;
-      }
-
-      // 게이지 단계별 시각 피드백 (0~250ms: 90°, 250~550ms: 180°)
-      if (this.indicatorEl && this.badgeEl) {
-        if (elapsed >= this.STAGE1_HOLD_MS) {
-          if (!this.indicatorEl.classList.contains('stage-180')) {
-            this.indicatorEl.classList.add('stage-180');
-          }
-          this.badgeEl.textContent = '180°';
-        } else {
-          this.indicatorEl.classList.remove('stage-180', 'stage-270');
-          this.badgeEl.textContent = '90°';
-        }
       }
 
       if (elapsed >= this.STAGE2_HOLD_MS) {
@@ -244,6 +233,10 @@ export class GestureRecognizer {
     this.isHoldTriggered = true;
     this.clearPendingTap();
 
+    if (this.indicatorTimer) {
+      clearTimeout(this.indicatorTimer);
+      this.indicatorTimer = null;
+    }
     if (this.holdTimer) {
       clearTimeout(this.holdTimer);
       this.holdTimer = null;
@@ -253,13 +246,14 @@ export class GestureRecognizer {
       this.animFrameId = null;
     }
 
+    this.ensureIndicator();
+
     if (this.ringFillEl) {
       this.ringFillEl.style.strokeDashoffset = '0';
     }
 
     if (this.indicatorEl && this.badgeEl) {
-      this.indicatorEl.classList.remove('stage-180');
-      this.indicatorEl.classList.add('stage-270', 'triggered');
+      this.indicatorEl.className = 'hold-indicator active stage-270 triggered';
       this.badgeEl.textContent = '270°';
     }
 
@@ -273,6 +267,10 @@ export class GestureRecognizer {
   }
 
   private hideIndicator(): void {
+    if (this.indicatorTimer) {
+      clearTimeout(this.indicatorTimer);
+      this.indicatorTimer = null;
+    }
     if (this.holdTimer) {
       clearTimeout(this.holdTimer);
       this.holdTimer = null;
@@ -407,7 +405,16 @@ export class GestureRecognizer {
         }
       }
 
-      this.showIndicator(centerX, centerY);
+      // 인디케이터 표시 220ms 지연 (손대고 가만히 머물러 있을 때만 인디케이터 표시)
+      if (this.indicatorTimer) {
+        clearTimeout(this.indicatorTimer);
+        this.indicatorTimer = null;
+      }
+      this.indicatorTimer = setTimeout(() => {
+        if (this.isPointerDown && !this.isHoldTriggered) {
+          this.showIndicator(centerX, centerY);
+        }
+      }, this.INDICATOR_DELAY_MS);
 
       // 550ms 도달 시 R270 자동 발동 타이머 가동 (rAF 보완용 타이머)
       if (this.holdTimer) clearTimeout(this.holdTimer);
@@ -422,11 +429,15 @@ export class GestureRecognizer {
       const curY = e.clientY ?? 0;
       this.points.push({ x: curX, y: curY });
 
-      // 35px 이상 이동 시 롱프레스 취소, 인디케이터 숨김 및 스와이프 제스처 모드로 전환
+      // 35px 이상 이동 시 롱프레스 취소, 인디케이터 취소/숨김 및 스와이프 제스처 모드로 전환
       if (this.points.length > 0) {
         const start = this.points[0];
         const dist = Math.hypot(curX - start.x, curY - start.y);
         if (dist >= this.SWIPE_DISTANCE_THRESHOLD) {
+          if (this.indicatorTimer) {
+            clearTimeout(this.indicatorTimer);
+            this.indicatorTimer = null;
+          }
           if (this.holdTimer) {
             clearTimeout(this.holdTimer);
             this.holdTimer = null;
@@ -446,6 +457,10 @@ export class GestureRecognizer {
     });
 
     const handleCancel = () => {
+      if (this.indicatorTimer) {
+        clearTimeout(this.indicatorTimer);
+        this.indicatorTimer = null;
+      }
       if (this.holdTimer) {
         clearTimeout(this.holdTimer);
         this.holdTimer = null;
@@ -463,6 +478,10 @@ export class GestureRecognizer {
     };
 
     const handleEnd = (e: any) => {
+      if (this.indicatorTimer) {
+        clearTimeout(this.indicatorTimer);
+        this.indicatorTimer = null;
+      }
       if (this.holdTimer) {
         clearTimeout(this.holdTimer);
         this.holdTimer = null;
@@ -489,7 +508,6 @@ export class GestureRecognizer {
         return;
       }
 
-      const elapsed = Date.now() - this.pointerDownTime;
       const start = this.points[0] || { x: 0, y: 0 };
       const endX = (e.clientX !== undefined) ? e.clientX : start.x;
       const endY = (e.clientY !== undefined) ? e.clientY : start.y;
@@ -512,18 +530,9 @@ export class GestureRecognizer {
       this.clearTrail();
 
       // ========================================================
-      // 1. 탭 및 홀드 판정 (이동거리 < 35px):
+      // 1. 탭 판정 (이동거리 < 35px): 오직 더블탭만 180° 회전!
       // ========================================================
       if (dist < this.SWIPE_DISTANCE_THRESHOLD) {
-        // 2) 누른 시간 t >= 250ms 인 경우 (180도까지 누르고 뗐을 때!)
-        if (elapsed >= this.STAGE1_HOLD_MS) {
-          this.clearPendingTap();
-          this.onAction(target, 'R180');
-          this.showBadgePopup(centerX, centerY, '180°');
-          return;
-        }
-
-        // 3) 누른 시간 t < 250ms 인 경우:
         // 동일 셀에서 240ms 이내 이전 탭이 있었으면 (짧게 두 번 톡톡) ➔ R180 단 1수 발동!
         if (this.pendingTap && this.pendingTap.r === r && this.pendingTap.c === c) {
           this.clearPendingTap();

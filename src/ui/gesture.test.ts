@@ -110,6 +110,22 @@ describe('GestureRecognizer - D4 하이브리드 회전 조작 시스템 및 제
       cancelAnimationFrame: vi.fn((id: any) => clearTimeout(id)),
     });
 
+    vi.stubGlobal('document', {
+      createElement: vi.fn(() => ({
+        className: '',
+        id: '',
+        innerHTML: '',
+        style: {} as any,
+        querySelector: vi.fn(() => ({ style: {} })),
+        classList: {
+          contains: vi.fn(),
+          add: vi.fn(),
+          remove: vi.fn(),
+        },
+        appendChild: vi.fn(),
+      })),
+    });
+
     mockBoard = {
       addEventListener: vi.fn((event: string, handler: Function) => {
         listeners[`board_${event}`] = handler;
@@ -212,7 +228,7 @@ describe('GestureRecognizer - D4 하이브리드 회전 조작 시스템 및 제
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('250ms 누르고 뗐을 때 180도 회전(R180) 발동: 250ms 이상 누른 뒤 손을 떼면 단 1수로 즉시 180도 회전해야 함', () => {
+  it('180도 시간 판정 제거 및 더블탭 전용 한정: 250ms~540ms 동안 누르고 떼더라도 180도가 발동하지 않고 단일 탭(240ms 후 R90)으로 처리되어야 함', () => {
     new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
 
     listeners['board_pointerdown']({
@@ -222,23 +238,69 @@ describe('GestureRecognizer - D4 하이브리드 회전 조작 시스템 및 제
       target: { closest: () => null, classList: { contains: () => false } },
     });
 
-    // 280ms 누른 후 손 뗌 (250ms 이상 550ms 미만)
+    // 280ms 누른 후 손 뗌 (과거 180도 시간 판정 기준이었으나 지금은 제거됨)
     vi.advanceTimersByTime(280);
     listeners['board_pointerup']({
       clientX: 50,
       clientY: 50,
     });
 
-    // 즉시 R180 단 1수 발동 확인
+    // 손 뗀 직후(이전 탭 없음) 180도(R180)가 즉시 발동하지 않아야 함
+    expect(callback).not.toHaveBeenCalled();
+
+    // 단일 탭 윈도우(240ms) 경과 후 R90으로 정상 발동 확인
+    vi.advanceTimersByTime(240);
     expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'row', idx: 0 }),
-      'R180',
+      'R90',
     );
+  });
 
-    // 이후 시간이 지나도 R90이나 R270이 추가 호출되지 않아야 함
-    vi.advanceTimersByTime(600);
-    expect(callback).toHaveBeenCalledTimes(1);
+  it('인디케이터 표시 220ms 지연 검증: pointerdown 후 220ms 미만에서는 인디케이터가 표시되지 않고, 220ms 도달 시 표시되어야 함', () => {
+    const gesture = new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
+
+    listeners['board_pointerdown']({
+      clientX: 50,
+      clientY: 50,
+      pointerId: 1,
+      target: { closest: () => null, classList: { contains: () => false } },
+    });
+
+    // 100ms 경과: 220ms 미만이므로 인디케이터 엘리먼트가 아직 DOM에 붙지 않음
+    vi.advanceTimersByTime(100);
+    const indicatorElBefore = (gesture as any).indicatorEl;
+    expect(indicatorElBefore).toBeNull();
+
+    // 220ms 경과 시점에 인디케이터가 비로소 생성 및 표시(active)되어야 함
+    vi.advanceTimersByTime(120);
+    const indicatorElAfter = (gesture as any).indicatorEl;
+    expect(indicatorElAfter).not.toBeNull();
+    expect(indicatorElAfter.className).toContain('active');
+    expect(indicatorElAfter.className).toContain('stage-270');
+  });
+
+  it('스와이프 시 인디케이터 미표시 검증: 터치 후 220ms 이내에 35px 이상 스와이프하면 인디케이터 예약이 취소되어 인디케이터가 뜨지 않아야 함', () => {
+    const gesture = new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
+
+    listeners['board_pointerdown']({
+      clientX: 50,
+      clientY: 50,
+      pointerId: 1,
+      target: { closest: () => null, classList: { contains: () => false } },
+    });
+
+    // 50ms 후 35px 이상 가로 이동 (스와이프)
+    vi.advanceTimersByTime(50);
+    listeners['board_pointermove']({
+      clientX: 90,
+      clientY: 50,
+    });
+
+    // 220ms가 훨씬 지난 후(총 300ms)에도 인디케이터가 생성되거나 활성화되지 않아야 함
+    vi.advanceTimersByTime(250);
+    const indicatorEl = (gesture as any).indicatorEl;
+    expect(indicatorEl).toBeNull();
   });
 
   it('550ms 롱 프레스(Long Press): 550ms 도달 즉시 270도 회전(R270)이 자동 발동하고 손 뗄 때 중복 발동하지 않아야 함', () => {
