@@ -196,7 +196,7 @@ export const translations: Record<Lang, Record<string, any>> = {
     // Tutorial Step 3
     'tutorial.step3Name': 'STEP 3. [D4 Practice] Dihedral Group D4 5-Move Master Solution',
     'tutorial.step3Main': 'D4 mode uses 8 transformations: 4 rotations (0°, 90°, 180°, 270°) and 4 reflections (Horizontal, Vertical, Main Diag, Anti-Diag)!',
-    'tutorial.step3Sub': '👆 Press [Move 1] ~ [Move 5] buttons or [▶ Step by Step]! 💡 [D4 Rotation Controls]: Tap ➔ 90° | Quick Double-Tap ➔ 180° (1 Move!) | Long Press ➔ 270° (1 Move!)',
+    'tutorial.step3Sub': '👆 Press [Move 1] ~ [Move 5] buttons or [▶ Step by Step]! 💡 [D4 Rotation]: Tap ➔ 90° | Double-tap or Hold to 180° ➔ 180° | Hold longer ➔ 270° (1 Move!)',
     'tutorial.step3TTS': 'D4 mode uses rotations and diagonal symmetries. Enjoy this fascinating five-move solution!',
 
     'tutorial.d4Step0Label': 'Initial',
@@ -213,9 +213,9 @@ export const translations: Record<Lang, Record<string, any>> = {
 
     'tutorial.d4Step2Label': 'Move 2',
     'tutorial.d4Step2Badge': '⚡ Move 2: Row 3 180° Rotation',
-    'tutorial.d4Step2Text': 'Quick double-tap Row 3 Col 1 (31) 👆👆 ➔ Row 3 180° Rotation (R180)',
+    'tutorial.d4Step2Text': 'Row 3 Col 1 (31) Double-tap or Hold to 180° ➔ Row 3 180° Rotation (R180)',
     'tutorial.d4Step2Desc': 'Quickly double-tapping 31 rotates all of Row 3 by 180° in just 1 move, cancelling the tile back to 0!',
-    'tutorial.d4Step2Bubble': '31 Quick Double-Tap (180° in 1 Move!)',
+    'tutorial.d4Step2Bubble': '31 Double-tap or Hold to 180° (180° in 1 Move!)',
 
     'tutorial.d4Step3Label': 'Move 3',
     'tutorial.d4Step3Badge': '⚡ Move 3: Col 3 Vertical Reflection',
@@ -437,7 +437,7 @@ export const translations: Record<Lang, Record<string, any>> = {
     // Tutorial Step 3
     'tutorial.step3Name': 'STEP 3. [D4 실전] 8차 정이면체군 D4 5수 묘수 풀이',
     'tutorial.step3Main': 'D4 모드는 회전 4종(0°, 90°, 180°, 270°)과 반사 4종(가로, 세로, 주대각, 부대각) 총 8가지 변환을 사용해요!',
-    'tutorial.step3Sub': '👆 [1수] ~ [5수] 버튼이나 [▶ 한 수씩 보기] 클릭! 💡 [D4 전용 회전 조작]: 한 번 톡 ➔ 90° | 짧게 두 번 톡톡 ➔ 180° (단 1수!) | 길게 누름 ➔ 270° (단 1수!)',
+    'tutorial.step3Sub': '👆 [1수] ~ [5수] 버튼이나 [▶ 한 수씩 보기] 클릭! 💡 [D4 전용 회전]: 톡 ➔ 90° | 톡톡 또는 180°까지 누름 ➔ 180° | 더 길게 누름 ➔ 270° (단 1수!)',
     'tutorial.step3TTS': '디포 모드는 회전과 대각선 대칭까지 모두 사용해요. 다섯 수 만에 완성되는 신기한 해법을 함께 즐겨보세요!',
 
     'tutorial.d4Step0Label': '초기',
@@ -454,9 +454,9 @@ export const translations: Record<Lang, Record<string, any>> = {
 
     'tutorial.d4Step2Label': '2수',
     'tutorial.d4Step2Badge': '⚡ 2수: 3행 180° 회전',
-    'tutorial.d4Step2Text': '3행 1열(31) 짧게 두 번 톡톡 👆👆 ➔ 3행 180° 회전 (R180)',
+    'tutorial.d4Step2Text': '3행 1열(31) 톡톡 또는 180°까지 누름 ➔ 3행 180° 회전 (R180)',
     'tutorial.d4Step2Desc': '3행 1열을 짧게 두 번 톡톡 치면 3행 전체가 180° 즉시 회전하여 단 1수 만에 0번으로 상쇄!',
-    'tutorial.d4Step2Bubble': '31 짧게 두 번 톡톡 (180° 단 1수!)',
+    'tutorial.d4Step2Bubble': '31 톡톡 또는 180°까지 누름 (180° 단 1수!)',
 
     'tutorial.d4Step3Label': '3수',
     'tutorial.d4Step3Badge': '⚡ 3수: 3열 세로 반사',

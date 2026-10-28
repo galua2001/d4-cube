@@ -1492,7 +1492,7 @@ export class TutorialModalController {
       this.d4AnimTimers.push(t1, t2);
 
     } else if (this.d4SubStep === 2) {
-      // 2수: 3행 1열 짧게 두 번 톡톡 ➔ 3행 전체([6, 7, 8]) 180° 즉시 회전 (단 1수!)
+      // 2수: 3행 1열 톡톡 또는 180°까지 누름 ➔ 3행 전체([6, 7, 8]) 180° 회전 (R180)
       this.boardOps = [...D4_EXAMPLE_STEPS[1].boardOps];
       this.renderBoard();
 

@@ -430,6 +430,9 @@ body {
   border: 2px solid var(--border-strong);
   box-shadow: var(--board-shadow);
   touch-action: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
   perspective: 1000px;
   transform-style: preserve-3d;
 }

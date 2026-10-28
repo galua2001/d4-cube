@@ -31,6 +31,10 @@ describe('GestureRecognizer - allowDiagonal 및 컨트롤러 성분 매핑 검�
     callback = vi.fn();
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('기본 모드(allowDiagonal: false)에서는 오직 외곽 5곳만 컨트롤러로 인식해야 함', () => {
     const gesture = new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
     expect(gesture.isDiagonalAllowed()).toBe(false);
@@ -86,7 +90,7 @@ describe('GestureRecognizer - allowDiagonal 및 컨트롤러 성분 매핑 검�
   });
 });
 
-describe('GestureRecognizer - 더블탭 1수 R180 / 단일탭 R90 / 롱프레스 R270 시스템 검증', () => {
+describe('GestureRecognizer - D4 하이브리드 회전 조작 시스템 및 제스처 안전성 검증', () => {
   let mockBoard: any;
   let mockCanvas: any;
   let callback: ReturnType<typeof vi.fn>;
@@ -153,7 +157,7 @@ describe('GestureRecognizer - 더블탭 1수 R180 / 단일탭 R90 / 롱프레스
     // 더블탭 인식 대기 중이므로 아직 발동되지 않아야 함
     expect(callback).not.toHaveBeenCalled();
 
-    // 240ms 경과 (윈도우 만료)
+    // 240ms 경과 (더블탭 대기 시간 만료)
     vi.advanceTimersByTime(240);
 
     // R90 발동 확인
@@ -164,10 +168,10 @@ describe('GestureRecognizer - 더블탭 1수 R180 / 단일탭 R90 / 롱프레스
     );
   });
 
-  it('더블 탭(Double Tap): 240ms 이내에 동일한 타일(r, c)을 다시 탭하면 R90 예약이 취소되고 즉시 180도 회전(R180)이 단 1수로 발동해야 함', () => {
+  it('톡톡 더블 탭(Double Tap): 240ms 이내에 동일한 타일(r, c)을 다시 탭하면 즉시 180도 회전(R180)이 단 1수로 발동해야 함', () => {
     new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
 
-    // 첫 번째 탭 (누름 -> 뗌)
+    // 첫 번째 탭 (누름 40ms -> 뗌)
     listeners['board_pointerdown']({
       clientX: 50,
       clientY: 50,
@@ -182,7 +186,7 @@ describe('GestureRecognizer - 더블탭 1수 R180 / 단일탭 R90 / 롱프레스
 
     expect(callback).not.toHaveBeenCalled();
 
-    // 100ms 후 두 번째 탭 (240ms 윈도우 이내)
+    // 100ms 후 두 번째 탭 (240ms 윈도우 이내, 누름 40ms -> 뗌)
     vi.advanceTimersByTime(100);
     listeners['board_pointerdown']({
       clientX: 50,
@@ -203,12 +207,12 @@ describe('GestureRecognizer - 더블탭 1수 R180 / 단일탭 R90 / 롱프레스
       'R180',
     );
 
-    // 이후 시간이 한참 지나도 R90이 추가 호출되지 않아야 함 (총 1회 유지)
+    // 이후 시간이 지나도 R90이 추가 호출되지 않아야 함
     vi.advanceTimersByTime(500);
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('롱 프레스(Long Press): 500ms 이상 누르고 있으면 500ms 도달 즉시 270도 회전(R270)이 자동 발동하고 손 뗄 때 중복 발동하지 않아야 함', () => {
+  it('250ms 누르고 뗐을 때 180도 회전(R180) 발동: 250ms 이상 누른 뒤 손을 떼면 단 1수로 즉시 180도 회전해야 함', () => {
     new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
 
     listeners['board_pointerdown']({
@@ -218,8 +222,37 @@ describe('GestureRecognizer - 더블탭 1수 R180 / 단일탭 R90 / 롱프레스
       target: { closest: () => null, classList: { contains: () => false } },
     });
 
-    // 500ms 경과 시 즉시 자동 발동!
-    vi.advanceTimersByTime(500);
+    // 280ms 누른 후 손 뗌 (250ms 이상 550ms 미만)
+    vi.advanceTimersByTime(280);
+    listeners['board_pointerup']({
+      clientX: 50,
+      clientY: 50,
+    });
+
+    // 즉시 R180 단 1수 발동 확인
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'row', idx: 0 }),
+      'R180',
+    );
+
+    // 이후 시간이 지나도 R90이나 R270이 추가 호출되지 않아야 함
+    vi.advanceTimersByTime(600);
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it('550ms 롱 프레스(Long Press): 550ms 도달 즉시 270도 회전(R270)이 자동 발동하고 손 뗄 때 중복 발동하지 않아야 함', () => {
+    new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
+
+    listeners['board_pointerdown']({
+      clientX: 50,
+      clientY: 50,
+      pointerId: 1,
+      target: { closest: () => null, classList: { contains: () => false } },
+    });
+
+    // 550ms 경과 시 즉시 자동 발동!
+    vi.advanceTimersByTime(550);
 
     expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith(
@@ -233,7 +266,7 @@ describe('GestureRecognizer - 더블탭 1수 R180 / 단일탭 R90 / 롱프레스
       clientY: 50,
     });
 
-    expect(callback).toHaveBeenCalledTimes(1); // 여전히 1회
+    expect(callback).toHaveBeenCalledTimes(1); // 여전히 1회 유지
   });
 
   it('35px 이상 이동 시 롱프레스 및 탭 예약이 취소되고 스와이프 반사(MX)가 발동해야 함', () => {
@@ -267,6 +300,38 @@ describe('GestureRecognizer - 더블탭 1수 R180 / 단일탭 R90 / 롱프레스
       expect.objectContaining({ type: 'row', idx: 0 }),
       'MX',
     );
+  });
+
+  it('모바일 롱프레스 컨텍스트 메뉴 방지: contextmenu 이벤트 발생 시 preventDefault가 호출되어야 함', () => {
+    new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
+
+    expect(listeners['board_contextmenu']).toBeDefined();
+    const mockEvent = {
+      preventDefault: vi.fn(),
+    };
+    listeners['board_contextmenu'](mockEvent);
+
+    expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1);
+  });
+
+  it('모바일 제스처 취소 방지: pointercancel 발생 시 상태가 안전하게 초기화되고 아무 액션도 발동하지 않아야 함', () => {
+    new GestureRecognizer(mockBoard, mockCanvas, callback, 3);
+
+    listeners['board_pointerdown']({
+      clientX: 50,
+      clientY: 50,
+      pointerId: 1,
+      target: { closest: () => null, classList: { contains: () => false } },
+    });
+
+    // 도중에 브라우저 시스템 제스처 등으로 취소 발생
+    vi.advanceTimersByTime(200);
+    expect(listeners['board_pointercancel']).toBeDefined();
+    listeners['board_pointercancel']();
+
+    // 1초 이상 시간이 지나도 어떤 액션도 발동하지 않아야 함
+    vi.advanceTimersByTime(1000);
+    expect(callback).not.toHaveBeenCalled();
   });
 
   it('1행1열 스위치(.tile-switch-11) 조작 시 제스처가 무시되어야 함', () => {
