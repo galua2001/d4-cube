@@ -389,6 +389,15 @@ body {
   box-shadow: 0 0 10px rgba(250, 204, 21, 0.45);
 }
 
+/* 시간 무제한 자유 모드 ♾️ 활성화 시 네온 시안 스타일 */
+.btn-option-pill.active-timer-free {
+  background: linear-gradient(135deg, #06b6d4, #0284c7);
+  border-color: #38bdf8;
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.45);
+}
+
 /* Status Info */
 .status-bar {
   width: 100%;
@@ -1271,6 +1280,33 @@ body {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+/* 타이머 모드 토글 버튼 및 인터랙션 */
+#btn-toggle-timer-mode {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+#btn-toggle-timer-mode:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#btn-toggle-timer-mode.active-free-mode,
+#btn-toggle-timer-mode.active-timer-free {
+  background: linear-gradient(135deg, #06b6d4, #059669);
+  border-color: #34d399;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+#btn-toggle-timer-mode.active-free-mode:hover,
+#btn-toggle-timer-mode.active-timer-free:hover {
+  box-shadow: 0 0 16px rgba(45, 212, 191, 0.7);
+  transform: translateY(-1px) scale(1.03);
+}
+
 .timer-display {
   font-size: 0.95rem;
   font-weight: 700;
@@ -1280,6 +1316,69 @@ body {
   border-radius: 6px;
   border: 1px solid #475569;
   letter-spacing: 0.5px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timer-display:hover {
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+  transform: scale(1.05);
+}
+
+.timer-display:active {
+  transform: scale(0.96);
+}
+
+/* 무제한 자유 모드(free)일 때 네온 에메랄드/시안 스타일링 */
+.timer-display.mode-free {
+  color: #34d399;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(16, 185, 129, 0.25));
+  border-color: #34d399;
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.7);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+  animation: free-timer-glow 2.4s infinite alternate ease-in-out;
+}
+
+.timer-display.mode-free:hover {
+  border-color: #6ee7b7;
+  color: #6ee7b7;
+  box-shadow: 0 0 18px rgba(52, 211, 153, 0.65);
+}
+
+@keyframes free-timer-glow {
+  0% {
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.25);
+  }
+  100% {
+    box-shadow: 0 0 14px rgba(6, 182, 212, 0.5);
+  }
+}
+
+/* 라이트 모드 지원 */
+[data-theme="light"] .timer-display {
+  background: rgba(241, 245, 249, 0.9);
+  color: #b45309;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .timer-display:hover {
+  border-color: #0284c7;
+  color: #0284c7;
+  box-shadow: 0 0 10px rgba(2, 132, 199, 0.3);
+}
+
+[data-theme="light"] .timer-display.mode-free {
+  background: linear-gradient(135deg, rgba(204, 251, 241, 0.9), rgba(209, 250, 229, 0.9));
+  color: #047857;
+  border-color: #10b981;
+  text-shadow: none;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
 }
 
 .best-record-badge {

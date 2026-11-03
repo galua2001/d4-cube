@@ -135,5 +135,52 @@ describe('RecordManager 단위 테스트', () => {
       expect(recordManager.getElapsedMs()).toBe(0);
       expect(recordManager.getFormattedTime()).toBe('00:00.0');
     });
+
+    it('시간 무제한 자유 모드(자유 ♾️)와 초시계(⏱️) 모드 전환, 리스너 및 영속성을 올바르게 관리해야 함', () => {
+      let notified = '';
+      const unsub = recordManager.onTimerModeChange((m) => { notified = m; });
+
+      recordManager.setTimerMode('free');
+      expect(notified).toBe('free');
+      expect(recordManager.isFreeMode()).toBe(true);
+      expect(recordManager.getTimerMode()).toBe('free');
+      expect(recordManager.getFormattedTime()).toBe('♾️');
+      expect(mockStorage.getItem('matrix_cube_timer_mode')).toBe('free');
+
+      const toggled = recordManager.toggleTimerMode();
+      expect(toggled).toBe('stopwatch');
+      expect(notified).toBe('stopwatch');
+      expect(recordManager.isFreeMode()).toBe(false);
+      expect(recordManager.getTimerMode()).toBe('stopwatch');
+      expect(recordManager.getFormattedTime()).toBe('00:00.0');
+
+      unsub();
+      recordManager.setTimerMode('free');
+      expect(notified).toBe('stopwatch'); // unsub 확인
+
+      // 저장된 모드 복원 확인
+      mockStorage.setItem('matrix_cube_timer_mode', 'free');
+      const restored = new RecordManager();
+      expect(restored.getTimerMode()).toBe('free');
+      expect(restored.isFreeMode()).toBe(true);
+    });
+
+    it('자유 모드에서는 타이머가 카운트되지 않고 시간 무제한 ♾️ 상태를 유지하며 시간 신기록 갱신을 생략해야 함', () => {
+      recordManager.setTimerMode('free');
+      let tickValue = '';
+      recordManager.startTimer((formatted) => {
+        tickValue = formatted;
+      });
+
+      expect(recordManager.isTimerRunning()).toBe(false);
+      expect(recordManager.getElapsedMs()).toBe(0);
+      expect(tickValue).toBe('♾️');
+
+      // 자유 모드에서 클리어 시 시간 신기록 없이 최저 이동수만 갱신
+      const saveRes = recordManager.saveRecord(3, 3, 5000, 4);
+      expect(saveRes.isNewBestTime).toBe(false);
+      expect(saveRes.isNewBestMoves).toBe(true);
+      expect(saveRes.bestMoves).toBe(4);
+    });
   });
 });

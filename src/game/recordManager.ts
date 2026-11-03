@@ -1,5 +1,7 @@
 // 크기 및 난이도별 최고 기록(Best Time, Best Moves) 및 초시계 관리자
 
+export type TimerMode = 'stopwatch' | 'free';
+
 export interface BestRecord {
   bestTimeMs: number | null; // 최고 시간 (밀리초)
   bestMoves: number | null;  // 최소 조작 횟수
@@ -9,11 +11,12 @@ export interface BestRecord {
 export interface SaveResult {
   isNewBestTime: boolean;
   isNewBestMoves: boolean;
-  bestTimeMs: number;
+  bestTimeMs: number | null;
   bestMoves: number;
 }
 
 const STORAGE_PREFIX = 'matrix_cube_best_record_v1';
+const TIMER_MODE_STORAGE_KEY = 'matrix_cube_timer_mode';
 
 /**
  * 밀리초를 '00:00.0' (분:초.밀리초) 형식으로 포맷팅
@@ -36,6 +39,79 @@ export class RecordManager {
   private accumulatedMs = 0;
   private timerIntervalId: ReturnType<typeof setInterval> | null = null;
   private tickCallback: ((formatted: string, ms: number) => void) | null = null;
+  private timerMode: TimerMode = 'stopwatch';
+  private modeListeners: Array<(mode: TimerMode) => void> = [];
+
+  constructor() {
+    this.loadTimerMode();
+  }
+
+  private loadTimerMode() {
+    try {
+      const storage = this.getStorage();
+      if (storage) {
+        const saved = storage.getItem(TIMER_MODE_STORAGE_KEY);
+        if (saved === 'stopwatch' || saved === 'free') {
+          this.timerMode = saved;
+        }
+      }
+    } catch {
+      // 로컬스토리지 접근 제한 대비
+    }
+  }
+
+  /**
+   * 타이머 모드 조회 ('stopwatch' | 'free')
+   */
+  public getTimerMode(): TimerMode {
+    return this.timerMode;
+  }
+
+  /**
+   * 타이머 모드 설정 및 저장
+   */
+  public setTimerMode(mode: TimerMode): void {
+    this.timerMode = mode;
+    this.resetTimer();
+    try {
+      const storage = this.getStorage();
+      if (storage) {
+        storage.setItem(TIMER_MODE_STORAGE_KEY, mode);
+      }
+    } catch {}
+    this.modeListeners.forEach(cb => {
+      try {
+        cb(mode);
+      } catch {}
+    });
+  }
+
+  /**
+   * 타이머 모드 변경 리스너 등록
+   */
+  public onTimerModeChange(cb: (mode: TimerMode) => void): () => void {
+    this.modeListeners.push(cb);
+    return () => {
+      const idx = this.modeListeners.indexOf(cb);
+      if (idx !== -1) this.modeListeners.splice(idx, 1);
+    };
+  }
+
+  /**
+   * 타이머 모드 토글 ('free' <-> 'stopwatch')
+   */
+  public toggleTimerMode(): TimerMode {
+    const nextMode: TimerMode = this.timerMode === 'free' ? 'stopwatch' : 'free';
+    this.setTimerMode(nextMode);
+    return nextMode;
+  }
+
+  /**
+   * 시간 무제한 자유 모드 여부
+   */
+  public isFreeMode(): boolean {
+    return this.timerMode === 'free';
+  }
 
   /**
    * 로컬스토리지 키 생성
@@ -86,9 +162,12 @@ export class RecordManager {
     let bestTime = existing?.bestTimeMs ?? null;
     let bestMoves = existing?.bestMoves ?? null;
 
-    if (bestTime === null || timeMs < bestTime) {
-      bestTime = timeMs;
-      isNewBestTime = true;
+    // 자유 모드가 아니고 초시계 모드일 때만 시간 기록 갱신
+    if (!this.isFreeMode()) {
+      if (bestTime === null || timeMs < bestTime) {
+        bestTime = timeMs;
+        isNewBestTime = true;
+      }
     }
 
     if (bestMoves === null || movesCount < bestMoves) {
@@ -125,12 +204,20 @@ export class RecordManager {
   // ==========================================
 
   /**
-   * 타이머 시작
+   * 타이머 시작 (자유 모드에서는 시간 측정을 건너뛰고 '♾️' 표시 유지)
    */
   public startTimer(onTick?: (formatted: string, ms: number) => void) {
     if (onTick) {
       this.tickCallback = onTick;
     }
+
+    if (this.isFreeMode()) {
+      if (this.tickCallback) {
+        this.tickCallback('♾️', 0);
+      }
+      return;
+    }
+
     if (this.timerIntervalId !== null) return; // 이미 실행 중
 
     this.startTime = performance.now();
@@ -166,7 +253,7 @@ export class RecordManager {
     this.accumulatedMs = 0;
     this.startTime = null;
     if (this.tickCallback) {
-      this.tickCallback(formatTime(0), 0);
+      this.tickCallback(this.isFreeMode() ? '♾️' : formatTime(0), 0);
     }
   }
 
@@ -174,6 +261,7 @@ export class RecordManager {
    * 현재까지의 총 경과 시간(밀리초) 반환
    */
   public getElapsedMs(): number {
+    if (this.isFreeMode()) return 0;
     let current = this.accumulatedMs;
     if (this.startTime !== null) {
       current += performance.now() - this.startTime;
@@ -182,9 +270,10 @@ export class RecordManager {
   }
 
   /**
-   * 현재 경과 시간 포맷 반환
+   * 현재 경과 시간 포맷 반환 (자유 모드 시 '♾️')
    */
   public getFormattedTime(): string {
+    if (this.isFreeMode()) return '♾️';
     return formatTime(this.getElapsedMs());
   }
 

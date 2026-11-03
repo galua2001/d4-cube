@@ -64,6 +64,10 @@ export const translations: Record<Lang, Record<string, any>> = {
     'header.aboutTitle': 'Project Overview & Mathematics',
     'header.guide': '🧭 Guide',
     'header.guideTitle': 'Controller Tile Guide',
+    'header.timerModeStopwatch': '⏱️ Timer',
+    'header.timerModeFree': '♾️ Free',
+    'header.timerModeTitleStopwatch': 'Switch to Free Play Mode (No time pressure)',
+    'header.timerModeTitleFree': 'Switch to Stopwatch Mode',
     'header.bgm': 'BGM',
     'header.sfx': 'SFX',
     'header.langToggle': '🌐 EN | KO',
@@ -93,6 +97,8 @@ export const translations: Record<Lang, Record<string, any>> = {
     'status.bestRecordEmpty': '🏆 BEST: -',
     'status.bestRecordEmptyTitle': 'No clear records yet',
     'status.bestRecordTitle': 'Best Record: {time} ({moves})',
+    'status.timerFree': '♾️ Free',
+    'status.timerTitleToggle': 'Click to toggle Free Play / Stopwatch',
 
     // Controller tile labels
     'board.row': 'R{n}',
@@ -305,6 +311,10 @@ export const translations: Record<Lang, Record<string, any>> = {
     'header.aboutTitle': '작품 소개 및 수학적 배경',
     'header.guide': '🧭 가이드',
     'header.guideTitle': '컨트롤러 타일 가이드',
+    'header.timerModeStopwatch': '⏱️ 초시계',
+    'header.timerModeFree': '♾️ 무제한',
+    'header.timerModeTitleStopwatch': '시간 무제한(자유 모드)으로 전환하여 시간 압박 없이 즐기기',
+    'header.timerModeTitleFree': '초시계 기록 모드로 전환',
     'header.bgm': 'BGM',
     'header.sfx': 'SFX',
     'header.langToggle': '🌐 EN | KO',
@@ -334,6 +344,8 @@ export const translations: Record<Lang, Record<string, any>> = {
     'status.bestRecordEmpty': '🏆 BEST: -',
     'status.bestRecordEmptyTitle': '아직 클리어 기록이 없습니다',
     'status.bestRecordTitle': '최고 기록: {time} ({moves})',
+    'status.timerFree': '♾️ 무제한',
+    'status.timerTitleToggle': '클릭하여 시간 무제한 ↔ 초시계 모드 전환',
 
     // Controller tile labels
     'board.row': '{n}행',
