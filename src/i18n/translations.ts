@@ -875,7 +875,34 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.diagonalSpineFlush.step0': '초기 상태: 1행 모서리(0, 2번)가 MAD, 척추(4, 7번)가 MD인 사선 교차 상태',
     'formula.item.diagonalSpineFlush.step1': '1수: 1행 좌우 반전 (MY 세로밀기) ➔ 모서리 0, 2번 R270 전이, 교차점 1번 MY 상태',
     'formula.item.diagonalSpineFlush.step2': '2수: 2열 주대각 반사 (MD) ➔ 척추 라인 4, 7번 MD² = ID 즉시 소거, 1행 전체(0, 1, 2) R270 동기화',
-    'formula.item.diagonalSpineFlush.step3': '3수: 1행 90° 회전 (R90) ➔ 1행 전체 R270 ∘ R90 = ID 일괄 소거, 100% 올클리어 완성!'
+    'formula.item.diagonalSpineFlush.step3': '3수: 1행 90° 회전 (R90) ➔ 1행 전체 R270 ∘ R90 = ID 일괄 소거, 100% 올클리어 완성!',
+
+    'formula.item.d4DiamondCross3.title': 'D4 다이아몬드 십자 3수 폭파',
+    'formula.item.d4DiamondCross3.subtitle': '중심과 상하좌우 십자 날개의 위상을 단일 R270으로 동기화하여 3수에 일괄 폭파',
+    'formula.item.d4DiamondCross3.desc': '상하좌우 날개와 중심이 십자 형태로 뒤틀린 난제를 [2행 R90] ➔ [2열 MX] ➔ [2행 R90] 단 3수로 중심 및 날개 위상을 동기화하여 시원하게 폭파 올클리어하는 D4 핵심 마스터 공식입니다.',
+    'formula.item.d4DiamondCross3.tip': '2행 회전으로 좌우 날개를 R270으로 전환한 뒤, 2열 상하 반전(MX)으로 상하 날개를 복구하며 중심을 R270으로 합성시킵니다. 마지막 2행 R90으로 남아있던 2행 전체를 한 방에 폭파합니다.',
+    'formula.item.d4DiamondCross3.step0': '초기 상태: 상하 날개(1, 7번: MX), 좌우 날개(3, 5번: R180), 중심(4번: MX)의 다이아몬드 십자 형태',
+    'formula.item.d4DiamondCross3.step1': '1수: 2행 90° 시계 회전 (R90) ➔ 좌우 날개(3, 5번) R270 변환, 중심 4번 MD 합성',
+    'formula.item.d4DiamondCross3.step2': '2수: 2열 상하 반전 (MX 가로밀기) ➔ 상하 날개(1, 7번) MX² = ID 즉시 복구, 중심 4번 R270 합성 완료',
+    'formula.item.d4DiamondCross3.step3': '3수: 2행 90° 시계 회전 (R90 피니시) ➔ 2행 전체 R270 ∘ R90 = ID 일괄 자기상쇄, 100% 올클리어 완성!',
+
+    'formula.item.d4LDiagCombo3.title': 'D4 ㄱ자 사선연계 3수 올킬',
+    'formula.item.d4LDiagCombo3.subtitle': '사선 대칭과 직교 회전의 비가환성을 결합해 외곽 ㄱ자 5개 에러를 단 3수에 올킬',
+    'formula.item.d4LDiagCombo3.desc': '1행과 3열이 만나는 ㄱ자 형태의 5개 에러를 [1행 R90] ➔ [3열 MD] ➔ [1행 R90] 단 3수로 사선 대칭과 회전의 비가환성을 이용해 1행으로 위상을 집중시켜 한 방에 올킬하는 실전 공식입니다.',
+    'formula.item.d4LDiagCombo3.tip': '1행을 먼저 회전시켜 코너 위상을 반사(MY)로 유도한 뒤, 3열 사선 반사(MD)로 3열을 즉시 소거하고 1행 전체를 R270으로 동기화합니다. 마지막 1행 R90으로 한 번에 올킬합니다.',
+    'formula.item.d4LDiagCombo3.step0': '초기 상태: 1행(0, 1번: R180)과 3열(2, 5, 8번: MD)이 만나는 ㄱ자형 에러 배치',
+    'formula.item.d4LDiagCombo3.step1': '1수: 1행 90° 시계 회전 (R90) ➔ 0, 1번 타일 R270 전이, 코너 2번 타일 MY 변환',
+    'formula.item.d4LDiagCombo3.step2': '2수: 3열 사선 반사 (MD 사선밀기) ➔ 5, 8번 타일 MD² = ID 즉시 복구, 코너 2번 타일 R270 합성',
+    'formula.item.d4LDiagCombo3.step3': '3수: 1행 90° 시계 회전 (R90 피니시) ➔ 1행 전체 R270 ∘ R90 = ID 일괄 소거, 100% 올클리어 완성!',
+
+    'formula.item.d4XCross3.title': 'D4 X-크로스 모서리동시 3수 폭파',
+    'formula.item.d4XCross3.subtitle': '4개 모서리 에러를 상하 라인으로 분리 정렬하여 3수 만에 모서리를 동시 폭파',
+    'formula.item.d4XCross3.desc': '4개 모서리(0, 2, 6, 8번)와 중심(4번)이 X자 형태로 얽힌 대칭 난제를 [2열 R270] ➔ [3행 R90] ➔ [1행 R90] 3수로 중심을 먼저 맞추며 상하 라인을 동기화한 뒤 연속 폭파하는 궁극의 모서리 피니시입니다.',
+    'formula.item.d4XCross3.tip': '2열 반시계 회전(R270)으로 중심 타일을 자기상쇄(R90 ∘ R270 = ID)시키는 동시에 모서리들을 1행과 3행의 R270 라인으로 정렬합니다. 이후 3행과 1행을 차례로 R90 회전하여 올클리어합니다.',
+    'formula.item.d4XCross3.step0': '초기 상태: 4개 모서리(0, 2, 6, 8번: R270)와 중심(4번: R90)이 뒤틀린 X-크로스 패턴',
+    'formula.item.d4XCross3.step1': '1수: 2열 90° 반시계 회전 (R270) ➔ 중심 4번 ID 즉시 복구, 1행과 3행이 각각 완전한 R270 라인으로 정렬',
+    'formula.item.d4XCross3.step2': '2수: 3행 90° 시계 회전 (R90) ➔ 3행 전체(6, 7, 8번) R270 ∘ R90 = ID 일괄 소거',
+    'formula.item.d4XCross3.step3': '3수: 1행 90° 시계 회전 (R90 피니시) ➔ 1행 전체(0, 1, 2번) R270 ∘ R90 = ID 일괄 소거, 100% 올클리어 완성!'
   }
 };
 
