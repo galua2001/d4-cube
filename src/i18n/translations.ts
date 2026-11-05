@@ -489,7 +489,37 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.d4XCross3.step0': 'Initial State: 4 corners (0, 2, 6, 8: R270) and center (4: R90) form an X-cross pattern',
     'formula.item.d4XCross3.step1': 'Move 1: Col 2 R270 (Counter-clockwise 90°) ➔ Center 4 clears to ID, Rows 1 & 3 become pure R270 lines',
     'formula.item.d4XCross3.step2': 'Move 2: Row 3 R90 (Row 3 wipe) ➔ Row 3 tiles (6, 7, 8) clear via R270 ∘ R90 = ID',
-    'formula.item.d4XCross3.step3': 'Move 3: Row 1 R90 (Finish wipe) ➔ Row 1 tiles (0, 1, 2) clear via R270 ∘ R90 = ID, 100% all-clear!'
+    'formula.item.d4XCross3.step3': 'Move 3: Row 1 R90 (Finish wipe) ➔ Row 1 tiles (0, 1, 2) clear via R270 ∘ R90 = ID, 100% all-clear!',
+
+    'formula.item.d4DoubleCross4.title': 'D4 Double-Cross Twist 4-Move Purge',
+    'formula.item.d4DoubleCross4.subtitle': 'Orthogonal reflection composition (MX ∘ MY = R180) and center tile self-cancellation for a 4-move purge',
+    'formula.item.d4DoubleCross4.desc': 'A distance 4 bottleneck where the center cross is twisted by orthogonal reflections and corners by R180. Resolves in 4 moves: [Row 2 MX] ➔ [Col 2 MY] ➔ [Row 1 R180] ➔ [Col 1 R180] via center reduction and triple-cancel finish.',
+    'formula.item.d4DoubleCross4.tip': 'Applying MX on Row 2 shifts the center to MY, and Col 2 MY restores center to ID while compressing all remaining errors into Column 1 for a 3-tile simultaneous clearance.',
+    'formula.item.d4DoubleCross4.step0': 'Initial State: Center cross twisted by orthogonal reflections (1, 7: MY; 3, 5: MX) and corners by R180',
+    'formula.item.d4DoubleCross4.step1': 'Move 1: Row 2 MX (Horizontal flip) ➔ Clears tile 5, center becomes MY',
+    'formula.item.d4DoubleCross4.step2': 'Move 2: Col 2 MY (Vertical flip) ➔ Clears tile 7, restores center tile 4 to ID',
+    'formula.item.d4DoubleCross4.step3': 'Move 3: Row 1 R180 (Double tap) ➔ Clears tiles 1 & 2, concentrates all errors into Col 1',
+    'formula.item.d4DoubleCross4.step4': 'Move 4: Col 1 R180 (Triple Cancel Finish) ➔ Resolves tiles 0, 3, 6 simultaneously, 100% all-clear!',
+
+    'formula.item.d4SpiralVortex4.title': 'D4 4-Way Spiral Vortex 4-Move All-Clear',
+    'formula.item.d4SpiralVortex4.subtitle': 'Perimeter loop 90° pulses eliminating 2-pass corners and 1-pass edges sequentially',
+    'formula.item.d4SpiralVortex4.desc': 'A bottleneck where outer 8 tiles form a spiral of corner R180 and edge R270. Resolves in 4 moves along the perimeter loop: [Row 1 R90] ➔ [Col 3 R90] ➔ [Row 3 R90] ➔ [Col 1 R90] to achieve complete clearance.',
+    'formula.item.d4SpiralVortex4.tip': 'Cascading 90° clockwise pulses along the 4 borders execute double-kills in moves 2 & 3, culminating in a dramatic triple-kill in move 4.',
+    'formula.item.d4SpiralVortex4.step0': 'Initial State: Outer 8 tiles form a chirality vortex (corners: R180, edges: R270)',
+    'formula.item.d4SpiralVortex4.step1': 'Move 1: Row 1 R90 (Clockwise 90°) ➔ Clears edge tile 1, corners enter phase R270',
+    'formula.item.d4SpiralVortex4.step2': 'Move 2: Col 3 R90 (Double-Kill) ➔ Clears corner 2 and edge 5 simultaneously',
+    'formula.item.d4SpiralVortex4.step3': 'Move 3: Row 3 R90 (Double-Kill) ➔ Clears corner 8 and edge 7, aligns Col 1 to R270',
+    'formula.item.d4SpiralVortex4.step4': 'Move 4: Col 1 R90 (Triple-Kill Finish) ➔ Clears Col 1 (0, 3, 6) simultaneously, 100% all-clear!',
+
+    'formula.item.d4DualDiagonalBlitz4.title': 'D4 Dual-Diagonal Symmetry Blitz 4-Move Destruction',
+    'formula.item.d4DualDiagonalBlitz4.subtitle': 'Dual diagonal reflections (MD ∘ MAD = R180) partition rows into complementary phase sweeps',
+    'formula.item.d4DualDiagonalBlitz4.desc': 'A distance 4 bottleneck with dual diagonal reflections and row-wise phase splits. Solves in 4 moves: [Main Diag MD] ➔ [Anti Diag MAD] ➔ [Row 1 R90] ➔ [Row 3 R270] via center wipeout and dual triple-kills.',
+    'formula.item.d4DualDiagonalBlitz4.tip': 'Main diagonal MD transforms diagonal tiles into rotations; Anti-diagonal MAD wipes the center and segregates Row 1 (R270) and Row 3 (R90) for two back-to-back triple-kill sweeps.',
+    'formula.item.d4DualDiagonalBlitz4.step0': 'Initial State: Dual diagonal reflections and split phase rotations',
+    'formula.item.d4DualDiagonalBlitz4.step1': 'Move 1: Main Diag MD (Diagonal swipe ↖) ➔ Diagonal tiles convert to rotations, center becomes MAD',
+    'formula.item.d4DualDiagonalBlitz4.step2': 'Move 2: Anti Diag MAD (Diagonal swipe ↗) ➔ Clears center, splits board into Row 1 (R270) & Row 3 (R90)',
+    'formula.item.d4DualDiagonalBlitz4.step3': 'Move 3: Row 1 R90 (Triple-Kill) ➔ Row 1 (0, 1, 2) clears via R270 ∘ R90 = ID',
+    'formula.item.d4DualDiagonalBlitz4.step4': 'Move 4: Row 3 R270 (Triple-Kill Finish) ➔ Row 3 (6, 7, 8) clears via R90 ∘ R270 = ID, 100% all-clear!'
   },
 
   ko: {
@@ -930,6 +960,36 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.d4XCross3.step1': '1수: 2열 90° 반시계 회전 (R270) ➔ 중심 4번 ID 즉시 복구, 1행과 3행이 각각 완전한 R270 라인으로 정렬',
     'formula.item.d4XCross3.step2': '2수: 3행 90° 시계 회전 (R90) ➔ 3행 전체(6, 7, 8번) R270 ∘ R90 = ID 일괄 소거',
     'formula.item.d4XCross3.step3': '3수: 1행 90° 시계 회전 (R90 피니시) ➔ 1행 전체(0, 1, 2번) R270 ∘ R90 = ID 일괄 소거, 100% 올클리어 완성!',
+
+    'formula.item.d4DoubleCross4.title': 'D4 가로/세로 십자 교차 이중 꼬임 4수 폭파',
+    'formula.item.d4DoubleCross4.subtitle': '직교 반사 합성(MX ∘ MY = R180)과 중심 자기상쇄로 4수에 외곽 3중 폭파 피니시',
+    'formula.item.d4DoubleCross4.desc': '중심 십자축이 직교 반사로 뒤틀리고 코너가 180° 반전된 거리 4 병목을 [2행 MX] ➔ [2열 MY] ➔ [1행 R180] ➔ [1열 R180] 4수로 중심 소거 후 1열 3중 동시 폭파로 완성하는 D4 마스터 공식입니다.',
+    'formula.item.d4DoubleCross4.tip': '2행 MX로 중심을 MY로 전환하고, 2열 MY로 중심을 완전 복원한 뒤, 잔여 에러를 1열로 몰아넣어 3개 타일을 한 번에 폭파합니다.',
+    'formula.item.d4DoubleCross4.step0': '초기 상태: 중심 십자축(1, 3, 5, 7번)이 직교 반사로 꼬이고 코너가 R180인 거리 4 병목',
+    'formula.item.d4DoubleCross4.step1': '1수: 2행 상하 반전 (MX 가로밀기) ➔ 5번 타일 MX² = ID 즉시 소거, 중심 4번 MY 전환',
+    'formula.item.d4DoubleCross4.step2': '2수: 2열 좌우 반전 (MY 세로밀기) ➔ 7번 타일 소거, 중심 4번 MY² = ID 완전 복원',
+    'formula.item.d4DoubleCross4.step3': '3수: 1행 180° 반전 (R180) ➔ 1, 2번 타일 동시 소거, 잔여 에러 1열로 결집',
+    'formula.item.d4DoubleCross4.step4': '4수: 1열 180° 반전 (R180 피니시) ➔ 1열 3개 타일(0, 3, 6번) 3중 동시 폭파, 100% 올클리어 완성!',
+
+    'formula.item.d4SpiralVortex4.title': 'D4 4방향 소용돌이 위상차 4수 올킬',
+    'formula.item.d4SpiralVortex4.subtitle': '4변 둘레길 순환 90° 펄스로 2회 경유 코너와 1회 경유 변을 차례로 소거하며 올킬',
+    'formula.item.d4SpiralVortex4.desc': '외곽 8개 타일이 모서리 R180, 변 R270으로 소용돌이치는 병목을 [1행 R90] ➔ [3열 R90] ➔ [3행 R90] ➔ [1열 R90] 4변 둘레길 순환 펄스로 2회 경유 코너와 1회 경유 변을 차례로 소거하며 올킬하는 마스터 공식입니다.',
+    'formula.item.d4SpiralVortex4.tip': '시계 방향 둘레길을 따라 90° 회전을 연속 적용하면 2수와 3수에서 더블 킬이 터지고, 마지막 4수에서 3개 타일이 일제히 소거됩니다.',
+    'formula.item.d4SpiralVortex4.step0': '초기 상태: 외곽 8개 타일이 코너 R180, 변 R270으로 얽힌 소용돌이 병목',
+    'formula.item.d4SpiralVortex4.step1': '1수: 1행 90° 시계 회전 (R90) ➔ 1번 변 타일 즉시 소거, 상단 코너 R270 전이',
+    'formula.item.d4SpiralVortex4.step2': '2수: 3열 90° 시계 회전 (R90 더블 킬) ➔ 2번 코너와 5번 변 동시 소거',
+    'formula.item.d4SpiralVortex4.step3': '3수: 3행 90° 시계 회전 (R90 더블 킬) ➔ 8번 코너와 7번 변 동시 소거, 1열 R270 정렬',
+    'formula.item.d4SpiralVortex4.step4': '4수: 1열 90° 시계 회전 (R90 피니시) ➔ 1열 3개 타일(0, 3, 6번) 3중 동시 폭파, 100% 올클리어 완성!',
+
+    'formula.item.d4DualDiagonalBlitz4.title': 'D4 양대각선(↖, ↗) 대칭 교차 4수 동시 폭파',
+    'formula.item.d4DualDiagonalBlitz4.subtitle': '양대각선 반사(MD ∘ MAD = R180)로 중심 소거 및 상하 층별 분할 후 2연속 트리플 킬',
+    'formula.item.d4DualDiagonalBlitz4.desc': '양대각선 축에 거울 반사가 걸려있고 상하 층별 위상이 어긋난 거리 4 병목을 [주대각 MD] ➔ [부대각 MAD] ➔ [1행 R90] ➔ [3행 R270] 4수로 중심 소거 및 상하 층별 분할 후 2연속 트리플 킬로 산산조각 내는 마스터 공식입니다.',
+    'formula.item.d4DualDiagonalBlitz4.tip': '주대각선 MD로 대각선 타일을 회전 좌표계로 바꾸고, 부대각선 MAD로 중심을 맞추며 상단(R270)과 하단(R90)으로 분리한 뒤 각각 90° 역회전으로 폭파합니다.',
+    'formula.item.d4DualDiagonalBlitz4.step0': '초기 상태: 양대각선 거울 반사와 상하 회전 위상차가 결합된 거리 4 병목',
+    'formula.item.d4DualDiagonalBlitz4.step1': '1수: 주대각선(↖) 사선 반사 (MD) ➔ 대각 타일 회전계 전환, 중심 MAD 유도',
+    'formula.item.d4DualDiagonalBlitz4.step2': '2수: 부대각선(↗) 역대각 반사 (MAD) ➔ 중심 MAD² = ID 소거, 상단 R270/하단 R90 분할',
+    'formula.item.d4DualDiagonalBlitz4.step3': '3수: 1행 90° 시계 회전 (R90 트리플 킬) ➔ 1행 3개 타일 R270 ∘ R90 = ID 동시 소거',
+    'formula.item.d4DualDiagonalBlitz4.step4': '4수: 3행 90° 반시계 회전 (R270 피니시) ➔ 3행 3개 타일 R90 ∘ R270 = ID 동시 소거, 100% 올클리어 완성!'
 
   }
 };

@@ -1037,7 +1037,275 @@ const d4XCrossSteps = createInteractiveSteps(d4XCrossInitialBoard, [
   }
 ]);
 
+// 18. [D4 신규 마스터 공식 4: D4 가로/세로 십자 이중꼬임 4수 폭파]
+// 초기 보드: ['ID', 'MX', 'R180', 'MY', 'R180', 'MX', 'R180', 'MY', 'ID']
+// 2행(row 1) MX ➔ 2열(col 1) MY ➔ 1행(row 0) R180 ➔ 1열(col 0) R180 = 100% ID 올클리어
+const d4DoubleCrossInitialBoard: D4Op[] = [
+  D4.ID,   D4.MX,   D4.R180,
+  D4.MY,   D4.R180, D4.MX,
+  D4.R180, D4.MY,   D4.ID
+];
+
+const d4DoubleCrossSteps = createInteractiveSteps(d4DoubleCrossInitialBoard, [
+  {
+    lineType: 'row',
+    lineIndex: 1,
+    op: D4.MX,
+    actionDescKo: '1수: 2행 상하 반전 (MX 가로밀기)',
+    actionDescEn: 'Move 1: Row 2 Vertical Flip (MX)',
+    mathInsightKo: '2행에 MX를 적용하여 5번 타일(MX ∘ MX = ID) 즉시 소거! 중심 타일은 MY로 전환되어 2열과의 대칭 합성을 준비합니다.',
+    mathInsightEn: 'Applying MX to Row 2 immediately cancels tile 5 (MX ∘ MX = ID)! The center tile shifts to MY, preparing symmetric composition with Col 2.',
+    highlightCells: [3, 4, 5],
+    formulaBadge: '1수: 2행 MX',
+    formulaText: 'Row₂ ➔ MX',
+    formulaDesc: '2행 상하 반전으로 5번 타일을 정위치 복원하고 중심 위상을 대칭 전환합니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 1,
+    op: D4.MY,
+    actionDescKo: '2수: 2열 좌우 반전 (MY 세로밀기)',
+    actionDescEn: 'Move 2: Col 2 Horizontal Flip (MY)',
+    mathInsightKo: '2열에 MY를 가하여 7번 타일 소거 및 중심 4번 타일(MY ∘ MY = ID) 완전 복원! 보드가 1열(0, 3, 6)과 1행 잔여(1, 2) R180으로 단순화됩니다.',
+    mathInsightEn: 'Applying MY to Col 2 clears tile 7 and perfectly restores center tile 4 (MY ∘ MY = ID)! Reduces the board to Col 1 (0, 3, 6) and Row 1 remaining (1, 2) in R180.',
+    highlightCells: [1, 4, 7],
+    formulaBadge: '2수: 2열 MY',
+    formulaText: 'Col₂ ➔ MY',
+    formulaDesc: '2열 좌우 반전으로 중심 4번 타일을 완전 복원하고 에러를 외곽 1행/1열로 압축합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.R180,
+    actionDescKo: '3수: 1행 180° 반전 (R180)',
+    actionDescEn: 'Move 3: Row 1 Invert 180° (R180)',
+    mathInsightKo: '1행에 R180을 적용하여 1번, 2번 타일(R180 ∘ R180 = ID) 동시 소거! 잔여 비틀림을 1열(0, 3, 6) 하나의 축으로 완전 몰아넣습니다.',
+    mathInsightEn: 'Applying R180 to Row 1 clears tiles 1 and 2 (R180 ∘ R180 = ID) simultaneously! Concentrates all remaining twists into Col 1 (0, 3, 6).',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '3수: 1행 R180',
+    formulaText: 'Row₁ ➔ R180',
+    formulaDesc: '1행 180° 반전으로 1, 2번 타일을 동시 소거하고 모든 잔여 에러를 1열로 몰아넣습니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 0,
+    op: D4.R180,
+    actionDescKo: '4수: 1열 180° 반전 (R180 트리플 킬 피니시)',
+    actionDescEn: 'Move 4: Col 1 Invert 180° (R180 Triple-Kill Finish)',
+    mathInsightKo: '1열의 3개 타일(0, 3, 6번)에 R180을 일괄 작용시켜 R180 ∘ R180 = ID로 3중 동시 폭파(Triple Cancel)! 전 타일 100% ID 올클리어 완성!',
+    mathInsightEn: 'Applying R180 to Col 1 resolves tiles 0, 3, and 6 simultaneously via R180 ∘ R180 = ID (Triple Cancel)! Completes 100% all-clear!',
+    highlightCells: [0, 3, 6],
+    formulaBadge: '4수: 1열 R180 트리플 킬',
+    formulaText: 'Col₁ ➔ R180 ➔ 100% 클리어',
+    formulaDesc: '1열 180° 반전으로 남아있던 1열 3개 타일을 한 번에 폭파하여 올클리어를 완성합니다.'
+  }
+]);
+
+// 19. [D4 신규 마스터 공식 5: D4 4방향 소용돌이 4수 올킬]
+// 초기 보드: ['R180', 'R270', 'R180', 'R270', 'ID', 'R270', 'R180', 'R270', 'R180']
+// 1행(row 0) R90 ➔ 3열(col 2) R90 ➔ 3행(row 2) R90 ➔ 1열(col 0) R90 = 100% ID 올클리어
+const d4SpiralVortexInitialBoard: D4Op[] = [
+  D4.R180, D4.R270, D4.R180,
+  D4.R270, D4.ID,   D4.R270,
+  D4.R180, D4.R270, D4.R180
+];
+
+const d4SpiralVortexSteps = createInteractiveSteps(d4SpiralVortexInitialBoard, [
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.R90,
+    actionDescKo: '1수: 1행 90° 시계 회전 (R90)',
+    actionDescEn: 'Move 1: Row 1 Rotate 90° (R90)',
+    mathInsightKo: '1행에 R90을 적용하여 1번 변 타일(R270 ∘ R90 = ID) 즉시 소거! 코너 타일 0, 2번은 R270 위상으로 1단계 진입합니다.',
+    mathInsightEn: 'Applying R90 to Row 1 clears edge tile 1 (R270 ∘ R90 = ID)! Corner tiles 0 & 2 transition to phase R270.',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '1수: 1행 R90',
+    formulaText: 'Row₁ ➔ R90',
+    formulaDesc: '1행 시계 회전으로 1번 타일을 즉시 맞추고 상단 코너들을 R270 위상으로 준비합니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 2,
+    op: D4.R90,
+    actionDescKo: '2수: 3열 90° 시계 회전 (R90 더블 킬)',
+    actionDescEn: 'Move 2: Col 3 Rotate 90° (R90 Double-Kill)',
+    mathInsightKo: '3열에 R90을 적용하여 2번 코너(R270 ∘ R90 = ID)와 5번 변(R270 ∘ R90 = ID)을 더블 킬(Double Cancel)! 8번 코너는 R270으로 전이됩니다.',
+    mathInsightEn: 'Applying R90 to Col 3 achieves a Double-Kill on corner 2 and edge 5 (both R270 ∘ R90 = ID)! Corner 8 transitions to R270.',
+    highlightCells: [2, 5, 8],
+    formulaBadge: '2수: 3열 R90 더블 킬',
+    formulaText: 'Col₃ ➔ R90',
+    formulaDesc: '3열 시계 회전으로 2번 코너와 5번 변을 동시 소거하고 8번 코너를 정렬합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 2,
+    op: D4.R90,
+    actionDescKo: '3수: 3행 90° 시계 회전 (R90 더블 킬)',
+    actionDescEn: 'Move 3: Row 3 Rotate 90° (R90 Double-Kill)',
+    mathInsightKo: '3행에 R90을 적용하여 8번 코너(R270 ∘ R90 = ID)와 7번 변(R270 ∘ R90 = ID)을 더블 킬! 이제 1열의 3개 타일(0, 3, 6)만 R270으로 완벽 동기화됩니다.',
+    mathInsightEn: 'Applying R90 to Row 3 executes a Double-Kill on corner 8 and edge 7! Concentrates all remaining errors into Col 1 (0, 3, 6) as uniform R270.',
+    highlightCells: [6, 7, 8],
+    formulaBadge: '3수: 3행 R90 더블 킬',
+    formulaText: 'Row₃ ➔ R90',
+    formulaDesc: '3행 시계 회전으로 8번 코너와 7번 변을 동시 소거하고 마지막 1열 전체를 R270으로 정렬합니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 0,
+    op: D4.R90,
+    actionDescKo: '4수: 1열 90° 시계 회전 (R90 트리플 킬 피니시)',
+    actionDescEn: 'Move 4: Col 1 Rotate 90° (R90 Triple-Kill Finish)',
+    mathInsightKo: '1열에 마지막 R90을 적용하여 남은 3개 타일(0, 3, 6)이 R270 ∘ R90 = ID로 3중 동시 폭파(Triple Kill)! 둘레길 전 타일 100% ID 올클리어 완성!',
+    mathInsightEn: 'Applying R90 to Col 1 resolves tiles 0, 3, 6 simultaneously via R270 ∘ R90 = ID (Triple-Kill)! Completes 100% perimeter all-clear!',
+    highlightCells: [0, 3, 6],
+    formulaBadge: '4수: 1열 R90 트리플 킬',
+    formulaText: 'Col₁ ➔ R90 ➔ 100% 클리어',
+    formulaDesc: '1열 시계 회전으로 남아있던 1열 3개 타일을 한 번에 폭파하여 소용돌이 퍼즐을 완성합니다.'
+  }
+]);
+
+// 20. [D4 신규 마스터 공식 6: D4 양대각선 대칭교차 4수 동시폭파]
+// 초기 보드: ['MY', 'R270', 'MX', 'ID', 'R180', 'ID', 'MY', 'R90', 'MX']
+// 주대각선(main) MD ➔ 부대각선(anti) MAD ➔ 1행(row 0) R90 ➔ 3행(row 2) R270 = 100% ID 올클리어
+const d4DualDiagonalBlitzInitialBoard: D4Op[] = [
+  D4.MY,   D4.R270, D4.MX,
+  D4.ID,   D4.R180, D4.ID,
+  D4.MY,   D4.R90,  D4.MX
+];
+
+const d4DualDiagonalBlitzSteps = createInteractiveSteps(d4DualDiagonalBlitzInitialBoard, [
+  {
+    lineType: 'diag',
+    lineIndex: 'main',
+    op: D4.MD,
+    actionDescKo: '1수: 주대각선(↖) 사선 반사 (MD 사선밀기)',
+    actionDescEn: 'Move 1: Main Diag (↖) Diagonal Reflection (MD)',
+    mathInsightKo: '주대각선(MD) 반사로 대각선 축 타일들을 회전 좌표계(0번 R270, 8번 R90)로 치환하고, 중심은 R180 ∘ MD = MAD로 유도합니다.',
+    mathInsightEn: 'Applying MD to main diagonal transforms diagonal tiles into rotational frames (0: R270, 8: R90), driving center to R180 ∘ MD = MAD.',
+    highlightCells: [0, 4, 8],
+    formulaBadge: '1수: 주대각 MD',
+    formulaText: 'Diag[main] ➔ MD',
+    formulaDesc: '주대각선 사선 반사로 대각선 타일들을 회전계로 전환하고 중심 축을 부대각선과 정렬합니다.'
+  },
+  {
+    lineType: 'diag',
+    lineIndex: 'anti',
+    op: D4.MAD,
+    actionDescKo: '2수: 부대각선(↗) 역대각 반사 (MAD 역대각밀기)',
+    actionDescEn: 'Move 2: Anti Diag (↗) Anti-Diagonal Reflection (MAD)',
+    mathInsightKo: '부대각선(MAD) 반사로 중심 타일(MAD ∘ MAD = ID) 즉시 소거! 보드가 상단 1행 전체 R270, 하단 3행 전체 R90 층별 대칭으로 분할됩니다.',
+    mathInsightEn: 'Applying MAD to anti diagonal clears center tile (MAD ∘ MAD = ID)! Partitions the board into Row 1 uniform R270 and Row 3 uniform R90.',
+    highlightCells: [2, 4, 6],
+    formulaBadge: '2수: 부대각 MAD',
+    formulaText: 'Diag[anti] ➔ MAD',
+    formulaDesc: '부대각선 반사로 중심 타일을 즉시 맞추고 상단과 하단을 각각 균일한 회전층으로 분할합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.R90,
+    actionDescKo: '3수: 1행 90° 시계 회전 (R90 트리플 킬)',
+    actionDescEn: 'Move 3: Row 1 Rotate 90° (R90 Triple-Kill)',
+    mathInsightKo: '1행에 R90을 적용하여 1행의 3개 타일(0, 1, 2)이 모두 R270 ∘ R90 = ID로 3중 동시 폭파(Triple Kill)! 상단부가 완전히 클리어됩니다.',
+    mathInsightEn: 'Applying R90 to Row 1 executes a Triple-Kill on tiles 0, 1, 2 via R270 ∘ R90 = ID! Completely clears the top row.',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '3수: 1행 R90 트리플 킬',
+    formulaText: 'Row₁ ➔ R90',
+    formulaDesc: '1행 시계 회전으로 상단 3개 타일을 일괄 폭파하여 상단 라인을 완성합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 2,
+    op: D4.R270,
+    actionDescKo: '4수: 3행 90° 반시계 회전 (R270 트리플 킬 피니시)',
+    actionDescEn: 'Move 4: Row 3 Rotate 90° CCW (R270 Triple-Kill Finish)',
+    mathInsightKo: '3행에 R270을 가하여 남은 3개 타일(6, 7, 8)이 일제히 R90 ∘ R270 = ID로 3중 동시 폭파(Triple Kill)! 4수 만에 전 타일 100% 항등원 올클리어 완성!',
+    mathInsightEn: 'Applying R270 to Row 3 executes a Triple-Kill on remaining tiles 6, 7, 8 via R90 ∘ R270 = ID! Completes 100% all-clear in 4 moves!',
+    highlightCells: [6, 7, 8],
+    formulaBadge: '4수: 3행 R270 트리플 킬',
+    formulaText: 'Row₃ ➔ R270 ➔ 100% 클리어',
+    formulaDesc: '3행 반시계 회전으로 하단 3개 타일을 한 번에 폭파하여 전 타일 올클리어를 완성합니다.'
+  }
+]);
+
 const BASE_FORMULAS: FormulaItem[] = [
+  {
+    id: 'd4-double-cross-4',
+    titleKo: 'D4 가로/세로 십자 교차 이중 꼬임 4수 폭파',
+    titleEn: 'D4 Double-Cross Twist 4-Move Purge',
+    category: 'god-number',
+    badgeKo: '⚔️ D4 마스터 4수',
+    badgeEn: '⚔️ D4 Master 4M',
+    difficulty: 4,
+    formulaSeq: '2행 MX ➔ 2열 MY ➔ 1행 R180 ➔ 1열 R180 = 전 타일 올클리어',
+    summaryKo: '중심 십자축이 직교 반사로 뒤틀리고 코너가 180° 반전된 거리 4 병목을 [2행 MX] ➔ [2열 MY] ➔ [1행 R180] ➔ [1열 R180] 4수로 중심 소거 후 1열 3중 동시 폭파로 완성하는 D4 마스터 공식입니다.',
+    summaryEn: 'A distance 4 bottleneck where the center cross is twisted by orthogonal reflections and corners by R180. Resolves in 4 moves: [Row 2 MX] ➔ [Col 2 MY] ➔ [Row 1 R180] ➔ [Col 1 R180] via center reduction and triple-cancel finish.',
+    diagramType: 'interactive',
+    steps: d4DoubleCrossSteps,
+    latexFormula: '\\text{Row}_2(\\text{MX}) \\circ \\text{Col}_2(\\text{MY}) \\circ \\text{Row}_1(\\text{R180}) \\circ \\text{Col}_1(\\text{R180}) = \\text{ID}',
+    notesKo: [
+      '직교 십자축의 거울 반사 합성(MX ∘ MY = R180)과 중심 4번 타일의 자기상쇄를 활용합니다.',
+      '외곽 잔여 에러를 1열로 완전히 몰아넣어 마지막 수에서 3중 동시 폭파(Triple Cancel)를 터뜨리는 정교한 공식입니다.'
+    ],
+    notesEn: [
+      'Utilizes orthogonal reflection composition (MX ∘ MY = R180) and center tile self-cancellation.',
+      'Concentrates remaining errors into Column 1 for a dramatic Triple Cancel finish.'
+    ],
+    tags: ['D4 마스터', '4수 폭파', '십자 이중꼬임', '신의 수', '고급 피니시', '신의 수 테크닉'],
+    isInteractive: true
+  },
+  {
+    id: 'd4-spiral-vortex-4',
+    titleKo: 'D4 4방향 소용돌이 위상차 4수 올킬',
+    titleEn: 'D4 4-Way Spiral Vortex 4-Move All-Clear',
+    category: 'god-number',
+    badgeKo: '🌀 D4 마스터 4수',
+    badgeEn: '🌀 D4 Master 4M',
+    difficulty: 4,
+    formulaSeq: '1행 R90 ➔ 3열 R90 ➔ 3행 R90 ➔ 1열 R90 = 전 타일 올클리어',
+    summaryKo: '외곽 8개 타일이 모서리 R180, 변 R270으로 소용돌이치는 병목을 [1행 R90] ➔ [3열 R90] ➔ [3행 R90] ➔ [1열 R90] 4변 둘레길 순환 펄스로 2회 경유 코너와 1회 경유 변을 차례로 소거하며 올킬하는 마스터 공식입니다.',
+    summaryEn: 'A bottleneck where outer 8 tiles form a spiral of corner R180 and edge R270. Resolves in 4 moves along the perimeter loop: [Row 1 R90] ➔ [Col 3 R90] ➔ [Row 3 R90] ➔ [Col 1 R90] to achieve complete clearance.',
+    diagramType: 'interactive',
+    steps: d4SpiralVortexSteps,
+    latexFormula: '\\text{Row}_1(\\text{R90}) \\circ \\text{Col}_3(\\text{R90}) \\circ \\text{Row}_3(\\text{R90}) \\circ \\text{Col}_1(\\text{R90}) = \\text{ID}',
+    notesKo: [
+      '4변 둘레길 순환 펄스로 모서리(2회 경유: R180 ∘ R90 ∘ R90 = ID)와 변(1회 경유: R270 ∘ R90 = ID)을 완벽 동기 소거합니다.',
+      '2수에서 2개, 3수에서 2개, 4수에서 3개 타일을 연속 소거하는 최고의 다중 상쇄 시원함을 선사합니다.'
+    ],
+    notesEn: [
+      'Perimeter loop pulses resolve corners (2 passes: R180 ∘ R90² = ID) and edges (1 pass: R270 ∘ R90 = ID).',
+      'Cascades double-kills in moves 2 & 3, culminating in a triple-kill in move 4.'
+    ],
+    tags: ['D4 마스터', '4수 올킬', '소용돌이 둘레길', '신의 수', '고급 피니시', '신의 수 테크닉'],
+    isInteractive: true
+  },
+  {
+    id: 'd4-dual-diagonal-blitz-4',
+    titleKo: 'D4 양대각선(↖, ↗) 대칭 교차 4수 동시 폭파',
+    titleEn: 'D4 Dual-Diagonal Symmetry Blitz 4-Move Destruction',
+    category: 'god-number',
+    badgeKo: '⚡ D4 마스터 4수',
+    badgeEn: '⚡ D4 Master 4M',
+    difficulty: 4,
+    formulaSeq: '주대각선 MD ➔ 부대각선 MAD ➔ 1행 R90 ➔ 3행 R270 = 전 타일 올클리어',
+    summaryKo: '양대각선 축에 거울 반사가 걸려있고 상하 층별 위상이 어긋난 거리 4 병목을 [주대각 MD] ➔ [부대각 MAD] ➔ [1행 R90] ➔ [3행 R270] 4수로 중심 소거 및 상하 층별 분할 후 2연속 트리플 킬로 산산조각 내는 마스터 공식입니다.',
+    summaryEn: 'A distance 4 bottleneck with dual diagonal reflections and row-wise phase splits. Solves in 4 moves: [Main Diag MD] ➔ [Anti Diag MAD] ➔ [Row 1 R90] ➔ [Row 3 R270] via center wipeout and dual triple-kills.',
+    diagramType: 'interactive',
+    steps: d4DualDiagonalBlitzSteps,
+    latexFormula: '\\text{Diag}_{\\text{main}}(\\text{MD}) \\circ \\text{Diag}_{\\text{anti}}(\\text{MAD}) \\circ \\text{Row}_1(\\text{R90}) \\circ \\text{Row}_3(\\text{R270}) = \\text{ID}',
+    notesKo: [
+      '두 대각선 반사의 합성(MD ∘ MAD = R180)으로 중심 타일을 소거하고, 상단 1행(R270)과 하단 3행(R90)으로 층별 완벽 분리합니다.',
+      '분할된 상단과 하단을 각각 반대 방향의 회전(R90, R270)으로 3개씩 2연속 폭파(Dual Triple-Kill)합니다.'
+    ],
+    notesEn: [
+      'Dual diagonal reflection composition (MD ∘ MAD = R180) clears the center and segregates Row 1 (R270) and Row 3 (R90).',
+      'Annihilates top and bottom rows via dual triple-kills using complementary 90° rotations.'
+    ],
+    tags: ['D4 마스터', '4수 동시폭파', '양대각선 대칭', '신의 수', '고급 피니시', '신의 수 테크닉'],
+    isInteractive: true
+  },
+
   {
     id: 'd4-diamond-cross-3',
     titleKo: 'D4 다이아몬드 십자 3수 폭파',

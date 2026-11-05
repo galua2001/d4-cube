@@ -957,3 +957,17 @@
   }
 }
 
+
+/* D4 마스터 공식 전용 네비게이션 뱃지 및 액센트 (UX 고도화) */
+.formula-nav-card[data-id^="d4-"] .formula-nav-badge {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.formula-nav-card[data-id^="d4-"].active {
+  border-color: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+}

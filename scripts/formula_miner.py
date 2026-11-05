@@ -464,6 +464,99 @@ def build_mined_formula_definitions():
                 'Move 2: Row 2 horizontal flip (MX) cancels remaining mirror components, achieving all-clear in 2 moves!'
             ],
             'tags': ['AI 발굴', '부대각선', '2수 전격', 'MAD 반사', '초단거리']
+        },
+        {
+            'id': 'd4-double-cross-4',
+            'titleKo': '가로/세로 십자 교차 이중 꼬임 4수 폭파',
+            'titleEn': 'Double-Cross Twist 4-Move Purge',
+            'badgeKo': '⚔️ D4 마스터 4수',
+            'badgeEn': '⚔️ D4 Master 4M',
+            'difficulty': 4,
+            'summaryKo': '중심 십자축의 교차 반사와 상단·좌측 라인의 R180 회전이 복합 결합된 최고난도 거리 4 병목을 단 4수로 분쇄하는 마스터 공식입니다.',
+            'summaryEn': 'A master formula crushing a complex distance-4 cross bottleneck via intersecting reflections and R180 rotations in exactly 4 moves.',
+            'moves': [
+                (1, OP_TO_INT['MX']),   # 2행 MX
+                (4, OP_TO_INT['MY']),   # 2열 MY
+                (0, OP_TO_INT['R180']), # 1행 R180
+                (3, OP_TO_INT['R180']), # 1열 R180
+            ],
+            'insightsKo': [
+                '보드 중심 십자축(1, 3, 5, 7)이 반사 대칭으로 교차 비틀림되어 있고 중심과 코너가 R180 위상차를 갖는 거리 4 병목입니다.',
+                '1수: 2행에 MX를 적용하여 5번 타일을 즉시 소거하고, 중심 타일을 MY로 변환하여 2열과의 대칭 합성을 준비합니다.',
+                '2수: 2열에 MY를 가하여 중심 4번 타일을 항등원(ID)으로 복원하고 보드를 직교 대칭군으로 압축합니다.',
+                '3수: 1행에 R180을 적용하여 1번, 2번 타일을 동시 소거하고 잔여 비틀림을 1열 단일 축으로 집중시킵니다.',
+                '4수: 1열 전체에 R180을 일괄 작용시켜 3개 타일을 3중 동시 폭파(Triple Cancel)! 100% 항등원 올 클리어 완성!'
+            ],
+            'insightsEn': [
+                'A distance-4 cross bottleneck where center cross axes are mirror-twisted and corners carry R180 rotational phase.',
+                'Move 1: Row 2 MX eliminates cell 5 and converts center to MY, priming for orthogonal composition.',
+                'Move 2: Col 2 MY restores center tile to ID and compresses residual twists into orthogonal lines.',
+                'Move 3: Row 1 R180 eliminates cells 1 and 2, concentrating remaining twists onto Column 1.',
+                'Move 4: Col 1 R180 delivers a devastating Triple-Cancel on cells 0, 3, 6, achieving 100% all-clear!'
+            ],
+            'tags': ['D4 마스터', '십자 교차', '4수 폭파', '거리 4 병목', '최단 공식']
+        },
+        {
+            'id': 'd4-spiral-vortex-4',
+            'titleKo': '4방향 소용돌이 위상차 4수 올킬',
+            'titleEn': '4-Way Spiral Vortex 4-Move All-Clear',
+            'badgeKo': '🌀 D4 마스터 4수',
+            'badgeEn': '🌀 D4 Master 4M',
+            'difficulty': 4,
+            'summaryKo': '중심은 불변인 채 외곽 8개 타일이 4회전 소용돌이 대칭(코너 R180, 변 R270)을 이루는 병목을 외곽 둘레길 순환으로 단 4수에 올킬합니다.',
+            'summaryEn': 'A stunning master formula wiping out an 8-tile outer chiral vortex (corners R180, edges R270) via perimeter loop rotation in 4 swift moves.',
+            'moves': [
+                (0, OP_TO_INT['R90']),  # 1행 R90
+                (5, OP_TO_INT['R90']),  # 3열 R90
+                (2, OP_TO_INT['R90']),  # 3행 R90
+                (3, OP_TO_INT['R90']),  # 1열 R90
+            ],
+            'insightsKo': [
+                '중심 타일은 ID를 유지한 채 외곽 8개 타일이 모서리 R180, 변 R270의 카이랄리티 소용돌이를 이루는 고유 거리 4 병목입니다.',
+                '1수: 1행에 R90을 적용하여 1번 변 타일을 즉시 소거하고, 상단 코너 타일들의 위상을 R270으로 전환합니다.',
+                '2수: 3열에 R90을 적용하여 2번 코너와 5번 변 타일을 더블 킬(Double Cancel)!',
+                '3수: 3행에 R90을 적용하여 8번 코너와 7번 변 타일을 더블 킬! 이제 1열의 3개 타일만 R270으로 정렬됩니다.',
+                '4수: 1열에 R90을 가하여 0번, 3번, 6번 타일이 일제히 R270 ∘ R90 = ID로 트리플 킬(Triple Cancel)! 전 타일 완벽 복원!'
+            ],
+            'insightsEn': [
+                'A pure chiral vortex bottleneck where 8 perimeter tiles swirl around an identity center (corners R180, edges R270).',
+                'Move 1: Row 1 R90 cancels top edge (1) and shifts top corners into R270 phase.',
+                'Move 2: Col 3 R90 scores a Double-Cancel on corner 2 and edge 5.',
+                'Move 3: Row 3 R90 scores another Double-Cancel on corner 8 and edge 7, isolating Column 1 in pure R270 phase.',
+                'Move 4: Col 1 R90 triggers an all-clearing Triple-Kill on Column 1 (cells 0, 3, 6), achieving 100% ID!'
+            ],
+            'tags': ['D4 마스터', '소용돌이', '4수 올킬', '순환 루프', '최단 공식']
+        },
+        {
+            'id': 'd4-dual-diagonal-blitz-4',
+            'titleKo': '양대각선(↖, ↗) 대칭 교차 4수 동시 폭파',
+            'titleEn': 'Dual-Diagonal Symmetry Blitz 4-Move Destruction',
+            'badgeKo': '⚡ D4 마스터 4수',
+            'badgeEn': '⚡ D4 Master 4M',
+            'difficulty': 4,
+            'summaryKo': '주대각선(MD)과 부대각선(MAD)의 반사 합성으로 중심을 정복한 뒤, 1행 시계 회전과 3행 반시계 회전으로 상하 대칭을 동시 폭파하는 공식입니다.',
+            'summaryEn': 'Dominates center and diagonal axes via MD ∘ MAD = R180 synthesis, then simultaneously annihilates top and bottom rows in 4 moves.',
+            'moves': [
+                (6, OP_TO_INT['MD']),   # 주대각선 MD
+                (7, OP_TO_INT['MAD']),  # 부대각선 MAD
+                (0, OP_TO_INT['R90']),  # 1행 R90
+                (2, OP_TO_INT['R270']), # 3행 R270
+            ],
+            'insightsKo': [
+                '두 대각선 축에 거울 반사와 180도 회전이 교차 결합되어 있고 상하 행의 회전 위상이 비틀린 고난도 거리 4 병목입니다.',
+                '1수: 주대각선(MD) 반사로 대각선 축 타일들을 회전 좌표계로 치환하고 중심을 MAD로 유도합니다.',
+                '2수: 부대각선(MAD) 반사로 중심 4번 타일을 MAD ∘ MAD = ID로 즉시 소거! 보드가 상단 R270 / 하단 R90 층별 대칭으로 완벽 분할됩니다.',
+                '3수: 1행에 R90을 적용하여 1행의 3개 타일이 R270 ∘ R90 = ID로 3중 동시 폭파(Triple Kill)!',
+                '4수: 3행에 R270을 가하여 남은 3개 타일이 R90 ∘ R270 = ID로 3중 동시 폭파! 4수만에 100% 올 클리어 종결!'
+            ],
+            'insightsEn': [
+                'A multi-diagonal distance-4 bottleneck coupling diagonal mirrors with opposite rotational phases on top and bottom rows.',
+                'Move 1: Main diagonal (MD) transforms diagonal axes into rotational frames, transitioning center to MAD.',
+                'Move 2: Anti-diagonal (MAD) instantly clears center (MAD ∘ MAD = ID) and cleanly splits board into top R270 / bottom R90 layers.',
+                'Move 3: Row 1 R90 executes a devastating Triple-Kill on Row 1 (cells 0, 1, 2).',
+                'Move 4: Row 3 R270 strikes the final Triple-Kill on Row 3 (cells 6, 7, 8), terminating the board in 100% identity!'
+            ],
+            'tags': ['D4 마스터', '양대각선', '대칭 교차', '4수 동시 폭파', '최단 공식']
         }
     ]
 

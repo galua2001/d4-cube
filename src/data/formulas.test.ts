@@ -338,7 +338,10 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
 
   it('18. 실전 빈출 2수 피니시 TOP 3 공식 카테고리(god-number, godTechnique) 및 총 공식 개수 검증', () => {
     const godNumberFormulas = getFormulasByCategory('god-number');
-    expect(godNumberFormulas.length).toBe(8);
+    expect(godNumberFormulas.length).toBe(11);
+    expect(godNumberFormulas.some((f) => f.id === 'd4-double-cross-4')).toBe(true);
+    expect(godNumberFormulas.some((f) => f.id === 'd4-spiral-vortex-4')).toBe(true);
+    expect(godNumberFormulas.some((f) => f.id === 'd4-dual-diagonal-blitz-4')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-diamond-cross-3')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-l-diag-combo-3')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-x-cross-3')).toBe(true);
@@ -658,5 +661,64 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     expect(godNumberFormulas.some((f) => f.id === 'd4-l-diag-combo-3')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-x-cross-3')).toBe(true);
   });
-});
 
+  it('35. [D4 4수 마스터 공식: d4-double-cross-4] 직교 십자축 이중 꼬임 4수 메타데이터 & All-ID 100% 클리어 검증', () => {
+    const f = getFormulaById('d4-double-cross-4');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('d4-double-cross-4');
+    expect(f?.category).toBe('god-number');
+    expect(f?.difficulty).toBe(4);
+    expect(f?.steps?.length).toBe(5); // 0단계(초기) + 4수
+
+    // 초기 보드 확인
+    expect(f!.steps![0].boardOps[4]).toBe(D4.R180);
+
+    // 최종 4수 적용 후: 전 타일 100% All-ID 클리어
+    const finalOps = f!.steps![4].boardOps;
+    expect(finalOps.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('36. [D4 4수 마스터 공식: d4-spiral-vortex-4] 4방향 소용돌이 위상차 4수 메타데이터 & All-ID 100% 클리어 검증', () => {
+    const f = getFormulaById('d4-spiral-vortex-4');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('d4-spiral-vortex-4');
+    expect(f?.category).toBe('god-number');
+    expect(f?.difficulty).toBe(4);
+    expect(f?.steps?.length).toBe(5); // 0단계 + 4수
+
+    // 초기 보드: 중심 ID, 코너 R180, 변 R270
+    expect(f!.steps![0].boardOps[4]).toBe(D4.ID);
+    expect(f!.steps![0].boardOps[0]).toBe(D4.R180);
+    expect(f!.steps![0].boardOps[1]).toBe(D4.R270);
+
+    // 최종 4수 적용 후: 전 타일 100% All-ID 클리어
+    const finalOps = f!.steps![4].boardOps;
+    expect(finalOps.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('37. [D4 4수 마스터 공식: d4-dual-diagonal-blitz-4] 양대각선(↖, ↗) 대칭 교차 4수 메타데이터 & All-ID 100% 클리어 검증', () => {
+    const f = getFormulaById('d4-dual-diagonal-blitz-4');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('d4-dual-diagonal-blitz-4');
+    expect(f?.category).toBe('god-number');
+    expect(f?.difficulty).toBe(4);
+    expect(f?.steps?.length).toBe(5); // 0단계 + 4수
+
+    // 초기 보드: 중심 R180
+    expect(f!.steps![0].boardOps[4]).toBe(D4.R180);
+
+    // 최종 4수 적용 후: 전 타일 100% All-ID 클리어
+    const finalOps = f!.steps![4].boardOps;
+    expect(finalOps.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('38. D4 거리 4 마스터 공식 3선 i18n 번역 키 및 다국어 사전 등록 검증', async () => {
+    const { translations } = await import('../i18n/translations');
+    expect(translations.ko['formula.item.d4DoubleCross4.title']).toContain('가로/세로 십자');
+    expect(translations.en['formula.item.d4DoubleCross4.title']).toContain('Double-Cross Twist');
+    expect(translations.ko['formula.item.d4SpiralVortex4.title']).toContain('4방향 소용돌이');
+    expect(translations.en['formula.item.d4SpiralVortex4.title']).toContain('4-Way Spiral Vortex');
+    expect(translations.ko['formula.item.d4DualDiagonalBlitz4.title']).toContain('양대각선');
+    expect(translations.en['formula.item.d4DualDiagonalBlitz4.title']).toContain('Dual-Diagonal');
+  });
+});

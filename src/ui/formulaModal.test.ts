@@ -311,5 +311,32 @@ describe('FormulaModalController (공식 비법서 모달 및 인터랙티브 �
     controller.close();
     expect(controller.isOpen()).toBe(false);
   });
-});
+  it('17. D4 신규 4수 마스터 공식 3선 (d4-double-cross-4, d4-spiral-vortex-4, d4-dual-diagonal-blitz-4) 모달 인터랙티브 제어 및 4단계 스텝 시뮬레이션 검증', () => {
+    controller.open('d4-double-cross-4');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+    controller.setStep(4);
 
+    controller.selectFormula('d4-spiral-vortex-4');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+    controller.setStep(4);
+
+    controller.selectFormula('d4-dual-diagonal-blitz-4');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+    controller.setStep(4);
+
+    controller.setCategory('god-number');
+    expect(controller.isOpen()).toBe(true);
+
+    controller.close();
+    expect(controller.isOpen()).toBe(false);
+  });
+});
