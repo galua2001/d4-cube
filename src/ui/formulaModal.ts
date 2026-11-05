@@ -49,6 +49,8 @@ export class FormulaModalController {
   private currentStepIndex: number = 0;
   private isPlaying: boolean = false;
   private playTimerId: number | null = null;
+  private playSpeed: number = 1.0;
+  private toastTimerId: number | null = null;
   private langUnsubscribe: (() => void) | null = null;
   private themeUnsubscribe: (() => void) | null = null;
   private keyDownHandler: ((e: KeyboardEvent) => void) | null = null;
@@ -201,6 +203,49 @@ export class FormulaModalController {
     this.setStep(0);
   }
 
+  public getPlaySpeed(): number {
+    return this.playSpeed;
+  }
+
+  public setPlaySpeed(speed: number): void {
+    this.playSpeed = speed;
+    const speedBtns = this.overlay?.querySelectorAll('.formula-speed-btn');
+    speedBtns?.forEach((b) => {
+      const btnSpeed = parseFloat((b as HTMLElement).dataset.speed || '1.0');
+      b.classList.toggle('active', btnSpeed === this.playSpeed);
+    });
+
+    if (this.isPlaying) {
+      this.stopAutoPlay();
+      this.startAutoPlay();
+    }
+  }
+
+  public showToast(message: string): void {
+    let toastEl = this.overlay?.querySelector('#formula-toast') as HTMLElement | null;
+    if (!toastEl) {
+      toastEl = document.createElement('div');
+      toastEl.id = 'formula-toast';
+      toastEl.className = 'formula-toast';
+      const card = this.overlay?.querySelector('.formula-modal-card');
+      if (card) {
+        card.appendChild(toastEl);
+      } else {
+        this.overlay?.appendChild(toastEl);
+      }
+    }
+    toastEl.textContent = message;
+    toastEl.classList.add('show');
+
+    if (this.toastTimerId !== null) {
+      window.clearTimeout(this.toastTimerId);
+    }
+    this.toastTimerId = window.setTimeout(() => {
+      toastEl?.classList.remove('show');
+      this.toastTimerId = null;
+    }, 2000);
+  }
+
   private applyFilterAndRender(): void {
     const filtered = filterFormulas(FORMULAS, this.searchQuery, this.currentCategory, this.selectedTag);
     if (filtered.length > 0 && !filtered.some((f) => f.id === this.currentFormulaId)) {
@@ -231,7 +276,7 @@ export class FormulaModalController {
       soundEngine.playTap();
       this.renderStepInfo();
       this.renderMiniBoard();
-    }, 1500);
+    }, Math.round(1500 / this.playSpeed));
   }
 
   private stopAutoPlay(): void {
@@ -322,6 +367,9 @@ export class FormulaModalController {
           <!-- 우측 공식 상세 및 3×3 인터랙티브 시뮬레이터 -->
           <div class="formula-detail-panel" id="formula-detail-panel"></div>
         </div>
+
+        <!-- 복사 알림 토스트 (Round 6) -->
+        <div class="formula-toast" id="formula-toast" role="status" aria-live="polite"></div>
       </div>
     `;
 
@@ -348,7 +396,7 @@ export class FormulaModalController {
     const clearBtn = this.overlay.querySelector('#btn-formula-search-clear');
     clearBtn?.addEventListener('click', () => {
       this.setSearchQuery('');
-      searchInput?.focus();
+      if (typeof searchInput?.focus === "function") { searchInput.focus(); }
     });
   }
 
@@ -511,7 +559,13 @@ export class FormulaModalController {
           </div>
           <h3 class="formula-detail-title">${title}</h3>
           <div class="formula-notation-box">
-            <div class="formula-notation-label">${t('formula.mathNotationLabel')}</div>
+            <div class="formula-notation-header">
+              <span class="formula-notation-label">${t('formula.mathNotationLabel')}</span>
+              <button class="btn-copy-formula" id="btn-copy-formula" type="button" title="${t('formula.btnCopy')}">
+                <span class="copy-icon">📋</span>
+                <span class="copy-text">${t('formula.btnCopy')}</span>
+              </button>
+            </div>
             <div class="formula-notation-code">⚡ ${formula.formulaSeq}</div>
             ${formula.latexFormula ? `<div class="formula-latex-code">Formula: ${formula.latexFormula}</div>` : ''}
           </div>
@@ -555,12 +609,19 @@ export class FormulaModalController {
                 <!-- 단계 점프 버튼군 -->
                 <div class="step-jump-buttons" id="step-jump-buttons"></div>
 
-                <!-- 재생 컨트롤 바 -->
+                <!-- 재생 컨트롤 바 & 속도 제어기 (Round 6) -->
                 <div class="step-playback-bar">
-                  <button class="formula-ctrl-btn" id="btn-step-prev">◀</button>
-                  <button class="formula-ctrl-btn primary" id="btn-step-play">▶ ${t('formula.btnPlay')}</button>
-                  <button class="formula-ctrl-btn" id="btn-step-next">▶</button>
-                  <button class="formula-ctrl-btn" id="btn-step-reset">↺ ${t('formula.btnReset')}</button>
+                  <div class="step-playback-main-btns">
+                    <button class="formula-ctrl-btn" id="btn-step-prev">◀</button>
+                    <button class="formula-ctrl-btn primary" id="btn-step-play">▶ ${t('formula.btnPlay')}</button>
+                    <button class="formula-ctrl-btn" id="btn-step-next">▶</button>
+                    <button class="formula-ctrl-btn" id="btn-step-reset">↺ ${t('formula.btnReset')}</button>
+                  </div>
+                  <div class="step-speed-selector" id="step-speed-selector">
+                    <button class="formula-speed-btn ${this.playSpeed === 0.5 ? 'active' : ''}" data-speed="0.5" id="btn-speed-05x">${t('formula.speed05x')}</button>
+                    <button class="formula-speed-btn ${this.playSpeed === 1.0 ? 'active' : ''}" data-speed="1.0" id="btn-speed-1x">${t('formula.speed1x')}</button>
+                    <button class="formula-speed-btn ${this.playSpeed === 2.0 ? 'active' : ''}" data-speed="2.0" id="btn-speed-2x">${t('formula.speed2x')}</button>
+                  </div>
                 </div>
 
                 <!-- 실전 보드 연습 액션 바 -->
@@ -626,6 +687,31 @@ export class FormulaModalController {
 
     panel.querySelector('#btn-step-reset')?.addEventListener('click', () => {
       this.resetStep();
+    });
+
+    // 공식 원클릭 복사 이벤트 (Round 6)
+    const copyBtn = panel.querySelector('#btn-copy-formula');
+    copyBtn?.addEventListener('click', async () => {
+      soundEngine.playTap();
+      try {
+        if (navigator?.clipboard?.writeText) {
+          await navigator.clipboard.writeText(formula.formulaSeq);
+        }
+      } catch (err) {
+        console.warn('Clipboard write failed:', err);
+      }
+      this.showToast(t('formula.copiedToast'));
+      copyBtn.classList.add('copied');
+      window.setTimeout(() => copyBtn.classList.remove('copied'), 1500);
+    });
+
+    // 재생 속도 제어 버튼군 이벤트 (Round 6)
+    panel.querySelectorAll('.formula-speed-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const speed = parseFloat((btn as HTMLElement).dataset.speed || '1.0');
+        soundEngine.playTap();
+        this.setPlaySpeed(speed);
+      });
     });
 
     // 실전 보드 연습하기 버튼 이벤트
