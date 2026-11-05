@@ -263,7 +263,8 @@ export class FormulaModalController {
       { key: 'basics', label: t('formula.tabBasic'), icon: '📐' },
       { key: 'rotation', label: isKo ? '회전 공식' : 'Rotation', icon: '🔄' },
       { key: 'reflection', label: isKo ? '반사 공식' : 'Reflection', icon: '🪞' },
-      { key: 'godTechnique', label: t('formula.tabGodTechnique'), icon: '⚡' }
+      { key: 'godTechnique', label: t('formula.tabGodTechnique'), icon: '⚡' },
+      { key: 'god-number', label: t('formula.tabAiMined'), icon: '🤖' }
     ];
 
     tabsContainer.innerHTML = tabs

@@ -225,4 +225,27 @@ describe('FormulaModalController (공식 비법서 모달 및 인터랙티브 �
     controller.close();
     expect(controller.isOpen()).toBe(false);
   });
+
+  it('13. 실전 빈출 2수 피니시 TOP 3 공식 (finish-l-shape-5, finish-wing-cross-4, finish-hybrid-cancel) 모달 인터랙티브 제어 검증', () => {
+    controller.open('finish-l-shape-5');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+
+    controller.selectFormula('finish-wing-cross-4');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+
+    controller.selectFormula('finish-hybrid-cancel');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+
+    controller.setCategory('god-number');
+    expect(controller.isOpen()).toBe(true);
+
+    controller.close();
+    expect(controller.isOpen()).toBe(false);
+  });
 });

@@ -14,6 +14,7 @@ export type FormulaCategory =
   | 'rotation'
   | 'reflection'
   | 'godTechnique'
+  | 'god-number'
   | 'beginner'
   | 'intermediate'
   | 'advanced';
@@ -669,6 +670,117 @@ const parity90CycleSteps = createInteractiveSteps(emptyBoard, [
   }
 ]);
 
+// 10. [실전 1위: L자형 5개 에러 2수 피니시 인터랙티브 스텝]
+// 초기 보드: Row1(MX) + Col1(MY) 적용 상태 -> 교차점 셀 0은 R180, 셀 1, 2는 MX, 셀 3, 6은 MY
+const finishLShapeInitialBoard: D4Op[] = [
+  D4.R180, D4.MX, D4.MX,
+  D4.MY,   D4.ID, D4.ID,
+  D4.MY,   D4.ID, D4.ID
+];
+
+const finishLShapeSteps = createInteractiveSteps(finishLShapeInitialBoard, [
+  {
+    lineType: 'col',
+    lineIndex: 0,
+    op: D4.MY,
+    actionDescKo: '1수: 1열 좌우 반전 (MY 세로밀기)',
+    actionDescEn: 'Move 1: Col 1 Horizontal Flip (MY Vertical Swipe)',
+    mathInsightKo: '1열의 3, 6번 타일이 MY² = ID로 복구되고, 코너 0번 타일은 R180 ∘ MY = MX로 전이되어 1행 전체가 MX로 동기화됩니다.',
+    mathInsightEn: 'Col 1 tiles (3, 6) restore via MY² = ID, and corner tile 0 becomes R180 ∘ MY = MX, aligning Row 1 uniformly to MX.',
+    highlightCells: [0, 3, 6],
+    formulaBadge: '1수: 1열 MY',
+    formulaText: 'Col₁ ➔ MY',
+    formulaDesc: '1열 세로밀기로 1열의 에러를 잡고 코너 위상을 1행과 정렬합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.MX,
+    actionDescKo: '2수: 1행 상하 반전 (MX 가로밀기)',
+    actionDescEn: 'Move 2: Row 1 Vertical Flip (MX Horizontal Swipe)',
+    mathInsightKo: '동기화된 1행의 0, 1, 2번 타일이 MX² = ID로 일괄 소거되며 전 타일 100% 올클리어 완성!',
+    mathInsightEn: 'All tiles (0, 1, 2) in Row 1 clear simultaneously via MX² = ID, completing 100% board clearance!',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '2수: 1행 MX 피니시',
+    formulaText: 'Row₁ ➔ MX ➔ 100% 클리어',
+    formulaDesc: '1행 가로밀기로 남아있던 1행 전체를 정위치로 일괄 복원합니다.'
+  }
+]);
+
+// 11. [실전 2위: 십자 날개 엇갈림 4개 에러 2수 피니시 인터랙티브 스텝]
+// 초기 보드: Row2(R180) + Col2(R180) -> 중심(4번)은 R180² = ID 상쇄, 상하좌우 날개(1, 3, 5, 7)만 R180
+const finishWingCrossInitialBoard: D4Op[] = [
+  D4.ID,   D4.R180, D4.ID,
+  D4.R180, D4.ID,   D4.R180,
+  D4.ID,   D4.R180, D4.ID
+];
+
+const finishWingCrossSteps = createInteractiveSteps(finishWingCrossInitialBoard, [
+  {
+    lineType: 'row',
+    lineIndex: 1,
+    op: D4.R180,
+    actionDescKo: '1수: 2행 180° 회전 (R180 더블탭)',
+    actionDescEn: 'Move 1: Row 2 Rotate 180° (R180 Double Tap)',
+    mathInsightKo: '좌우 날개(3, 5번)가 R180² = ID로 즉시 정위치 복원되며, 중심 타일(4번)은 R180 상태로 임시 전이됩니다.',
+    mathInsightEn: 'Left and right wings (3, 5) restore via R180² = ID, and the center tile temporarily becomes R180.',
+    highlightCells: [3, 4, 5],
+    formulaBadge: '1수: 2행 R180',
+    formulaText: 'Row₂ ➔ R180',
+    formulaDesc: '2행 더블탭으로 좌우 날개를 맞추고 중심 타일을 임시 전이시킵니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 1,
+    op: D4.R180,
+    actionDescKo: '2수: 2열 180° 회전 (R180 더블탭)',
+    actionDescEn: 'Move 2: Col 2 Rotate 180° (R180 Double Tap)',
+    mathInsightKo: '상하 날개(1, 7번)가 복원되고, 중심 4번 타일은 R180 ∘ R180 = ID로 자기상쇄되어 전 타일 100% ID 완성!',
+    mathInsightEn: 'Top and bottom wings (1, 7) restore, and center tile cancels out via R180² = ID to complete 100% board clearance!',
+    highlightCells: [1, 4, 7],
+    formulaBadge: '2수: 2열 R180 피니시',
+    formulaText: 'Col₂ ➔ R180 ➔ 100% 클리어',
+    formulaDesc: '2열 더블탭으로 상하 날개와 중심을 동시 소거하여 퍼즐을 완성합니다.'
+  }
+]);
+
+// 12. [실전 3위: 반사-회전 하이브리드 L자 동시소거 2수 피니시 인터랙티브 스텝]
+// 초기 보드: Row1(R180) + Col1(MX) -> 교차점 0번은 R180 ∘ MX = MY, 1행(1, 2번)은 R180, 1열(3, 6번)은 MX
+const finishHybridInitialBoard: D4Op[] = [
+  D4.MY,   D4.R180, D4.R180,
+  D4.MX,   D4.ID,   D4.ID,
+  D4.MX,   D4.ID,   D4.ID
+];
+
+const finishHybridSteps = createInteractiveSteps(finishHybridInitialBoard, [
+  {
+    lineType: 'col',
+    lineIndex: 0,
+    op: D4.MX,
+    actionDescKo: '1수: 1열 상하 반전 (MX 가로밀기)',
+    actionDescEn: 'Move 1: Col 1 Vertical Flip (MX Horizontal Swipe)',
+    mathInsightKo: '1열의 3, 6번 반사 타일이 MX² = ID로 소거되고, 교차점 0번 타일은 MY ∘ MX = R180 순수 회전으로 변환되어 1행 전체가 R180으로 동기화됩니다.',
+    mathInsightEn: 'Col 1 reflection tiles (3, 6) cancel via MX² = ID, and corner tile 0 converts to pure rotation MY ∘ MX = R180, aligning Row 1 uniformly to R180.',
+    highlightCells: [0, 3, 6],
+    formulaBadge: '1수: 1열 MX',
+    formulaText: 'Col₁ ➔ MX',
+    formulaDesc: '1열 가로밀기로 반사 에러를 소거하고 코너 타일을 순수 회전으로 전환합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.R180,
+    actionDescKo: '2수: 1행 180° 회전 (R180 더블탭)',
+    actionDescEn: 'Move 2: Row 1 Rotate 180° (R180 Double Tap)',
+    mathInsightKo: '순수 회전으로 정렬된 1행의 0, 1, 2번 타일이 R180² = ID로 한 방에 상쇄되며 전 타일 100% ID 올클리어 완성!',
+    mathInsightEn: 'All tiles (0, 1, 2) in Row 1 clear simultaneously via R180² = ID, completing 100% board clearance!',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '2수: 1행 R180 피니시',
+    formulaText: 'Row₁ ➔ R180 ➔ 100% 클리어',
+    formulaDesc: '1행 더블탭으로 남은 1행 전체를 정위치로 일괄 복원합니다.'
+  }
+]);
+
 export const FORMULAS: FormulaItem[] = [
   {
     id: 'master-method-3step',
@@ -722,6 +834,81 @@ export const FORMULAS: FormulaItem[] = [
       '3-Cycle One-Shot Clear: Three 90° tiles on the same line are instantly resolved with a single reverse rotation (R270).'
     ],
     tags: ['패리티 법칙', '90도 공식', '3-Cycle', '상쇄쌍', '군론 불변량', '원샷 해법'],
+    isInteractive: true
+  },
+  {
+    id: 'finish-l-shape-5',
+    titleKo: '[실전 1위] L자형 5개 에러 2수 피니시',
+    titleEn: '[Rank #1] L-Shape 5-Tile Error 2-Move Finish',
+    category: 'god-number',
+    badgeKo: '실전 1위 피니시',
+    badgeEn: 'Top #1 Finish',
+    difficulty: 2,
+    formulaSeq: '1열 MY ➔ 1행 MX = 전 타일 올클리어',
+    summaryKo: '실전 게임에서 가장 빈번하게 발생하는 직교 2선 교차 패턴! 교차 코너 타일을 포함한 5개 에러를 [1열 세로밀기] ➔ [1행 가로밀기] 단 2수로 완벽하게 0번(정위치)으로 매듭짓는 실전 최다 빈출 피니시 공식입니다.',
+    summaryEn: 'The most frequent pattern in actual matches: 2 perpendicular lines intersecting. Resolves 5 error tiles including the corner tile in just 2 moves: [Col 1 MY] ➔ [Row 1 MX] to achieve 100% all-clear.',
+    diagramType: 'interactive',
+    steps: finishLShapeSteps,
+    latexFormula: '\\\\text{Col}_1(\\\\text{MY}) \\\\circ \\\\text{Row}_1(\\\\text{MX}) = \\\\text{ID}',
+    notesKo: [
+      'L자 형태로 5개 타일이 어긋났을 때 당황하지 마세요. 직교하는 두 선의 단 2수 피니시로 즉시 해결됩니다.',
+      '1열의 반사를 먼저 풀어 코너 타일의 위상을 1행과 일치시킨 뒤, 1행을 한 방에 쓸어 담는 것이 핵심입니다.'
+    ],
+    notesEn: [
+      'Do not panic when 5 tiles form an L-shaped error. It is solved cleanly in 2 moves using perpendicular lines.',
+      'Resolve Col 1 first to align the corner tile orientation with Row 1, then sweep Row 1 in a single move.'
+    ],
+    tags: ['실전 피니시', '2수 피니시', 'L자형', '신의 수', 'TOP 3', '고빈출', '신의 수 테크닉'],
+    isInteractive: true
+  },
+  {
+    id: 'finish-wing-cross-4',
+    titleKo: '[실전 2위] 십자 날개 엇갈림 4개 에러 2수 피니시',
+    titleEn: '[Rank #2] Wing Cross 4-Tile Misalignment 2-Move Finish',
+    category: 'god-number',
+    badgeKo: '실전 2위 피니시',
+    badgeEn: 'Top #2 Finish',
+    difficulty: 3,
+    formulaSeq: '2행 R180 ➔ 2열 R180 = 전 타일 올클리어',
+    summaryKo: '중심과 모서리는 모두 맞았는데 상하좌우 십자 날개(1, 3, 5, 7번) 4개 타일만 180° 회전된 고난도 대칭 난제! [2행 더블탭] ➔ [2열 더블탭] 2수로 중심 상쇄(R180² = ID)를 유도해 단 2수 만에 4개 날개를 동시 소거합니다.',
+    summaryEn: 'A high-level dilemma where the center and 4 corners are solved, but the 4 cross wings (1, 3, 5, 7) are flipped by 180°. [Row 2 R180] ➔ [Col 2 R180] cancels out the center via R180² = ID and finishes all 4 wings in 2 moves.',
+    diagramType: 'interactive',
+    steps: finishWingCrossSteps,
+    latexFormula: '\\\\text{Row}_2(\\\\text{R180}) \\\\circ \\\\text{Col}_2(\\\\text{R180}) = \\\\text{ID}',
+    notesKo: [
+      '중심을 공유하는 2행과 2열의 위수 2 회전이 교차점에서 자기상쇄(R180² = ID)되는 군론적 기적을 활용합니다.',
+      '십자 날개 4개가 180°로 뒤집혀 있을 때 가장 빠르고 우아하게 끝내는 2수 비법입니다.'
+    ],
+    notesEn: [
+      'Leverages the group miracle where order-2 rotations of Row 2 and Col 2 cancel out at the center (R180² = ID).',
+      'The fastest and most elegant 2-move method when all 4 cross wings are flipped by 180°.'
+    ],
+    tags: ['실전 피니시', '2수 피니시', '십자 날개', '신의 수', 'TOP 3', 'R180 상쇄', '신의 수 테크닉'],
+    isInteractive: true
+  },
+  {
+    id: 'finish-hybrid-cancel',
+    titleKo: '[실전 3위] 반사-회전 하이브리드 L자 동시소거 2수 피니시',
+    titleEn: '[Rank #3] Hybrid Reflection-Rotation L-Shape 2-Move Finish',
+    category: 'god-number',
+    badgeKo: '실전 3위 피니시',
+    badgeEn: 'Top #3 Finish',
+    difficulty: 3,
+    formulaSeq: '1열 MX ➔ 1행 R180 = 전 타일 올클리어',
+    summaryKo: '한쪽 줄은 뒤집힌 거울 반사(MX)이고 다른 쪽 줄은 머리가 돌아간 회전(R180)인 난감한 하이브리드 혼합 에러! [1열 가로밀기] ➔ [1행 더블탭] 2수로 반사 성분을 먼저 소거하며 교차점 위상을 회전으로 동기화시켜 단 2수로 올클리어합니다.',
+    summaryEn: 'A tricky hybrid error where one line is mirror-reflected (MX) and the intersecting line is rotated (R180). [Col 1 MX] ➔ [Row 1 R180] eliminates reflection first, aligns the intersection phase to rotation, and resolves the entire board in 2 moves.',
+    diagramType: 'interactive',
+    steps: finishHybridSteps,
+    latexFormula: '\\\\text{Col}_1(\\\\text{MX}) \\\\circ \\\\text{Row}_1(\\\\text{R180}) = \\\\text{ID}',
+    notesKo: [
+      '반사 타일과 회전 타일이 섞여 있을 때, 반사를 먼저 조작하여 교차점을 회전 성분으로 승화시키는 것이 하이브리드 해법의 본질입니다.',
+      'D4 군론의 비가환성(MY ∘ MX = R180)을 역이용하여 반사 문제와 회전 문제를 동시에 해결하는 실전 고급 테크닉입니다.'
+    ],
+    notesEn: [
+      'When reflection and rotation coexist, manipulating reflection first to elevate the intersection into rotation is the essence of hybrid solving.',
+      'An advanced practical technique exploiting D4 non-commutativity (MY ∘ MX = R180) to resolve reflection and rotation simultaneously.'
+    ],
+    tags: ['실전 피니시', '2수 피니시', '하이브리드', '신의 수', 'TOP 3', '반사회전', '신의 수 테크닉'],
     isInteractive: true
   },
   {
@@ -969,11 +1156,14 @@ export function getFormulasByCategory(category: FormulaCategory | 'all' | string
   if (category === 'advanced') {
     return FORMULAS.filter((f) => f.category === 'advanced');
   }
+  if (category === 'god-number') {
+    return FORMULAS.filter((f) => f.category === 'god-number');
+  }
   return FORMULAS.filter((f) => {
     if (category === 'basic') return f.category === 'basics';
     if (category === 'rotation') return f.category === 'beginner' || f.tags?.includes('회전 공식');
     if (category === 'reflection') return f.category === 'intermediate' || f.tags?.includes('반사 공식');
-    if (category === 'godTechnique') return f.category === 'advanced' || f.tags?.includes('신의 수 테크닉');
+    if (category === 'godTechnique') return f.category === 'advanced' || f.category === 'god-number' || f.tags?.includes('신의 수 테크닉');
     return f.category === category;
   });
 }

@@ -250,4 +250,105 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     const all = getFormulasByCategory('all');
     expect(all.length).toBeGreaterThanOrEqual(11);
   });
+
+  it('15. [실전 1위: finish-l-shape-5] L자형 5개 에러 2수 피니시 단계별 시뮬레이션 및 올클리어 검증', () => {
+    const f = getFormulaById('finish-l-shape-5');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('finish-l-shape-5');
+    expect(f?.category).toBe('god-number');
+    expect(f?.steps?.length).toBe(3); // 초기(0) + 2수
+
+    // 0단계: 5개 에러 (0: R180, 1: MX, 2: MX, 3: MY, 6: MY)
+    const step0Ops = f!.steps![0].boardOps;
+    expect(step0Ops[0]).toBe(D4.R180);
+    expect(step0Ops[1]).toBe(D4.MX);
+    expect(step0Ops[2]).toBe(D4.MX);
+    expect(step0Ops[3]).toBe(D4.MY);
+    expect(step0Ops[6]).toBe(D4.MY);
+    expect([4, 5, 7, 8].every((idx) => step0Ops[idx] === D4.ID)).toBe(true);
+
+    // 1수: 1열 MY -> 3, 6번 ID 복구, 0번은 R180 ∘ MY = MX 전이
+    const step1Ops = f!.steps![1].boardOps;
+    expect(step1Ops[3]).toBe(D4.ID);
+    expect(step1Ops[6]).toBe(D4.ID);
+    expect(step1Ops[0]).toBe(D4.MX);
+    expect(step1Ops[1]).toBe(D4.MX);
+    expect(step1Ops[2]).toBe(D4.MX);
+
+    // 2수: 1행 MX -> 1행 0, 1, 2번 MX² = ID 일괄 복원 -> 전 타일 100% ID 완성!
+    const step2Ops = f!.steps![2].boardOps;
+    expect(step2Ops.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('16. [실전 2위: finish-wing-cross-4] 십자 날개 엇갈림 4개 에러 2수 피니시 및 중심 상쇄 검증', () => {
+    const f = getFormulaById('finish-wing-cross-4');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('finish-wing-cross-4');
+    expect(f?.category).toBe('god-number');
+    expect(f?.steps?.length).toBe(3); // 초기(0) + 2수
+
+    // 0단계: 십자 날개 4개(1, 3, 5, 7번)만 R180, 중심 4번 및 코너 4개는 ID
+    const step0Ops = f!.steps![0].boardOps;
+    expect(step0Ops[1]).toBe(D4.R180);
+    expect(step0Ops[3]).toBe(D4.R180);
+    expect(step0Ops[5]).toBe(D4.R180);
+    expect(step0Ops[7]).toBe(D4.R180);
+    expect(step0Ops[4]).toBe(D4.ID);
+    expect([0, 2, 6, 8].every((idx) => step0Ops[idx] === D4.ID)).toBe(true);
+
+    // 1수: 2행 R180 -> 좌우 날개(3, 5번) ID 복원, 중심(4번) R180 임시 전이
+    const step1Ops = f!.steps![1].boardOps;
+    expect(step1Ops[3]).toBe(D4.ID);
+    expect(step1Ops[5]).toBe(D4.ID);
+    expect(step1Ops[4]).toBe(D4.R180);
+
+    // 2수: 2열 R180 -> 상하 날개(1, 7번) ID 복원, 중심(4번) R180² = ID 상쇄 -> 전 타일 100% 올클리어!
+    const step2Ops = f!.steps![2].boardOps;
+    expect(step2Ops.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('17. [실전 3위: finish-hybrid-cancel] 반사-회전 하이브리드 L자 동시소거 2수 피니시 검증', () => {
+    const f = getFormulaById('finish-hybrid-cancel');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('finish-hybrid-cancel');
+    expect(f?.category).toBe('god-number');
+    expect(f?.steps?.length).toBe(3); // 초기(0) + 2수
+
+    // 0단계: 하이브리드 L자 에러 (0: MY, 1: R180, 2: R180, 3: MX, 6: MX)
+    const step0Ops = f!.steps![0].boardOps;
+    expect(step0Ops[0]).toBe(D4.MY);
+    expect(step0Ops[1]).toBe(D4.R180);
+    expect(step0Ops[2]).toBe(D4.R180);
+    expect(step0Ops[3]).toBe(D4.MX);
+    expect(step0Ops[6]).toBe(D4.MX);
+    expect([4, 5, 7, 8].every((idx) => step0Ops[idx] === D4.ID)).toBe(true);
+
+    // 1수: 1열 MX -> 3, 6번 반사 ID 소거, 코너 0번은 MY ∘ MX = R180 순수 회전 전이
+    const step1Ops = f!.steps![1].boardOps;
+    expect(step1Ops[3]).toBe(D4.ID);
+    expect(step1Ops[6]).toBe(D4.ID);
+    expect(step1Ops[0]).toBe(D4.R180);
+    expect(step1Ops[1]).toBe(D4.R180);
+    expect(step1Ops[2]).toBe(D4.R180);
+
+    // 2수: 1행 R180 -> 1행 0, 1, 2번 타일 일괄 R180² = ID 상쇄 -> 전 타일 100% 올클리어!
+    const step2Ops = f!.steps![2].boardOps;
+    expect(step2Ops.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('18. 실전 빈출 2수 피니시 TOP 3 공식 카테고리(god-number, godTechnique) 및 총 공식 개수 검증', () => {
+    const godNumberFormulas = getFormulasByCategory('god-number');
+    expect(godNumberFormulas.length).toBe(3);
+    expect(godNumberFormulas.some((f) => f.id === 'finish-l-shape-5')).toBe(true);
+    expect(godNumberFormulas.some((f) => f.id === 'finish-wing-cross-4')).toBe(true);
+    expect(godNumberFormulas.some((f) => f.id === 'finish-hybrid-cancel')).toBe(true);
+
+    const godTechniqueFormulas = getFormulasByCategory('godTechnique');
+    expect(godTechniqueFormulas.some((f) => f.id === 'finish-l-shape-5')).toBe(true);
+    expect(godTechniqueFormulas.some((f) => f.id === 'finish-wing-cross-4')).toBe(true);
+    expect(godTechniqueFormulas.some((f) => f.id === 'finish-hybrid-cancel')).toBe(true);
+
+    const all = getFormulasByCategory('all');
+    expect(all.length).toBeGreaterThanOrEqual(14);
+  });
 });

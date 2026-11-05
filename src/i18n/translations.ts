@@ -314,6 +314,7 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.tabRotation': 'Rotation',
     'formula.tabReflection': 'Reflection',
     'formula.tabGodTechnique': 'God Techniques',
+    'formula.tabAiMined': 'AI Mined',
     'formula.stepCount': 'Step {current} / {total}',
     'formula.btnPlay': '▶ Step Through',
     'formula.btnPause': '⏸ Pause',
@@ -419,7 +420,31 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.diagonal180Pair.step1': 'Move 1: Main Diagonal MD (Transitions corners to MAD)',
     'formula.item.diagonal180Pair.step2': 'Move 2: Row 1 R180 (Aligns top-left corner to MD)',
     'formula.item.diagonal180Pair.step3': 'Move 3: Col 3 R180 (Aligns bottom-right corner to MD and restores cell 2)',
-    'formula.item.diagonal180Pair.step4': 'Move 4: Main Diagonal MD (Restores via MD² = ID: corners solved!)'
+    'formula.item.diagonal180Pair.step4': 'Move 4: Main Diagonal MD (Restores via MD² = ID: corners solved!)',
+
+    'formula.item.finishLShape5.title': '[Rank #1] L-Shape 5-Tile Error 2-Move Finish',
+    'formula.item.finishLShape5.subtitle': 'Most frequent perpendicular 2-line intersection 5-error all-clear technique',
+    'formula.item.finishLShape5.desc': 'A very common match-ending pattern where 5 tiles including the corner are misaligned along intersecting row and column lines. By applying Col 1 MY followed by Row 1 MX, the corner is properly phased and the entire L-shape collapses back to identity.',
+    'formula.item.finishLShape5.tip': 'Resolve the column reflection first to align the corner tile phase with the row, then sweep the entire row in a single stroke.',
+    'formula.item.finishLShape5.step0': 'Initial State: 5 tiles forming an L-shaped error (cells 0, 1, 2, 3, 6)',
+    'formula.item.finishLShape5.step1': 'Move 1: Col 1 MY (Vertical swipe) ➔ Clears tiles 3 & 6, phases corner 0 into MX',
+    'formula.item.finishLShape5.step2': 'Move 2: Row 1 MX (Horizontal swipe) ➔ All Row 1 tiles resolve via MX² = ID, 100% all-clear!',
+
+    'formula.item.finishWingCross4.title': '[Rank #2] Wing Cross 4-Tile Misalignment 2-Move Finish',
+    'formula.item.finishWingCross4.subtitle': 'Center self-cancellation miracle solving 4 cross edge wings simultaneously',
+    'formula.item.finishWingCross4.desc': 'When the center and 4 corners are solved, but the 4 cross wings (cells 1, 3, 5, 7) are flipped by 180°. Order-2 rotations of Row 2 and Col 2 cancel out at the center (R180² = ID) and cleanly eliminate all 4 wings in 2 moves.',
+    'formula.item.finishWingCross4.tip': 'Double tap Row 2, then double tap Col 2. The center temporarily inverts and immediately restores, clearing all 4 wings.',
+    'formula.item.finishWingCross4.step0': 'Initial State: 4 cross edge wings (cells 1, 3, 5, 7) flipped by 180°',
+    'formula.item.finishWingCross4.step1': 'Move 1: Row 2 R180 (Double tap Row 2) ➔ Resolves wings 3 & 5, center temporarily becomes R180',
+    'formula.item.finishWingCross4.step2': 'Move 2: Col 2 R180 (Double tap Col 2) ➔ Resolves wings 1 & 7, center cancels via R180² = ID, 100% all-clear!',
+
+    'formula.item.finishHybridCancel.title': '[Rank #3] Hybrid Reflection-Rotation L-Shape 2-Move Finish',
+    'formula.item.finishHybridCancel.subtitle': 'Harmonizing mirror reflection and pure rotation into simultaneous 2-move clearance',
+    'formula.item.finishHybridCancel.desc': 'A tricky state where one line is mirrored (MX) and the intersecting line is rotated (R180). Applying Col 1 MX cancels the reflection components and converts the corner into pure rotation (MY ∘ MX = R180), enabling Row 1 R180 to finish the board.',
+    'formula.item.finishHybridCancel.tip': 'When reflection and rotation coexist, cancel the reflection first to synchronize the intersection into a pure rotation.',
+    'formula.item.finishHybridCancel.step0': 'Initial State: Hybrid L-shape with reflection (cells 3, 6) and rotation (cells 1, 2)',
+    'formula.item.finishHybridCancel.step1': 'Move 1: Col 1 MX (Horizontal swipe) ➔ Clears reflection tiles 3 & 6, turns corner into R180',
+    'formula.item.finishHybridCancel.step2': 'Move 2: Row 1 R180 (Double tap Row 1) ➔ Row 1 resolves via R180² = ID, 100% all-clear!'
   },
 
   ko: {
@@ -684,6 +709,7 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.tabRotation': '회전 공식',
     'formula.tabReflection': '반사 공식',
     'formula.tabGodTechnique': '신의 수 테크닉',
+    'formula.tabAiMined': 'AI 발굴 공식',
     'formula.stepCount': '{current} / {total} 단계',
     'formula.btnPlay': '▶ 단계별 보기',
     'formula.btnPause': '⏸ 일시 정지',
@@ -789,7 +815,31 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.diagonal180Pair.step1': '1수: 주대각선 사선 반사 (MD 사선밀기로 대각 축 켤레 변환 준비)',
     'formula.item.diagonal180Pair.step2': '2수: 1행 180° 회전 (1행 1열 코너 타일 위상 정렬)',
     'formula.item.diagonal180Pair.step3': '3수: 3열 180° 회전 (3행 3열 코너 위상 정렬 및 2번 셀 복구)',
-    'formula.item.diagonal180Pair.step4': '4수: 주대각선 사선 반사 복원 (MD² = ID로 모서리 180° 쌍 동시 소거 완성!)'
+    'formula.item.diagonal180Pair.step4': '4수: 주대각선 사선 반사 복원 (MD² = ID로 모서리 180° 쌍 동시 소거 완성!)',
+
+    'formula.item.finishLShape5.title': '[실전 1위] L자형 5개 에러 2수 피니시',
+    'formula.item.finishLShape5.subtitle': '실전 최다 빈출! 직교 2선 교차 5개 에러를 단 2수 만에 올클리어하는 핵심 비법',
+    'formula.item.finishLShape5.desc': '실전 게임에서 가장 빈번하게 발생하는 직교 2선 교차 패턴! 교차 코너 타일을 포함한 5개 에러를 [1열 세로밀기] ➔ [1행 가로밀기] 단 2수로 완벽하게 0번(정위치)으로 매듭짓는 실전 최다 빈출 피니시 공식입니다.',
+    'formula.item.finishLShape5.tip': '1열의 반사를 먼저 풀어 코너 타일의 위상을 1행과 일치시킨 뒤, 1행을 한 방에 쓸어 담는 것이 핵심입니다.',
+    'formula.item.finishLShape5.step0': '초기 상태: 5개 타일이 L자형 에러를 형성한 상태 (0, 1, 2, 3, 6번 셀)',
+    'formula.item.finishLShape5.step1': '1수: 1열 좌우 반전 (MY 세로밀기) ➔ 3, 6번 소거 및 코너 0번 위상을 1행(MX)과 일치',
+    'formula.item.finishLShape5.step2': '2수: 1행 상하 반전 (MX 가로밀기) ➔ 1행 전체가 MX² = ID로 일괄 소거, 100% 올클리어 완성!',
+
+    'formula.item.finishWingCross4.title': '[실전 2위] 십자 날개 엇갈림 4개 에러 2수 피니시',
+    'formula.item.finishWingCross4.subtitle': '중심 자기상쇄 기적을 활용해 상하좌우 4개 십자 날개를 단 2수에 동시 소거',
+    'formula.item.finishWingCross4.desc': '중심과 모서리는 모두 맞았는데 상하좌우 십자 날개(1, 3, 5, 7번) 4개 타일만 180° 회전된 고난도 대칭 난제! [2행 더블탭] ➔ [2열 더블탭] 2수로 중심 상쇄(R180² = ID)를 유도해 단 2수 만에 4개 날개를 동시 소거합니다.',
+    'formula.item.finishWingCross4.tip': '2행 더블탭 후 2열 더블탭을 적용하세요. 중심 타일이 잠시 뒤집혔다가 다시 정위치로 상쇄되며 4개 날개가 깔끔하게 소거됩니다.',
+    'formula.item.finishWingCross4.step0': '초기 상태: 상하좌우 십자 날개 4개(1, 3, 5, 7번 타일)만 180° 회전된 상태',
+    'formula.item.finishWingCross4.step1': '1수: 2행 180° 회전 (R180 더블탭) ➔ 좌우 날개(3, 5번) 즉시 복원, 중심은 R180 임시 전이',
+    'formula.item.finishWingCross4.step2': '2수: 2열 180° 회전 (R180 더블탭) ➔ 상하 날개(1, 7번) 복원 및 중심 자기상쇄(R180² = ID), 100% 올클리어!',
+
+    'formula.item.finishHybridCancel.title': '[실전 3위] 반사-회전 하이브리드 L자 동시소거 2수 피니시',
+    'formula.item.finishHybridCancel.subtitle': '거울 반사와 순수 회전이 뒤섞인 L자 에러를 위상 조화로 단 2수에 동시 해결',
+    'formula.item.finishHybridCancel.desc': '한쪽 줄은 뒤집힌 거울 반사(MX)이고 다른 쪽 줄은 머리가 돌아간 회전(R180)인 난감한 하이브리드 혼합 에러! [1열 가로밀기] ➔ [1행 더블탭] 2수로 반사 성분을 먼저 소거하며 교차점 위상을 회전으로 동기화시켜 단 2수로 올클리어합니다.',
+    'formula.item.finishHybridCancel.tip': '반사 타일과 회전 타일이 섞여 있을 때, 반사를 먼저 조작하여 교차점을 회전 성분으로 승화시키는 것이 하이브리드 해법의 본질입니다.',
+    'formula.item.finishHybridCancel.step0': '초기 상태: 반사(3, 6번)와 회전(1, 2번)이 결합된 하이브리드 L자 에러 배치',
+    'formula.item.finishHybridCancel.step1': '1수: 1열 상하 반전 (MX 가로밀기) ➔ 반사 성분 소거 및 교차점(0번)을 순수 회전(R180)으로 정렬',
+    'formula.item.finishHybridCancel.step2': '2수: 1행 180° 회전 (R180 더블탭) ➔ 1행 전체가 R180² = ID로 상쇄되며 100% 올클리어 완성!'
   }
 };
 
