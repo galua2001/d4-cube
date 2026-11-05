@@ -1,0 +1,152 @@
+[
+  {
+    "id": "mined-hybrid-1",
+    "titleKo": "AI 발굴 2수 피니시 공식",
+    "patternType": "hybrid",
+    "errorCount": 6,
+    "initialTiles": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    "solutionMoves": [
+      {
+        "type": "row",
+        "index": 1,
+        "op": "R270"
+      },
+      {
+        "type": "row",
+        "index": 0,
+        "op": "R270"
+      }
+    ],
+    "formulaSeq": "ROW2 R270 ➔ ROW1 R270"
+  },
+  {
+    "id": "mined-hybrid-2",
+    "titleKo": "AI 발굴 2수 피니시 공식",
+    "patternType": "hybrid",
+    "errorCount": 6,
+    "initialTiles": [
+      1,
+      1,
+      1,
+      2,
+      2,
+      2,
+      0,
+      0,
+      0
+    ],
+    "solutionMoves": [
+      {
+        "type": "row",
+        "index": 1,
+        "op": "R180"
+      },
+      {
+        "type": "row",
+        "index": 0,
+        "op": "R270"
+      }
+    ],
+    "formulaSeq": "ROW2 R180 ➔ ROW1 R270"
+  },
+  {
+    "id": "mined-hybrid-3",
+    "titleKo": "AI 발굴 2수 피니시 공식",
+    "patternType": "hybrid",
+    "errorCount": 6,
+    "initialTiles": [
+      1,
+      1,
+      1,
+      3,
+      3,
+      3,
+      0,
+      0,
+      0
+    ],
+    "solutionMoves": [
+      {
+        "type": "row",
+        "index": 1,
+        "op": "R90"
+      },
+      {
+        "type": "row",
+        "index": 0,
+        "op": "R270"
+      }
+    ],
+    "formulaSeq": "ROW2 R90 ➔ ROW1 R270"
+  },
+  {
+    "id": "mined-hybrid-4",
+    "titleKo": "AI 발굴 2수 피니시 공식",
+    "patternType": "hybrid",
+    "errorCount": 6,
+    "initialTiles": [
+      1,
+      1,
+      1,
+      4,
+      4,
+      4,
+      0,
+      0,
+      0
+    ],
+    "solutionMoves": [
+      {
+        "type": "row",
+        "index": 1,
+        "op": "MX"
+      },
+      {
+        "type": "row",
+        "index": 0,
+        "op": "R270"
+      }
+    ],
+    "formulaSeq": "ROW2 MX ➔ ROW1 R270"
+  },
+  {
+    "id": "mined-hybrid-5",
+    "titleKo": "AI 발굴 2수 피니시 공식",
+    "patternType": "hybrid",
+    "errorCount": 6,
+    "initialTiles": [
+      1,
+      1,
+      1,
+      5,
+      5,
+      5,
+      0,
+      0,
+      0
+    ],
+    "solutionMoves": [
+      {
+        "type": "row",
+        "index": 1,
+        "op": "MY"
+      },
+      {
+        "type": "row",
+        "index": 0,
+        "op": "R270"
+      }
+    ],
+    "formulaSeq": "ROW2 MY ➔ ROW1 R270"
+  }
+]

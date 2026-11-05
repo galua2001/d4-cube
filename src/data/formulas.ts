@@ -6,6 +6,8 @@
 
 import { D4, D4Op } from '../core/group';
 import { LINE_CELLS_3X3, applyLineMoveGeneric } from '../core/board';
+import minedFormulasRaw from './minedFormulas.json';
+export { minedFormulasRaw };
 
 export type FormulaCategory =
   | 'all'
@@ -17,7 +19,8 @@ export type FormulaCategory =
   | 'god-number'
   | 'beginner'
   | 'intermediate'
-  | 'advanced';
+  | 'advanced'
+  | 'ai-mined';
 
 export interface FormulaStep {
   stepIndex: number;
@@ -781,7 +784,7 @@ const finishHybridSteps = createInteractiveSteps(finishHybridInitialBoard, [
   }
 ]);
 
-export const FORMULAS: FormulaItem[] = [
+const BASE_FORMULAS: FormulaItem[] = [
   {
     id: 'master-method-3step',
     titleKo: '3단계 마스터 일반 해법',
@@ -1135,6 +1138,11 @@ export const FORMULAS: FormulaItem[] = [
   }
 ];
 
+export const MINED_FORMULAS: FormulaItem[] = Array.isArray(minedFormulasRaw)
+  ? (minedFormulasRaw as unknown as FormulaItem[])
+  : [];
+
+export const FORMULAS: FormulaItem[] = [...BASE_FORMULAS, ...MINED_FORMULAS];
 export const FORMULA_LIST: FormulaItem[] = FORMULAS;
 
 /**
@@ -1143,6 +1151,9 @@ export const FORMULA_LIST: FormulaItem[] = FORMULAS;
 export function getFormulasByCategory(category: FormulaCategory | 'all' | string = 'all'): FormulaItem[] {
   if (category === 'all') {
     return FORMULAS;
+  }
+  if (category === 'ai-mined') {
+    return FORMULAS.filter((f) => f.category === 'ai-mined');
   }
   if (category === 'basics') {
     return FORMULAS.filter((f) => f.category === 'basics');
@@ -1160,6 +1171,7 @@ export function getFormulasByCategory(category: FormulaCategory | 'all' | string
     return FORMULAS.filter((f) => f.category === 'god-number');
   }
   return FORMULAS.filter((f) => {
+    if (category === 'ai-mined') return f.category === 'ai-mined';
     if (category === 'basic') return f.category === 'basics';
     if (category === 'rotation') return f.category === 'beginner' || f.tags?.includes('회전 공식');
     if (category === 'reflection') return f.category === 'intermediate' || f.tags?.includes('반사 공식');

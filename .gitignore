@@ -3,3 +3,6 @@ node_modules/
 .venv/
 .vite/
 verify_*.png
+
+__pycache__/
+*.pyc

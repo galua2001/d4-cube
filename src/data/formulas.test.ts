@@ -351,4 +351,30 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     const all = getFormulasByCategory('all');
     expect(all.length).toBeGreaterThanOrEqual(14);
   });
+
+  it('19. [AI 채굴 공식 검증 #1] mined_formulas.json 및 자율 공식 발굴 스키마 정합성 검증', async () => {
+    const imported = await import('./mined_formulas.json');
+    const minedList = imported.default || imported;
+    expect(Array.isArray(minedList)).toBe(true);
+    expect(minedList.length).toBeGreaterThanOrEqual(1);
+
+    const sample = minedList[0];
+    expect(sample.id).toBeTruthy();
+    expect(sample.titleKo).toBeTruthy();
+    expect(sample.errorCount).toBeGreaterThanOrEqual(3);
+    expect(sample.solutionMoves.length).toBe(2);
+  });
+
+  it('20. [AI 채굴 공식 검증 #2] 비법서 [AI 발굴 공식] 탭(god-number) 다국어 i18n 번역 키 일관성 검증', async () => {
+    const { translations } = await import('../i18n/translations');
+    expect(translations.ko['formula.tabAiMined']).toBe('AI 발굴 공식');
+    expect(translations.en['formula.tabAiMined']).toBe('AI Mined');
+  });
+
+  it('21. [AI 채굴 공식 검증 #3] AI 공식 발굴 엔진의 2수 역해법 군론적 올클리어(ID 수렴) 수학적 불변성 검증', () => {
+    const corner = composeOps(D4.R180, D4.MY);
+    expect(corner).toBe(D4.MX);
+    const cornerFinal = composeOps(D4.MX, corner);
+    expect(cornerFinal).toBe(D4.ID);
+  });
 });

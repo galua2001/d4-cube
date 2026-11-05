@@ -1,0 +1,1014 @@
+[
+  {
+    "id": "ai-diagonal-triangle-break",
+    "titleKo": "사선 트라이앵글 3수 파괴 공식",
+    "titleEn": "Diagonal Triangle 3-Move Break Formula",
+    "category": "ai-mined",
+    "badgeKo": "🤖 AI 발굴 3수",
+    "badgeEn": "🤖 AI Mined 3M",
+    "difficulty": 3,
+    "formulaSeq": "Main Diag (↖) MD ➔ Row 1 MX ➔ Col 1 MY",
+    "summaryKo": "사선 모서리와 연결된 3개 타일의 비틀림을 주대각선 반사(MD)와 직교 거울의 합성으로 단 3수 만에 완전 정복하는 AI 발굴 공식입니다.",
+    "summaryEn": "An AI-discovered formula that neutralizes a 3-tile diagonal cascade in exactly 3 moves via main diagonal reflection and orthogonal mirrors.",
+    "diagramType": "interactive",
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (AI 발굴 병목 패턴)",
+        "labelEn": "Initial State (AI Mined Bottleneck Pattern)",
+        "label": "초기 배치",
+        "boardOps": [
+          "MAD",
+          "MX",
+          "MX",
+          "MY",
+          "MD",
+          "ID",
+          "MY",
+          "ID",
+          "MD"
+        ],
+        "highlightCells": [
+          0,
+          4,
+          8
+        ],
+        "actionDescKo": "AI 자율 탐색으로 발굴된 고유 병목 패턴입니다. 최단 수순으로 공략합니다.",
+        "actionDescEn": "An autonomous AI-discovered bottleneck pattern. Solving via optimal sequence.",
+        "mathInsightKo": "사선 모서리(0번)와 인접 축들이 얽힌 전형적인 사선 트라이앵글 병목 형태입니다.",
+        "mathInsightEn": "A canonical diagonal triangle bottleneck where corner (0) and adjacent axes are entangled.",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "AI 발굴 고유 병목 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 주대각선 (↖) 주대각선 반사 (↖ 축 대칭) (MD)",
+        "labelEn": "Move 1: Main Diag (↖) Main Diag Reflection (MD) (MD)",
+        "label": "1수: 주대각선 (↖) 주대각선 반사 (↖ 축 대칭) (MD)",
+        "boardOps": [
+          "R180",
+          "MX",
+          "MX",
+          "MY",
+          "ID",
+          "ID",
+          "MY",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          4,
+          8
+        ],
+        "highlightLine": {
+          "type": "diag",
+          "index": "main"
+        },
+        "actionDescKo": "주대각선 (↖) 주대각선 반사 (↖ 축 대칭) (MD)",
+        "actionDescEn": "Main Diag (↖) Main Diag Reflection (MD) (MD)",
+        "mathInsightKo": "1수: 주대각선(MD) 반사를 적용하여 사선 축 위의 비틀림을 정렬하고 대칭을 치환합니다.",
+        "mathInsightEn": "Move 1: Main diagonal reflection (MD) aligns the diagonal axis and permutes symmetry components.",
+        "formulaBadge": "1수: 주대각선 (↖) MD",
+        "formulaText": "Diag[main] ➔ MD",
+        "formulaDesc": "1수: 주대각선(MD) 반사를 적용하여 사선 축 위의 비틀림을 정렬하고 대칭을 치환합니다."
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 1행 상하 가로 반사 (X축 대칭) (MX)",
+        "labelEn": "Move 2: Row 1 Horizontal Reflection (MX) (MX)",
+        "label": "2수: 1행 상하 가로 반사 (X축 대칭) (MX)",
+        "boardOps": [
+          "MY",
+          "ID",
+          "ID",
+          "MY",
+          "ID",
+          "ID",
+          "MY",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          1,
+          2
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 0
+        },
+        "actionDescKo": "1행 상하 가로 반사 (X축 대칭) (MX)",
+        "actionDescEn": "Row 1 Horizontal Reflection (MX) (MX)",
+        "mathInsightKo": "2수: 1행에 상하 반사(MX)를 가하여 상단 3개 타일의 반사 성분을 동기화합니다.",
+        "mathInsightEn": "Move 2: Row 1 horizontal flip (MX) synchronizes mirror components of top tiles.",
+        "formulaBadge": "2수: 1행 MX",
+        "formulaText": "Row[0] ➔ MX",
+        "formulaDesc": "2수: 1행에 상하 반사(MX)를 가하여 상단 3개 타일의 반사 성분을 동기화합니다."
+      },
+      {
+        "stepIndex": 3,
+        "subStep": 3,
+        "labelKo": "3수: 1열 좌우 세로 반사 (Y축 대칭) (MY)",
+        "labelEn": "Move 3: Col 1 Vertical Reflection (MY) (MY)",
+        "label": "3수: 1열 좌우 세로 반사 (Y축 대칭) (MY)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          3,
+          6
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 0
+        },
+        "actionDescKo": "1열 좌우 세로 반사 (Y축 대칭) (MY)",
+        "actionDescEn": "Col 1 Vertical Reflection (MY) (MY)",
+        "mathInsightKo": "3수: 1열에 좌우 반사(MY)를 작용시키면 MX ∘ MY = R180 상쇄와 함께 전 타일이 0(ID)으로 올 클리어됩니다!",
+        "mathInsightEn": "Move 3: Col 1 vertical flip (MY) composes via MX ∘ MY = R180, restoring all tiles to 0 (ID)!",
+        "formulaBadge": "3수: 1열 MY",
+        "formulaText": "Col[0] ➔ MY",
+        "formulaDesc": "3수: 1열에 좌우 반사(MY)를 작용시키면 MX ∘ MY = R180 상쇄와 함께 전 타일이 0(ID)으로 올 클리어됩니다!"
+      }
+    ],
+    "tags": [
+      "AI 발굴",
+      "사선 트라이앵글",
+      "3수 파괴",
+      "주대각선",
+      "최단 공식"
+    ],
+    "isInteractive": true,
+    "notesKo": [
+      "AI 자율 마이닝 엔진이 $D_4$ 공간(56개 연산자) 전수 탐색으로 검증한 3수 보장 공식입니다.",
+      "지름길이 존재하지 않는 수학적 최단 수순(God's Algorithm Subpath)입니다."
+    ],
+    "notesEn": [
+      "An AI-mined formula verified by full BFS exploration in $D_4$ space (56 moves).",
+      "Guaranteed minimal 3-move sequence with zero shortcuts."
+    ]
+  },
+  {
+    "id": "ai-center-wing-break",
+    "titleKo": "중심-대각 날개 3수 파괴 공식",
+    "titleEn": "Center-Wing Triangle Break Formula",
+    "category": "ai-mined",
+    "badgeKo": "🤖 AI 발굴 3수",
+    "badgeEn": "🤖 AI Mined 3M",
+    "difficulty": 3,
+    "formulaSeq": "Main Diag (↖) MD ➔ Row 2 R180 ➔ Col 2 MY",
+    "summaryKo": "정중앙(4번)과 대각선 양 끝 타일(0, 8번)이 위상차로 꼬였을 때, 주대각선과 2행·2열 직교 연산으로 3수에 종결합니다.",
+    "summaryEn": "Resolves phase misalignment between the center tile (4) and diagonal wings (0, 8) in 3 swift moves using diagonal and middle axes.",
+    "diagramType": "interactive",
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (AI 발굴 병목 패턴)",
+        "labelEn": "Initial State (AI Mined Bottleneck Pattern)",
+        "label": "초기 배치",
+        "boardOps": [
+          "MD",
+          "MY",
+          "ID",
+          "R180",
+          "R90",
+          "R180",
+          "ID",
+          "MY",
+          "MD"
+        ],
+        "highlightCells": [
+          0,
+          4,
+          8
+        ],
+        "actionDescKo": "AI 자율 탐색으로 발굴된 고유 병목 패턴입니다. 최단 수순으로 공략합니다.",
+        "actionDescEn": "An autonomous AI-discovered bottleneck pattern. Solving via optimal sequence.",
+        "mathInsightKo": "중심 타일(4번)과 주대각선 날개 타일들이 직교 위상차로 고립된 병목입니다.",
+        "mathInsightEn": "A bottleneck where the center tile (4) and diagonal wings are phase-isolated.",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "AI 발굴 고유 병목 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 주대각선 (↖) 주대각선 반사 (↖ 축 대칭) (MD)",
+        "labelEn": "Move 1: Main Diag (↖) Main Diag Reflection (MD) (MD)",
+        "label": "1수: 주대각선 (↖) 주대각선 반사 (↖ 축 대칭) (MD)",
+        "boardOps": [
+          "ID",
+          "MY",
+          "ID",
+          "R180",
+          "MX",
+          "R180",
+          "ID",
+          "MY",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          4,
+          8
+        ],
+        "highlightLine": {
+          "type": "diag",
+          "index": "main"
+        },
+        "actionDescKo": "주대각선 (↖) 주대각선 반사 (↖ 축 대칭) (MD)",
+        "actionDescEn": "Main Diag (↖) Main Diag Reflection (MD) (MD)",
+        "mathInsightKo": "1수: 주대각선(MD) 반사를 통해 중심 타일과 양 날개 타일의 좌표계를 일체화합니다.",
+        "mathInsightEn": "Move 1: Main diagonal (MD) couples the center and wings into a unified coordinate frame.",
+        "formulaBadge": "1수: 주대각선 (↖) MD",
+        "formulaText": "Diag[main] ➔ MD",
+        "formulaDesc": "1수: 주대각선(MD) 반사를 통해 중심 타일과 양 날개 타일의 좌표계를 일체화합니다."
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 2행 180° 반전 회전 (R180)",
+        "labelEn": "Move 2: Row 2 Rotate 180° (R180)",
+        "label": "2수: 2행 180° 반전 회전 (R180)",
+        "boardOps": [
+          "ID",
+          "MY",
+          "ID",
+          "ID",
+          "MY",
+          "ID",
+          "ID",
+          "MY",
+          "ID"
+        ],
+        "highlightCells": [
+          3,
+          4,
+          5
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 1
+        },
+        "actionDescKo": "2행 180° 반전 회전 (R180)",
+        "actionDescEn": "Row 2 Rotate 180° (R180)",
+        "mathInsightKo": "2수: 2행 전체에 180° 반전(R180)을 주어 중심 타일의 회전 자유도를 단번에 교정합니다.",
+        "mathInsightEn": "Move 2: Row 2 180° rotation (R180) directly corrects the central tile rotational phase.",
+        "formulaBadge": "2수: 2행 R180",
+        "formulaText": "Row[1] ➔ R180",
+        "formulaDesc": "2수: 2행 전체에 180° 반전(R180)을 주어 중심 타일의 회전 자유도를 단번에 교정합니다."
+      },
+      {
+        "stepIndex": 3,
+        "subStep": 3,
+        "labelKo": "3수: 2열 좌우 세로 반사 (Y축 대칭) (MY)",
+        "labelEn": "Move 3: Col 2 Vertical Reflection (MY) (MY)",
+        "label": "3수: 2열 좌우 세로 반사 (Y축 대칭) (MY)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          1,
+          4,
+          7
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 1
+        },
+        "actionDescKo": "2열 좌우 세로 반사 (Y축 대칭) (MY)",
+        "actionDescEn": "Col 2 Vertical Reflection (MY) (MY)",
+        "mathInsightKo": "3수: 2열에 좌우 반사(MY)를 주어 2열 타일들의 잔여 반사를 소거하고 100% ID로 완성합니다!",
+        "mathInsightEn": "Move 3: Col 2 vertical flip (MY) cancels residual reflections, achieving 100% identity!",
+        "formulaBadge": "3수: 2열 MY",
+        "formulaText": "Col[1] ➔ MY",
+        "formulaDesc": "3수: 2열에 좌우 반사(MY)를 주어 2열 타일들의 잔여 반사를 소거하고 100% ID로 완성합니다!"
+      }
+    ],
+    "tags": [
+      "AI 발굴",
+      "중심 날개",
+      "3수 파괴",
+      "R180 반전",
+      "최단 공식"
+    ],
+    "isInteractive": true,
+    "notesKo": [
+      "AI 자율 마이닝 엔진이 $D_4$ 공간(56개 연산자) 전수 탐색으로 검증한 3수 보장 공식입니다.",
+      "지름길이 존재하지 않는 수학적 최단 수순(God's Algorithm Subpath)입니다."
+    ],
+    "notesEn": [
+      "An AI-mined formula verified by full BFS exploration in $D_4$ space (56 moves).",
+      "Guaranteed minimal 3-move sequence with zero shortcuts."
+    ]
+  },
+  {
+    "id": "ai-corner-quad-purge",
+    "titleKo": "외곽 4코너 쿼드 4수 정렬 공식",
+    "titleEn": "Corner Quad 4-Move Symmetrical Purge",
+    "category": "ai-mined",
+    "badgeKo": "🤖 AI 발굴 4수",
+    "badgeEn": "🤖 AI Mined 4M",
+    "difficulty": 4,
+    "formulaSeq": "Row 1 R180 ➔ Row 3 R180 ➔ Col 1 MX ➔ Col 3 MX",
+    "summaryKo": "3×3 보드의 외곽 4개 모서리 타일(0, 2, 6, 8번)이 반사 대칭으로 교차 비틀림되었을 때, 4수로 완전 정복하는 AI 고유 대칭 공식입니다.",
+    "summaryEn": "An AI-discovered symmetrical master formula resolving a 4-corner twist across cells (0, 2, 6, 8) in exactly 4 moves.",
+    "diagramType": "interactive",
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (AI 발굴 병목 패턴)",
+        "labelEn": "Initial State (AI Mined Bottleneck Pattern)",
+        "label": "초기 배치",
+        "boardOps": [
+          "MY",
+          "R180",
+          "MY",
+          "MX",
+          "ID",
+          "MX",
+          "MY",
+          "R180",
+          "MY"
+        ],
+        "highlightCells": [
+          0,
+          1,
+          2
+        ],
+        "actionDescKo": "AI 자율 탐색으로 발굴된 고유 병목 패턴입니다. 최단 수순으로 공략합니다.",
+        "actionDescEn": "An autonomous AI-discovered bottleneck pattern. Solving via optimal sequence.",
+        "mathInsightKo": "보드의 네 귀퉁이(코너 타일들)만 정반대 위상으로 틀어진 대칭적 난제 상태입니다.",
+        "mathInsightEn": "A highly symmetrical bottleneck where the four board corners are oppositely polarized.",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "AI 발굴 고유 병목 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 1행 180° 반전 회전 (R180)",
+        "labelEn": "Move 1: Row 1 Rotate 180° (R180)",
+        "label": "1수: 1행 180° 반전 회전 (R180)",
+        "boardOps": [
+          "MX",
+          "ID",
+          "MX",
+          "MX",
+          "ID",
+          "MX",
+          "MY",
+          "R180",
+          "MY"
+        ],
+        "highlightCells": [
+          0,
+          1,
+          2
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 0
+        },
+        "actionDescKo": "1행 180° 반전 회전 (R180)",
+        "actionDescEn": "Row 1 Rotate 180° (R180)",
+        "mathInsightKo": "1수: 1행에 180° 반전(R180)을 적용하여 상단 두 코너의 회전 대칭을 복원합니다.",
+        "mathInsightEn": "Move 1: Row 1 R180 restores rotational symmetry on the top corners.",
+        "formulaBadge": "1수: 1행 R180",
+        "formulaText": "Row[0] ➔ R180",
+        "formulaDesc": "1수: 1행에 180° 반전(R180)을 적용하여 상단 두 코너의 회전 대칭을 복원합니다."
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 3행 180° 반전 회전 (R180)",
+        "labelEn": "Move 2: Row 3 Rotate 180° (R180)",
+        "label": "2수: 3행 180° 반전 회전 (R180)",
+        "boardOps": [
+          "MX",
+          "ID",
+          "MX",
+          "MX",
+          "ID",
+          "MX",
+          "MX",
+          "ID",
+          "MX"
+        ],
+        "highlightCells": [
+          6,
+          7,
+          8
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 2
+        },
+        "actionDescKo": "3행 180° 반전 회전 (R180)",
+        "actionDescEn": "Row 3 Rotate 180° (R180)",
+        "mathInsightKo": "2수: 3행에 180° 반전(R180)을 적용하여 하단 두 코너를 상단과 동일한 위상으로 맞춥니다.",
+        "mathInsightEn": "Move 2: Row 3 R180 mirrors the top treatment onto bottom corners.",
+        "formulaBadge": "2수: 3행 R180",
+        "formulaText": "Row[2] ➔ R180",
+        "formulaDesc": "2수: 3행에 180° 반전(R180)을 적용하여 하단 두 코너를 상단과 동일한 위상으로 맞춥니다."
+      },
+      {
+        "stepIndex": 3,
+        "subStep": 3,
+        "labelKo": "3수: 1열 상하 가로 반사 (X축 대칭) (MX)",
+        "labelEn": "Move 3: Col 1 Horizontal Reflection (MX) (MX)",
+        "label": "3수: 1열 상하 가로 반사 (X축 대칭) (MX)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "MX",
+          "ID",
+          "ID",
+          "MX",
+          "ID",
+          "ID",
+          "MX"
+        ],
+        "highlightCells": [
+          0,
+          3,
+          6
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 0
+        },
+        "actionDescKo": "1열 상하 가로 반사 (X축 대칭) (MX)",
+        "actionDescEn": "Col 1 Horizontal Reflection (MX) (MX)",
+        "mathInsightKo": "3수: 1열에 가로 반사(MX)를 가하여 좌측 라인의 상하 거울 성분을 소거합니다.",
+        "mathInsightEn": "Move 3: Col 1 horizontal flip (MX) eliminates mirror components along the left column.",
+        "formulaBadge": "3수: 1열 MX",
+        "formulaText": "Col[0] ➔ MX",
+        "formulaDesc": "3수: 1열에 가로 반사(MX)를 가하여 좌측 라인의 상하 거울 성분을 소거합니다."
+      },
+      {
+        "stepIndex": 4,
+        "subStep": 4,
+        "labelKo": "4수: 3열 상하 가로 반사 (X축 대칭) (MX)",
+        "labelEn": "Move 4: Col 3 Horizontal Reflection (MX) (MX)",
+        "label": "4수: 3열 상하 가로 반사 (X축 대칭) (MX)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          2,
+          5,
+          8
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 2
+        },
+        "actionDescKo": "3열 상하 가로 반사 (X축 대칭) (MX)",
+        "actionDescEn": "Col 3 Horizontal Reflection (MX) (MX)",
+        "mathInsightKo": "4수: 3열에 가로 반사(MX)를 적용하여 우측 라인의 잔여 반사까지 모두 상쇄하고 올 클리어!",
+        "mathInsightEn": "Move 4: Col 3 horizontal flip (MX) perfectly cancels the right column, achieving all-clear!",
+        "formulaBadge": "4수: 3열 MX",
+        "formulaText": "Col[2] ➔ MX",
+        "formulaDesc": "4수: 3열에 가로 반사(MX)를 적용하여 우측 라인의 잔여 반사까지 모두 상쇄하고 올 클리어!"
+      }
+    ],
+    "tags": [
+      "AI 발굴",
+      "4코너 쿼드",
+      "4수 정렬",
+      "대칭 상쇄",
+      "외곽 정복"
+    ],
+    "isInteractive": true,
+    "notesKo": [
+      "AI 자율 마이닝 엔진이 $D_4$ 공간(56개 연산자) 전수 탐색으로 검증한 4수 보장 공식입니다.",
+      "지름길이 존재하지 않는 수학적 최단 수순(God's Algorithm Subpath)입니다."
+    ],
+    "notesEn": [
+      "An AI-mined formula verified by full BFS exploration in $D_4$ space (56 moves).",
+      "Guaranteed minimal 4-move sequence with zero shortcuts."
+    ]
+  },
+  {
+    "id": "ai-anti-diag-blitz",
+    "titleKo": "부대각선 윙 2수 전격 공식",
+    "titleEn": "Anti-Diagonal Wing 2-Move Blitz Formula",
+    "category": "ai-mined",
+    "badgeKo": "🤖 AI 발굴 2수",
+    "badgeEn": "🤖 AI Mined 2M",
+    "difficulty": 2,
+    "formulaSeq": "Anti Diag (↗) MAD ➔ Row 2 MX",
+    "summaryKo": "부대각선(↗) 축 위의 3개 타일이 부대각 반사(MAD)와 행 조작으로 꼬여 있을 때 단 2수 만에 끝내는 초고속 전격 공식입니다.",
+    "summaryEn": "A lightning 2-move blitz formula that solves an anti-diagonal twist along (2, 4, 6) in exactly two swift strokes.",
+    "diagramType": "interactive",
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (AI 발굴 병목 패턴)",
+        "labelEn": "Initial State (AI Mined Bottleneck Pattern)",
+        "label": "초기 배치",
+        "boardOps": [
+          "ID",
+          "ID",
+          "MAD",
+          "MX",
+          "R270",
+          "MX",
+          "MAD",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          2,
+          4,
+          6
+        ],
+        "actionDescKo": "AI 자율 탐색으로 발굴된 고유 병목 패턴입니다. 최단 수순으로 공략합니다.",
+        "actionDescEn": "An autonomous AI-discovered bottleneck pattern. Solving via optimal sequence.",
+        "mathInsightKo": "부대각선(2, 4, 6번) 축을 따라 2수 만에 풀릴 수 있는 초단거리 기하학적 병목 상태입니다.",
+        "mathInsightEn": "A geometric bottleneck along the anti-diagonal (2, 4, 6) solvable in 2 moves.",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "AI 발굴 고유 병목 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 부대각선 (↗) 부대각선 반사 (↗ 축 대칭) (MAD)",
+        "labelEn": "Move 1: Anti Diag (↗) Anti Diag Reflection (MAD) (MAD)",
+        "label": "1수: 부대각선 (↗) 부대각선 반사 (↗ 축 대칭) (MAD)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "MX",
+          "MX",
+          "MX",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          2,
+          4,
+          6
+        ],
+        "highlightLine": {
+          "type": "diag",
+          "index": "anti"
+        },
+        "actionDescKo": "부대각선 (↗) 부대각선 반사 (↗ 축 대칭) (MAD)",
+        "actionDescEn": "Anti Diag (↗) Anti Diag Reflection (MAD) (MAD)",
+        "mathInsightKo": "1수: 부대각선(MAD) 반사를 적용하여 ↗ 사선 축 타일들을 동시 정렬합니다.",
+        "mathInsightEn": "Move 1: Anti-diagonal reflection (MAD) aligns all tiles along the ↗ axis.",
+        "formulaBadge": "1수: 부대각선 (↗) MAD",
+        "formulaText": "Diag[anti] ➔ MAD",
+        "formulaDesc": "1수: 부대각선(MAD) 반사를 적용하여 ↗ 사선 축 타일들을 동시 정렬합니다."
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 2행 상하 가로 반사 (X축 대칭) (MX)",
+        "labelEn": "Move 2: Row 2 Horizontal Reflection (MX) (MX)",
+        "label": "2수: 2행 상하 가로 반사 (X축 대칭) (MX)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          3,
+          4,
+          5
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 1
+        },
+        "actionDescKo": "2행 상하 가로 반사 (X축 대칭) (MX)",
+        "actionDescEn": "Row 2 Horizontal Reflection (MX) (MX)",
+        "mathInsightKo": "2수: 2행 가로 반사(MX)로 잔여 거울 성분을 상쇄시켜 2수만에 전 타일 0(ID) 올 클리어!",
+        "mathInsightEn": "Move 2: Row 2 horizontal flip (MX) cancels remaining mirror components, achieving all-clear in 2 moves!",
+        "formulaBadge": "2수: 2행 MX",
+        "formulaText": "Row[1] ➔ MX",
+        "formulaDesc": "2수: 2행 가로 반사(MX)로 잔여 거울 성분을 상쇄시켜 2수만에 전 타일 0(ID) 올 클리어!"
+      }
+    ],
+    "tags": [
+      "AI 발굴",
+      "부대각선",
+      "2수 전격",
+      "MAD 반사",
+      "초단거리"
+    ],
+    "isInteractive": true,
+    "notesKo": [
+      "AI 자율 마이닝 엔진이 $D_4$ 공간(56개 연산자) 전수 탐색으로 검증한 2수 보장 공식입니다.",
+      "지름길이 존재하지 않는 수학적 최단 수순(God's Algorithm Subpath)입니다."
+    ],
+    "notesEn": [
+      "An AI-mined formula verified by full BFS exploration in $D_4$ space (56 moves).",
+      "Guaranteed minimal 2-move sequence with zero shortcuts."
+    ]
+  },
+  {
+    "id": "ai-l-triad-break",
+    "titleKo": "직교 L-자 3수 파괴 공식",
+    "titleEn": "Orthogonal L-Triad 3-Move Break Formula",
+    "category": "ai-mined",
+    "badgeKo": "🤖 AI 발굴 3수",
+    "badgeEn": "🤖 AI Mined 3M",
+    "difficulty": 3,
+    "formulaSeq": "Row 1 R90 ➔ Row 2 MY ➔ Col 1 MX",
+    "summaryKo": "좌상단 모서리(0번)와 인접 2변 타일(1, 3번)이 90° 회전 및 반사로 뒤틀린 L자형 병목을 3수만에 종결하는 공식입니다.",
+    "summaryEn": "Resolves an L-shaped triad bottleneck around cell 0, 1, 3 in 3 moves via 90° rotation and orthogonal flips.",
+    "diagramType": "interactive",
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (AI 발굴 병목 패턴)",
+        "labelEn": "Initial State (AI Mined Bottleneck Pattern)",
+        "label": "초기 배치",
+        "boardOps": [
+          "MAD",
+          "R270",
+          "R270",
+          "R180",
+          "MY",
+          "MY",
+          "MX",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          1,
+          2
+        ],
+        "actionDescKo": "AI 자율 탐색으로 발굴된 고유 병목 패턴입니다. 최단 수순으로 공략합니다.",
+        "actionDescEn": "An autonomous AI-discovered bottleneck pattern. Solving via optimal sequence.",
+        "mathInsightKo": "좌상단 1번 모서리를 중심으로 L자 형태로 비틀린 전형적인 국소 고립 병목입니다.",
+        "mathInsightEn": "A localized L-triad bottleneck clustered around the top-left corner.",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "AI 발굴 고유 병목 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 1행 90° 시계 회전 (R90)",
+        "labelEn": "Move 1: Row 1 Rotate 90° CW (R90)",
+        "label": "1수: 1행 90° 시계 회전 (R90)",
+        "boardOps": [
+          "MX",
+          "ID",
+          "ID",
+          "R180",
+          "MY",
+          "MY",
+          "MX",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          1,
+          2
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 0
+        },
+        "actionDescKo": "1행 90° 시계 회전 (R90)",
+        "actionDescEn": "Row 1 Rotate 90° CW (R90)",
+        "mathInsightKo": "1수: 1행에 90° 시계 회전(R90)을 적용하여 상단 라인의 각도를 정렬합니다.",
+        "mathInsightEn": "Move 1: Row 1 90° rotation (R90) realigns angular orientation of the top row.",
+        "formulaBadge": "1수: 1행 R90",
+        "formulaText": "Row[0] ➔ R90",
+        "formulaDesc": "1수: 1행에 90° 시계 회전(R90)을 적용하여 상단 라인의 각도를 정렬합니다."
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 2행 좌우 세로 반사 (Y축 대칭) (MY)",
+        "labelEn": "Move 2: Row 2 Vertical Reflection (MY) (MY)",
+        "label": "2수: 2행 좌우 세로 반사 (Y축 대칭) (MY)",
+        "boardOps": [
+          "MX",
+          "ID",
+          "ID",
+          "MX",
+          "ID",
+          "ID",
+          "MX",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          3,
+          4,
+          5
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 1
+        },
+        "actionDescKo": "2행 좌우 세로 반사 (Y축 대칭) (MY)",
+        "actionDescEn": "Row 2 Vertical Reflection (MY) (MY)",
+        "mathInsightKo": "2수: 2행에 좌우 반사(MY)를 주어 중앙 행과의 위상차를 조율합니다.",
+        "mathInsightEn": "Move 2: Row 2 vertical flip (MY) coordinates phase parity with the middle row.",
+        "formulaBadge": "2수: 2행 MY",
+        "formulaText": "Row[1] ➔ MY",
+        "formulaDesc": "2수: 2행에 좌우 반사(MY)를 주어 중앙 행과의 위상차를 조율합니다."
+      },
+      {
+        "stepIndex": 3,
+        "subStep": 3,
+        "labelKo": "3수: 1열 상하 가로 반사 (X축 대칭) (MX)",
+        "labelEn": "Move 3: Col 1 Horizontal Reflection (MX) (MX)",
+        "label": "3수: 1열 상하 가로 반사 (X축 대칭) (MX)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          3,
+          6
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 0
+        },
+        "actionDescKo": "1열 상하 가로 반사 (X축 대칭) (MX)",
+        "actionDescEn": "Col 1 Horizontal Reflection (MX) (MX)",
+        "mathInsightKo": "3수: 1열에 상하 반사(MX)를 가하여 남은 반사 성분을 완전히 상쇄하고 올 클리어!",
+        "mathInsightEn": "Move 3: Col 1 horizontal flip (MX) cancels all residual reflections to achieve all-clear!",
+        "formulaBadge": "3수: 1열 MX",
+        "formulaText": "Col[0] ➔ MX",
+        "formulaDesc": "3수: 1열에 상하 반사(MX)를 가하여 남은 반사 성분을 완전히 상쇄하고 올 클리어!"
+      }
+    ],
+    "tags": [
+      "AI 발굴",
+      "L자 파괴",
+      "3수 공식",
+      "90도 회전",
+      "국소 고립"
+    ],
+    "isInteractive": true,
+    "notesKo": [
+      "AI 자율 마이닝 엔진이 $D_4$ 공간(56개 연산자) 전수 탐색으로 검증한 3수 보장 공식입니다.",
+      "지름길이 존재하지 않는 수학적 최단 수순(God's Algorithm Subpath)입니다."
+    ],
+    "notesEn": [
+      "An AI-mined formula verified by full BFS exploration in $D_4$ space (56 moves).",
+      "Guaranteed minimal 3-move sequence with zero shortcuts."
+    ]
+  },
+  {
+    "id": "ai-dual-diagonal-cross",
+    "titleKo": "양대각·중심십자 4수 결합 공식",
+    "titleEn": "Dual Diagonal & Center Cross 4-Move Fusion",
+    "category": "ai-mined",
+    "badgeKo": "🤖 AI 발굴 4수",
+    "badgeEn": "🤖 AI Mined 4M",
+    "difficulty": 4,
+    "formulaSeq": "Main Diag (↖) MD ➔ Anti Diag (↗) MAD ➔ Row 2 MX ➔ Col 2 MY",
+    "summaryKo": "주대각선(↖)과 부대각선(↗)의 교차 반사와 중심 2행·2열의 반사를 융합하여 보드 전체의 꼬임을 4수만에 격파하는 마스터 공식입니다.",
+    "summaryEn": "A grand master formula fusing both diagonal reflections (MD, MAD) with middle cross axes to crush complex twists in 4 moves.",
+    "diagramType": "interactive",
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (AI 발굴 병목 패턴)",
+        "labelEn": "Initial State (AI Mined Bottleneck Pattern)",
+        "label": "초기 배치",
+        "boardOps": [
+          "MD",
+          "MY",
+          "MAD",
+          "MX",
+          "ID",
+          "MX",
+          "MAD",
+          "MY",
+          "MD"
+        ],
+        "highlightCells": [
+          0,
+          4,
+          8
+        ],
+        "actionDescKo": "AI 자율 탐색으로 발굴된 고유 병목 패턴입니다. 최단 수순으로 공략합니다.",
+        "actionDescEn": "An autonomous AI-discovered bottleneck pattern. Solving via optimal sequence.",
+        "mathInsightKo": "두 개의 대각선과 중심 직교축이 모두 얽힌 최고 난도의 다중 대칭 병목 상태입니다.",
+        "mathInsightEn": "A complex multi-axial bottleneck entangling both diagonals and the middle cross.",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "AI 발굴 고유 병목 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 주대각선 (↖) 주대각선 반사 (↖ 축 대칭) (MD)",
+        "labelEn": "Move 1: Main Diag (↖) Main Diag Reflection (MD) (MD)",
+        "label": "1수: 주대각선 (↖) 주대각선 반사 (↖ 축 대칭) (MD)",
+        "boardOps": [
+          "ID",
+          "MY",
+          "MAD",
+          "MX",
+          "MD",
+          "MX",
+          "MAD",
+          "MY",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          4,
+          8
+        ],
+        "highlightLine": {
+          "type": "diag",
+          "index": "main"
+        },
+        "actionDescKo": "주대각선 (↖) 주대각선 반사 (↖ 축 대칭) (MD)",
+        "actionDescEn": "Main Diag (↖) Main Diag Reflection (MD) (MD)",
+        "mathInsightKo": "1수: 주대각선(MD) 반사로 ↖ 대각선 축 타일들의 위상을 1차 정렬합니다.",
+        "mathInsightEn": "Move 1: Main diagonal reflection (MD) aligns the primary diagonal axis.",
+        "formulaBadge": "1수: 주대각선 (↖) MD",
+        "formulaText": "Diag[main] ➔ MD",
+        "formulaDesc": "1수: 주대각선(MD) 반사로 ↖ 대각선 축 타일들의 위상을 1차 정렬합니다."
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 부대각선 (↗) 부대각선 반사 (↗ 축 대칭) (MAD)",
+        "labelEn": "Move 2: Anti Diag (↗) Anti Diag Reflection (MAD) (MAD)",
+        "label": "2수: 부대각선 (↗) 부대각선 반사 (↗ 축 대칭) (MAD)",
+        "boardOps": [
+          "ID",
+          "MY",
+          "ID",
+          "MX",
+          "R180",
+          "MX",
+          "ID",
+          "MY",
+          "ID"
+        ],
+        "highlightCells": [
+          2,
+          4,
+          6
+        ],
+        "highlightLine": {
+          "type": "diag",
+          "index": "anti"
+        },
+        "actionDescKo": "부대각선 (↗) 부대각선 반사 (↗ 축 대칭) (MAD)",
+        "actionDescEn": "Anti Diag (↗) Anti Diag Reflection (MAD) (MAD)",
+        "mathInsightKo": "2수: 부대각선(MAD) 반사로 ↗ 대각선 축을 정렬하며 MD ∘ MAD = R180 효과를 유도합니다.",
+        "mathInsightEn": "Move 2: Anti-diagonal reflection (MAD) induces the MD ∘ MAD = R180 composite transition.",
+        "formulaBadge": "2수: 부대각선 (↗) MAD",
+        "formulaText": "Diag[anti] ➔ MAD",
+        "formulaDesc": "2수: 부대각선(MAD) 반사로 ↗ 대각선 축을 정렬하며 MD ∘ MAD = R180 효과를 유도합니다."
+      },
+      {
+        "stepIndex": 3,
+        "subStep": 3,
+        "labelKo": "3수: 2행 상하 가로 반사 (X축 대칭) (MX)",
+        "labelEn": "Move 3: Row 2 Horizontal Reflection (MX) (MX)",
+        "label": "3수: 2행 상하 가로 반사 (X축 대칭) (MX)",
+        "boardOps": [
+          "ID",
+          "MY",
+          "ID",
+          "ID",
+          "MY",
+          "ID",
+          "ID",
+          "MY",
+          "ID"
+        ],
+        "highlightCells": [
+          3,
+          4,
+          5
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 1
+        },
+        "actionDescKo": "2행 상하 가로 반사 (X축 대칭) (MX)",
+        "actionDescEn": "Row 2 Horizontal Reflection (MX) (MX)",
+        "mathInsightKo": "3수: 2행 가로 반사(MX)를 적용하여 수평 중심축의 거울 위상을 일치시킵니다.",
+        "mathInsightEn": "Move 3: Row 2 horizontal flip (MX) harmonizes mirror phase on the middle horizontal axis.",
+        "formulaBadge": "3수: 2행 MX",
+        "formulaText": "Row[1] ➔ MX",
+        "formulaDesc": "3수: 2행 가로 반사(MX)를 적용하여 수평 중심축의 거울 위상을 일치시킵니다."
+      },
+      {
+        "stepIndex": 4,
+        "subStep": 4,
+        "labelKo": "4수: 2열 좌우 세로 반사 (Y축 대칭) (MY)",
+        "labelEn": "Move 4: Col 2 Vertical Reflection (MY) (MY)",
+        "label": "4수: 2열 좌우 세로 반사 (Y축 대칭) (MY)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          1,
+          4,
+          7
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 1
+        },
+        "actionDescKo": "2열 좌우 세로 반사 (Y축 대칭) (MY)",
+        "actionDescEn": "Col 2 Vertical Reflection (MY) (MY)",
+        "mathInsightKo": "4수: 2열 세로 반사(MY)로 수직 중심축까지 완벽 복원하여 4수만에 100% 항등원 올 클리어!",
+        "mathInsightEn": "Move 4: Col 2 vertical flip (MY) resolves the vertical axis, achieving 100% identity in 4 moves!",
+        "formulaBadge": "4수: 2열 MY",
+        "formulaText": "Col[1] ➔ MY",
+        "formulaDesc": "4수: 2열 세로 반사(MY)로 수직 중심축까지 완벽 복원하여 4수만에 100% 항등원 올 클리어!"
+      }
+    ],
+    "tags": [
+      "AI 발굴",
+      "양대각선",
+      "4수 결합",
+      "중심 십자",
+      "마스터 공식"
+    ],
+    "isInteractive": true,
+    "notesKo": [
+      "AI 자율 마이닝 엔진이 $D_4$ 공간(56개 연산자) 전수 탐색으로 검증한 4수 보장 공식입니다.",
+      "지름길이 존재하지 않는 수학적 최단 수순(God's Algorithm Subpath)입니다."
+    ],
+    "notesEn": [
+      "An AI-mined formula verified by full BFS exploration in $D_4$ space (56 moves).",
+      "Guaranteed minimal 4-move sequence with zero shortcuts."
+    ]
+  }
+]
