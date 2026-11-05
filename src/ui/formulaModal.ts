@@ -11,6 +11,8 @@ import {
   FORMULAS,
   FormulaCategory,
   FormulaItem,
+  FormulaSortOption,
+  sortFormulas,
   getFormulaById,
   filterFormulas
 } from '../data/formulas';
@@ -63,6 +65,7 @@ export class FormulaModalController {
   // Round 5: 실시간 검색 및 태그 필터 상태
   private searchQuery: string = '';
   private selectedTag: string | 'all' = 'all';
+  private currentSortOption: FormulaSortOption = 'default';
 
   constructor() {
     this.langUnsubscribe = onLangChange(() => {
@@ -183,6 +186,23 @@ export class FormulaModalController {
 
   public getSelectedTag(): string | 'all' {
     return this.selectedTag;
+  }
+
+  /**
+   * 공식 정렬 기준 설정 및 목록 재배치 (Round 8)
+   */
+  public setSortOption(option: FormulaSortOption): void {
+    this.currentSortOption = option;
+    const selectEl = this.overlay?.querySelector('#formula-sort-select') as HTMLSelectElement | null;
+    if (selectEl && selectEl.value !== option) {
+      selectEl.value = option;
+    }
+    soundEngine.playTap();
+    this.applyFilterAndRender();
+  }
+
+  public getSortOption(): FormulaSortOption {
+    return this.currentSortOption;
   }
 
   /**
@@ -477,6 +497,18 @@ export class FormulaModalController {
         <div class="formula-body-layout">
           <!-- 좌측 공식 목록 네비게이션 -->
           <div class="formula-sidebar" id="formula-sidebar">
+            <div class="formula-sidebar-header">
+              <span class="formula-count-badge" id="formula-count-badge">공식 (0개)</span>
+              <div class="formula-sort-wrapper">
+                <label for="formula-sort-select" class="sr-only">${t('formula.sortLabel')}</label>
+                <select id="formula-sort-select" class="formula-sort-select" aria-label="${t('formula.sortLabel')}">
+                  <option value="default" ${this.currentSortOption === 'default' ? 'selected' : ''}>${t('formula.sortDefault')}</option>
+                  <option value="diff-asc" ${this.currentSortOption === 'diff-asc' ? 'selected' : ''}>${t('formula.sortDiffAsc')}</option>
+                  <option value="diff-desc" ${this.currentSortOption === 'diff-desc' ? 'selected' : ''}>${t('formula.sortDiffDesc')}</option>
+                  <option value="name-asc" ${this.currentSortOption === 'name-asc' ? 'selected' : ''}>${t('formula.sortNameAsc')}</option>
+                </select>
+              </div>
+            </div>
             <div class="formula-list-nav" id="formula-list-nav"></div>
           </div>
 
@@ -513,6 +545,13 @@ export class FormulaModalController {
     clearBtn?.addEventListener('click', () => {
       this.setSearchQuery('');
       if (typeof searchInput?.focus === "function") { searchInput.focus(); }
+    });
+
+    // 공식 정렬 셀렉트 이벤트 (Round 8)
+    const sortSelect = this.overlay.querySelector('#formula-sort-select') as HTMLSelectElement | null;
+    sortSelect?.addEventListener('change', (e) => {
+      const val = (e.target as HTMLSelectElement).value as FormulaSortOption;
+      if (val) this.setSortOption(val);
     });
   }
 

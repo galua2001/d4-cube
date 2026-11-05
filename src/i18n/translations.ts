@@ -677,6 +677,36 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.d4StarBurstVortex4.step3': 'Move 3: Row 2 R270 ➔ Center row tiles (3, 5) cleared (Double-Kill); vertical spine aligned to R90',
     'formula.item.d4StarBurstVortex4.step4': 'Move 4: Col 2 R270 ➔ Col 2 tiles (1, 4, 7) wiped simultaneously (Triple-Kill Finish), 100% all-clear!',
 
+    // Round 7 D4 Master Formulas 3-Pack (EN)
+    'formula.item.d4CornerKiteFlux4.title': 'Corner Kite Flux 4-Move Super Cancellation',
+    'formula.item.d4CornerKiteFlux4.subtitle': 'Eliminates a 4-tile diagonal kite pattern along the main diagonal via dual diagonal cross-reflections',
+    'formula.item.d4CornerKiteFlux4.desc': 'Clears a 4-tile kite configuration carrying MX phase along the main diagonal using dual diagonal cross-reflections and orthogonal sweeps.',
+    'formula.item.d4CornerKiteFlux4.tip': 'Mathematically proven minimal 4-move sequence (Zero-Shortcut). Clear corners with main diagonal, align center via anti-diagonal, then sweep Col 3 and Row 3.',
+    'formula.item.d4CornerKiteFlux4.step0': 'Initial State: 4-tile kite pattern (cells 0, 5, 7, 8) entangled in MX phase along main diagonal',
+    'formula.item.d4CornerKiteFlux4.step1': 'Move 1: Main Diag (↖) MX ➔ Double-cancels corners 0 and 8',
+    'formula.item.d4CornerKiteFlux4.step2': 'Move 2: Anti Diag (↗) MX ➔ Clears center tile 4 and aligns Col 3 & Row 3',
+    'formula.item.d4CornerKiteFlux4.step3': 'Move 3: Col 3 MX ➔ Clears tiles 2 and 5, aligning Row 3 to pure MX',
+    'formula.item.d4CornerKiteFlux4.step4': 'Move 4: Row 3 MX ➔ Triple-cancels Row 3 tiles (6, 7, 8) for 100% All Clear',
+
+    'formula.item.d4PlusOmegaCross3.title': 'Plus-Omega Cross 3-Move Compound Kill',
+    'formula.item.d4PlusOmegaCross3.subtitle': 'A lethal 3-move killer eradicating 4 cross edges (MAD) and main diagonal (MD) via orthogonal anti-reflections and diagonal stroke',
+    'formula.item.d4PlusOmegaCross3.desc': 'Combines cross edge anti-diagonal reflections (MAD) with main diagonal reflections (MD), neutralized in exactly 3 moves.',
+    'formula.item.d4PlusOmegaCross3.tip': 'Proven minimal 3-move sequence (Zero-Shortcut). Middle axis MAD operations purge edges and synchronize center to MD for a final diagonal strike.',
+    'formula.item.d4PlusOmegaCross3.step0': 'Initial State: 4 cross edges in MAD phase, main diagonal in MD phase',
+    'formula.item.d4PlusOmegaCross3.step1': 'Move 1: Row 2 MAD ➔ Double-cancels horizontal cross edges 3 and 5',
+    'formula.item.d4PlusOmegaCross3.step2': 'Move 2: Col 2 MAD ➔ Clears vertical edges 1 and 7, synchronizing main diagonal to MD',
+    'formula.item.d4PlusOmegaCross3.step3': 'Move 3: Main Diag (↖) MD ➔ Triple-cancels main diagonal tiles 0, 4, 8 for 100% All Clear',
+
+    'formula.item.d4HyperCubeFrame4.title': 'Hyper-Cube Frame 4-Move Finale',
+    'formula.item.d4HyperCubeFrame4.subtitle': 'Terminates full 8-tile outer frame rotational symmetry in exactly 4 moves via outer perimeter R90 sweeps',
+    'formula.item.d4HyperCubeFrame4.desc': 'A pure outer frame challenge with center ID, 4 corners R180, and 4 edges R270 solved in 4 perimeter R90 moves.',
+    'formula.item.d4HyperCubeFrame4.tip': 'Proven minimal 4-move sequence (Zero-Shortcut). Row sweeps clear edges and synchronize corners to R270, then column sweeps execute double triple-kills.',
+    'formula.item.d4HyperCubeFrame4.step0': 'Initial State: Center tile pure ID, 4 corners in R180, 4 edges in R270',
+    'formula.item.d4HyperCubeFrame4.step1': 'Move 1: Row 1 R90 ➔ Clears top edge 1 and aligns corners 0 and 2 to R270',
+    'formula.item.d4HyperCubeFrame4.step2': 'Move 2: Row 3 R90 ➔ Clears bottom edge 7 and synchronizes Col 1 & Col 3 to R270',
+    'formula.item.d4HyperCubeFrame4.step3': 'Move 3: Col 1 R90 ➔ Triple-cancels Col 1 tiles 0, 3, 6 simultaneously',
+    'formula.item.d4HyperCubeFrame4.step4': 'Move 4: Col 3 R90 ➔ Triple-cancels Col 3 tiles 2, 5, 8 for 100% All Clear',
+
   },
 
   ko: {
