@@ -3875,5 +3875,577 @@
         "formulaDesc": "3열 트리플 킬로 외곽 프레임 완전 종결"
       }
     ]
+  },
+  {
+    "id": "d4-spiral-core-vortex-4",
+    "titleKo": "나선형 코어 볼텍스 4수 소거 공식",
+    "titleEn": "Spiral Core Vortex 4-Move Purge Formula",
+    "category": "god-number",
+    "badgeKo": "🏁 D4 마스터 4수",
+    "badgeEn": "🏁 D4 Master 4M",
+    "difficulty": 4,
+    "formulaSeq": "Row 1 R90 ➔ Col 3 R90 ➔ Row 3 R90 ➔ Col 1 R90",
+    "summaryKo": "외곽 8개 타일이 중심을 축으로 회전하는 나선형 와류(Vortex) 배치를 1행·3열·3행·1열의 시계방향 나선 4단 90° 회전으로 완벽 소거합니다.",
+    "summaryEn": "Eliminates a perimeter spiral vortex pattern (8 outer tiles rotating around the core) via a 4-move clockwise perimeter sweep (Row 1 ➔ Col 3 ➔ Row 3 ➔ Col 1) using 90° rotations.",
+    "latexFormula": "\\mathcal{F}_{\\text{vortex}} = \\text{Col}_1(R_{90}) \\circ \\text{Row}_3(R_{90}) \\circ \\text{Col}_3(R_{90}) \\circ \\text{Row}_1(R_{90})",
+    "isInteractive": true,
+    "tags": [
+      "D4 마스터",
+      "나선형",
+      "회오리",
+      "AI 발굴 공식",
+      "4수 소거",
+      "Vortex"
+    ],
+    "notesKo": [
+      "BFS 전수 탐색(754,922개 상태)으로 증명된 지름길 없는(Zero-Shortcut) 엄격한 4수 마스터 공식입니다.",
+      "중심(4번)은 항등원(ID)인 태풍의 눈 상태를 유지하며, 외곽 둘레를 1행(Row 1) ➔ 3열(Col 3) ➔ 3행(Row 3) ➔ 1열(Col 1) 순으로 감아 돌며 위상을 차례로 중화합니다."
+    ],
+    "notesEn": [
+      "Mathematically proven minimal 4-move sequence (Zero-Shortcut) verified across 754,922 states.",
+      "The center core (cell 4) stays in ID as the calm eye of the hurricane, while the outer ring is sequentially neutralized via a clockwise perimeter cascade."
+    ],
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (나선형 코어 볼텍스 외곽 8개 얽힘)",
+        "labelEn": "Initial State (Perimeter Spiral Vortex Entanglement)",
+        "label": "초기 배치",
+        "boardOps": [
+          "R180",
+          "R270",
+          "R180",
+          "R270",
+          "ID",
+          "R270",
+          "R180",
+          "R270",
+          "R180"
+        ],
+        "highlightCells": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          8
+        ],
+        "actionDescKo": "중심 4번 타일은 ID이며, 코너 4개 타일은 R180, 변 4개 타일은 R270으로 회전 대칭 와류를 형성하고 있습니다.",
+        "actionDescEn": "Center tile 4 is ID, 4 corners are R180, and 4 edges are R270, forming a rotational vortex.",
+        "mathInsightKo": "완벽한 C4 회전 군론 대칭 구조로, 중심을 건드리지 않고 외곽 4개 라인을 연속 스위프해야만 풀리는 고난도 패턴입니다.",
+        "mathInsightEn": "Possesses C4 rotational group symmetry, requiring an outer perimeter cascade to solve without disturbing the core.",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "나선형 코어 볼텍스 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 1행(Row 1) 90° 시계방향 회전 (R90)",
+        "labelEn": "Move 1: Row 1 90° Clockwise Rotation (R90)",
+        "label": "1수: 1행 R90",
+        "boardOps": [
+          "R270",
+          "ID",
+          "R270",
+          "R270",
+          "ID",
+          "R270",
+          "R180",
+          "R270",
+          "R180"
+        ],
+        "highlightCells": [
+          0,
+          1,
+          2
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 0
+        },
+        "actionDescKo": "상단 1행(0, 1, 2번 타일)에 R90 연산 적용",
+        "actionDescEn": "Row 1 (cells 0, 1, 2) R90 applied",
+        "mathInsightKo": "1번 상단 변 타일(R270 * R90 = ID)이 즉시 소거되고, 0번과 2번 코너 타일은 R270으로 전이되어 다음 열 스위프와 위상 정합을 이룹니다.",
+        "mathInsightEn": "Tile 1 is neutralized to ID (R270 * R90 = ID), while corners 0 and 2 transition to R270 to align with the upcoming column sweep.",
+        "formulaBadge": "1수: 1행 R90",
+        "formulaText": "Row[1] ➔ R90",
+        "formulaDesc": "1번 상단 변 즉각 소거"
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 3열(Col 3) 90° 시계방향 회전 (R90)",
+        "labelEn": "Move 2: Col 3 90° Clockwise Rotation (R90)",
+        "label": "2수: 3열 R90",
+        "boardOps": [
+          "R270",
+          "ID",
+          "ID",
+          "R270",
+          "ID",
+          "ID",
+          "R180",
+          "R270",
+          "R270"
+        ],
+        "highlightCells": [
+          2,
+          5,
+          8
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 2
+        },
+        "actionDescKo": "우측 3열(2, 5, 8번 타일)에 R90 연산 적용",
+        "actionDescEn": "Col 3 (cells 2, 5, 8) R90 applied",
+        "mathInsightKo": "우측 상단 2번 코너와 5번 변 타일이 동시에 ID로 더블 소거(Double Cancel)! 3열의 상단부가 완전 정돈됩니다.",
+        "mathInsightEn": "Tiles 2 and 5 simultaneously cancel to ID (Double Cancel)! The upper right perimeter is fully solved.",
+        "formulaBadge": "2수: 3열 R90",
+        "formulaText": "Col[3] ➔ R90",
+        "formulaDesc": "2번·5번 타일 동시 더블 소거"
+      },
+      {
+        "stepIndex": 3,
+        "subStep": 3,
+        "labelKo": "3수: 3행(Row 3) 90° 시계방향 회전 (R90)",
+        "labelEn": "Move 3: Row 3 90° Clockwise Rotation (R90)",
+        "label": "3수: 3행 R90",
+        "boardOps": [
+          "R270",
+          "ID",
+          "ID",
+          "R270",
+          "ID",
+          "ID",
+          "R270",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          6,
+          7,
+          8
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 2
+        },
+        "actionDescKo": "하단 3행(6, 7, 8번 타일)에 R90 연산 적용",
+        "actionDescEn": "Row 3 (cells 6, 7, 8) R90 applied",
+        "mathInsightKo": "하단 7번 변과 8번 우하단 코너가 연속 소거! 이제 보드에는 좌측 1열(0, 3, 6번 타일)의 균일 위상(R270)만 남습니다.",
+        "mathInsightEn": "Tiles 7 and 8 cancel out! Only Col 1 (cells 0, 3, 6) remains with uniform phase R270.",
+        "formulaBadge": "3수: 3행 R90",
+        "formulaText": "Row[3] ➔ R90",
+        "formulaDesc": "7번·8번 타일 소거 및 1열 균일 정렬"
+      },
+      {
+        "stepIndex": 4,
+        "subStep": 4,
+        "labelKo": "4수: 1열(Col 1) 90° 시계방향 회전 (R90) - 올 클리어",
+        "labelEn": "Move 4: Col 1 90° Clockwise Rotation (R90) - Finale",
+        "label": "4수: 1열 R90",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          3,
+          6
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 0
+        },
+        "actionDescKo": "좌측 1열(0, 3, 6번 타일)에 R90 연산 적용하여 100% 완전 소거 종결",
+        "actionDescEn": "Col 1 (cells 0, 3, 6) R90 applied - 100% ID All Clear Achieved",
+        "mathInsightKo": "1열 전체(0, 3, 6번)가 일격에 트리플 킬(Triple Cancel)! 나선 회오리를 완벽히 진압하고 100% 항등 상태를 완성합니다.",
+        "mathInsightEn": "Col 1 (cells 0, 3, 6) triple-cancels to ID in one stroke! The vortex is fully mastered.",
+        "formulaBadge": "4수: 1열 R90 (종결)",
+        "formulaText": "Col[1] ➔ R90",
+        "formulaDesc": "1열 트리플 킬로 100% 완전 정복"
+      }
+    ]
+  },
+  {
+    "id": "d4-diamond-core-smash-3",
+    "titleKo": "마름모꼴 다이아몬드 코어 3수 스매시 공식",
+    "titleEn": "Diamond Core Smash 3-Move Finish Formula",
+    "category": "god-number",
+    "badgeKo": "⚡ D4 스피드 3수",
+    "badgeEn": "⚡ D4 Speed 3M",
+    "difficulty": 3,
+    "formulaSeq": "Row 2 R90 ➔ Col 2 MX ➔ Row 2 MD",
+    "summaryKo": "중심 코어(4번)와 십자 변(1, 3, 5, 7번)으로 이루어진 순수 마름모꼴 위상을 Row 2와 Col 2의 십자 교차 스트라이크로 단 3수만에 격파합니다.",
+    "summaryEn": "Crushes a pure diamond cross phase (center 4 + cross edges 1, 3, 5, 7) in exactly 3 moves via orthogonal Row 2 and Col 2 cross-strikes.",
+    "latexFormula": "\\mathcal{F}_{\\text{diamond}} = \\text{Row}_2(M_D) \\circ \\text{Col}_2(M_x) \\circ \\text{Row}_2(R_{90})",
+    "isInteractive": true,
+    "tags": [
+      "D4 마스터",
+      "다이아몬드",
+      "마름모꼴",
+      "AI 발굴 공식",
+      "3수 종결",
+      "Diamond Core"
+    ],
+    "notesKo": [
+      "BFS 전수 탐색으로 입증된 3수 극단 최단 거리(Zero-Shortcut k=3) 공식입니다.",
+      "외곽 4개 코너(0, 2, 6, 8)가 완전히 깨끗한 ID 상태를 유지하며 오직 다이아몬드 코어 5개 타일만 선별 타격합니다."
+    ],
+    "notesEn": [
+      "Mathematically proven minimal 3-move sequence (Zero-Shortcut) with no 1- or 2-move shortcuts.",
+      "All 4 corners (0, 2, 6, 8) remain pristine ID, surgically smashing only the 5 diamond core tiles."
+    ],
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (순수 마름모 다이아몬드 5개 타일)",
+        "labelEn": "Initial State (Pure Diamond Cross 5-Tile Configuration)",
+        "label": "초기 배치",
+        "boardOps": [
+          "ID",
+          "MX",
+          "ID",
+          "MX",
+          "R180",
+          "MX",
+          "ID",
+          "MX",
+          "ID"
+        ],
+        "highlightCells": [
+          1,
+          3,
+          4,
+          5,
+          7
+        ],
+        "actionDescKo": "십자 변 4개(1, 3, 5, 7)는 MX 반사 위상, 중심 4번 코어는 R180 위상으로 결합된 마름모꼴 배치입니다.",
+        "actionDescEn": "Cross edges (1, 3, 5, 7) carry MX reflection, and center core 4 carries R180.",
+        "mathInsightKo": "중심 코어를 감싸는 마름모꼴 4각 반사계는 코너를 건드리지 않는 정밀 십자 축 조작을 통해서만 최단 3수 종결이 가능합니다.",
+        "mathInsightEn": "The diamond reflection cage surrounding the core can only be solved in 3 moves via precise orthogonal center axis strikes.",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "마름모 다이아몬드 코어 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 2행(Row 2) 90° 시계방향 회전 (R90)",
+        "labelEn": "Move 1: Row 2 90° Clockwise Rotation (R90)",
+        "label": "1수: 2행 R90",
+        "boardOps": [
+          "ID",
+          "MX",
+          "ID",
+          "MD",
+          "R270",
+          "MD",
+          "ID",
+          "MX",
+          "ID"
+        ],
+        "highlightCells": [
+          3,
+          4,
+          5
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 1
+        },
+        "actionDescKo": "중앙 2행(3, 4, 5번 타일)에 R90 연산 적용",
+        "actionDescEn": "Row 2 (cells 3, 4, 5) R90 applied",
+        "mathInsightKo": "좌우 변(3, 5)이 MX에서 주대각 반사 MD로 전이되고, 중심 4번은 R180 * R90 = R270으로 조작되어 2수 십자 교차를 준비합니다.",
+        "mathInsightEn": "Edges 3 and 5 transition to MD, and center 4 becomes R270, priming the board for the vertical cross-sweep.",
+        "formulaBadge": "1수: 2행 R90",
+        "formulaText": "Row[2] ➔ R90",
+        "formulaDesc": "중앙 2행 대각 반사 위상 전이"
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 2열(Col 2) 가로축 반사 (MX)",
+        "labelEn": "Move 2: Col 2 Horizontal Reflection (MX)",
+        "label": "2수: 2열 MX",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "MD",
+          "MD",
+          "MD",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          1,
+          4,
+          7
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 1
+        },
+        "actionDescKo": "중앙 2열(1, 4, 7번 타일)에 MX 연산 적용",
+        "actionDescEn": "Col 2 (cells 1, 4, 7) MX applied",
+        "mathInsightKo": "상하 변(1, 7번)의 MX가 완벽 소거(ID)되고, 중심 4번 또한 MD로 변환되어 2행 전체(3, 4, 5)가 동일한 MD 위상으로 통합 정렬됩니다!",
+        "mathInsightEn": "Top and bottom edges (1, 7) cancel to ID! Center 4 becomes MD, perfectly unifying Row 2 (3, 4, 5) into identical MD phase!",
+        "formulaBadge": "2수: 2열 MX",
+        "formulaText": "Col[2] ➔ MX",
+        "formulaDesc": "1번·7번 상하 변 동시 소거 및 2행 단일 위상화"
+      },
+      {
+        "stepIndex": 3,
+        "subStep": 3,
+        "labelKo": "3수: 2행(Row 2) 주대각선 반사 (MD) - 일격 스매시 종결",
+        "labelEn": "Move 3: Row 2 Main Diagonal Reflection (MD) - Smash Finale",
+        "label": "3수: 2행 MD",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          3,
+          4,
+          5
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 1
+        },
+        "actionDescKo": "중앙 2행(3, 4, 5번 타일)에 MD 연산 적용하여 100% 완전 소거",
+        "actionDescEn": "Row 2 (cells 3, 4, 5) MD applied - 100% ID All Clear Achieved",
+        "mathInsightKo": "단일 위상 MD로 정렬된 2행 3개 타일(3, 4, 5번)을 MD의 자기역원 특성(MD * MD = ID)으로 트리플 킬! 3수만에 올 클리어!",
+        "mathInsightEn": "Row 2 triple-cancels to ID using MD self-inversion (MD * MD = ID)! 100% ID reached in just 3 lightning moves!",
+        "formulaBadge": "3수: 2행 MD (종결)",
+        "formulaText": "Row[2] ➔ MD",
+        "formulaDesc": "2행 트리플 킬로 마름모 코어 완전 격파"
+      }
+    ]
+  },
+  {
+    "id": "d4-anti-checker-parity-4",
+    "titleKo": "안티 체커 패리티 & 대각 반사 4수 올킬 공식",
+    "titleEn": "Anti-Checker Parity & Diagonal 4-Move All-Kill Formula",
+    "category": "god-number",
+    "badgeKo": "🏁 D4 마스터 4수",
+    "badgeEn": "🏁 D4 Master 4M",
+    "difficulty": 4,
+    "formulaSeq": "Main Diag (↖) MD ➔ Row 2 R180 ➔ Anti Diag (↗) MD ➔ Col 2 R180",
+    "summaryKo": "체커보드 흑/백 타일이 대각 반사(MD)와 점대칭(R180)으로 엇갈린 안티 패리티 위상을 양대각선과 십자축의 교차 핑퐁 연산으로 4수만에 완전 소거합니다.",
+    "summaryEn": "Eliminates an anti-checker parity state (corners carrying MD diagonal reflection vs edges carrying R180 point reflection) via alternating diagonal and orthogonal cross-sweeps.",
+    "latexFormula": "\\mathcal{F}_{\\text{checker}} = \\text{Col}_2(R_{180}) \\circ \\Delta_2(M_D) \\circ \\text{Row}_2(R_{180}) \\circ \\Delta_1(M_D)",
+    "isInteractive": true,
+    "tags": [
+      "D4 마스터",
+      "체커보드",
+      "대각 반사",
+      "AI 발굴 공식",
+      "4수 소거",
+      "Anti-Checker"
+    ],
+    "notesKo": [
+      "BFS 전수 탐색(754,922개 상태)으로 증명된 지름길 없는(Zero-Shortcut) 엄격한 4수 마스터 공식입니다.",
+      "주대각선(↖)과 부대각선(↗)의 대각 반사(MD) 연산과 중앙 Row 2, Col 2의 점대칭(R180) 회전이 완벽한 지그재그 쌍대성을 이룹니다."
+    ],
+    "notesEn": [
+      "Mathematically proven minimal 4-move sequence (Zero-Shortcut) verified across 754,922 states.",
+      "Main/Anti diagonals (MD) and orthogonal Row 2/Col 2 (R180) form an alternating zigzag duality."
+    ],
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (체커보드 대각 반사 vs 점대칭 안티 패리티)",
+        "labelEn": "Initial State (Anti-Checker Parity: MD Corners vs R180 Edges)",
+        "label": "초기 배치",
+        "boardOps": [
+          "MD",
+          "R180",
+          "MD",
+          "R180",
+          "ID",
+          "R180",
+          "MD",
+          "R180",
+          "MD"
+        ],
+        "highlightCells": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          8
+        ],
+        "actionDescKo": "코너 4개 타일(0, 2, 6, 8)은 대각 반사 MD, 십자 변 4개(1, 3, 5, 7)는 점대칭 R180으로 격자 교차 배치되어 있습니다.",
+        "actionDescEn": "Corners (0, 2, 6, 8) carry diagonal reflection MD, while cross edges (1, 3, 5, 7) carry point reflection R180.",
+        "mathInsightKo": "서로 다른 두 이면체 부분군(대각 반사계 vs 2차 순환 부분군)이 체커보드 패턴으로 얽혀 있어, 대각선 축과 십자축의 교차 합성 없이는 결코 풀 수 없습니다.",
+        "mathInsightEn": "Two distinct D4 subgroups are intertwined in checkerboard parity, strictly requiring alternating diagonal and orthogonal operations.",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "안티 체커 패리티 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 주대각선(↖) 대각 반사 (MD)",
+        "labelEn": "Move 1: Main Diag (↖) Diagonal Reflection (MD)",
+        "label": "1수: 주대각선 MD",
+        "boardOps": [
+          "ID",
+          "R180",
+          "MD",
+          "R180",
+          "MD",
+          "R180",
+          "MD",
+          "R180",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          4,
+          8
+        ],
+        "highlightLine": {
+          "type": "diag",
+          "index": "main"
+        },
+        "actionDescKo": "주대각선 (0, 4, 8번 타일)에 MD 연산 적용",
+        "actionDescEn": "Main Diag (cells 0, 4, 8) MD applied",
+        "mathInsightKo": "0번과 8번 코너의 MD 위상이 즉각 소거(ID)되고, 중심 4번은 MD 위상으로 전이되어 2행의 중심 가교가 형성됩니다.",
+        "mathInsightEn": "Corners 0 and 8 immediately cancel to ID, and center 4 transitions to MD to bridge Row 2.",
+        "formulaBadge": "1수: 주대각선 (↖) MD",
+        "formulaText": "Diag[main] ➔ MD",
+        "formulaDesc": "0번·8번 코너 즉각 소거"
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 2행(Row 2) 180° 회전 (R180)",
+        "labelEn": "Move 2: Row 2 180° Rotation (R180)",
+        "label": "2수: 2행 R180",
+        "boardOps": [
+          "ID",
+          "R180",
+          "MD",
+          "ID",
+          "MAD",
+          "ID",
+          "MD",
+          "R180",
+          "ID"
+        ],
+        "highlightCells": [
+          3,
+          4,
+          5
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 1
+        },
+        "actionDescKo": "중앙 2행 (3, 4, 5번 타일)에 R180 연산 적용",
+        "actionDescEn": "Row 2 (cells 3, 4, 5) R180 applied",
+        "mathInsightKo": "좌우 3번과 5번 타일의 R180이 동시 소거(Double Cancel)! 중심 4번은 MAD로 전이되어 부대각선(↗) 축과 정확히 공명합니다.",
+        "mathInsightEn": "Edges 3 and 5 double-cancel to ID! Center 4 transitions to MAD, resonating with the anti-diagonal axis.",
+        "formulaBadge": "2수: 2행 R180",
+        "formulaText": "Row[2] ➔ R180",
+        "formulaDesc": "3번·5번 타일 동시 더블 소거"
+      },
+      {
+        "stepIndex": 3,
+        "subStep": 3,
+        "labelKo": "3수: 부대각선(↗) 대각 반사 (MD)",
+        "labelEn": "Move 3: Anti Diag (↗) Diagonal Reflection (MD)",
+        "label": "3수: 부대각선 MD",
+        "boardOps": [
+          "ID",
+          "R180",
+          "ID",
+          "ID",
+          "R180",
+          "ID",
+          "ID",
+          "R180",
+          "ID"
+        ],
+        "highlightCells": [
+          2,
+          4,
+          6
+        ],
+        "highlightLine": {
+          "type": "diag",
+          "index": "anti"
+        },
+        "actionDescKo": "부대각선 (2, 4, 6번 타일)에 MD 연산 적용",
+        "actionDescEn": "Anti Diag (cells 2, 4, 6) MD applied",
+        "mathInsightKo": "우상단 2번과 좌하단 6번 코너가 완전히 소거(ID)! 이제 보드에는 중앙 2열(1, 4, 7번)의 균일 위상(R180)만 남습니다.",
+        "mathInsightEn": "Corners 2 and 6 fully cancel to ID! Only Col 2 (cells 1, 4, 7) remains with uniform phase R180.",
+        "formulaBadge": "3수: 부대각선 (↗) MD",
+        "formulaText": "Diag[anti] ➔ MD",
+        "formulaDesc": "2번·6번 코너 소거 및 2열 정렬"
+      },
+      {
+        "stepIndex": 4,
+        "subStep": 4,
+        "labelKo": "4수: 2열(Col 2) 180° 회전 (R180) - 100% 올킬 종결",
+        "labelEn": "Move 4: Col 2 180° Rotation (R180) - All-Kill Finale",
+        "label": "4수: 2열 R180",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          1,
+          4,
+          7
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 1
+        },
+        "actionDescKo": "중앙 2열 (1, 4, 7번 타일)에 R180 연산 적용하여 체커보드 완전 종결",
+        "actionDescEn": "Col 2 (cells 1, 4, 7) R180 applied - 100% ID All Clear Achieved",
+        "mathInsightKo": "중앙 2열 3개 타일(1, 4, 7번)을 R180으로 일격에 트리플 킬(Triple Cancel)! 복잡했던 체커 안티 패리티를 4수만에 완벽 평정합니다.",
+        "mathInsightEn": "Col 2 (cells 1, 4, 7) triple-cancels to ID! The intricate anti-checker parity is completely solved in 4 moves!",
+        "formulaBadge": "4수: 2열 R180 (종결)",
+        "formulaText": "Col[2] ➔ R180",
+        "formulaDesc": "2열 트리플 킬로 안티 체커 완전 정복"
+      }
+    ]
   }
 ]
