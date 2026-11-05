@@ -123,7 +123,6 @@ class MatrixCubeApp {
           <button id="btn-header-tutorial" class="btn-icon btn-nav-tutorial" title="${t('header.tutorialTitle')}">${t('header.tutorial')}</button>
           <button id="btn-about" class="btn-icon" title="${t('header.aboutTitle')}">${t('header.about')}</button>
           <button id="btn-toggle-guide" class="btn-icon" title="${t('header.guideTitle')}">${t('header.guide')}</button>
-          <button id="btn-toggle-timer-mode" class="btn-icon ${isFree ? 'active-free-mode' : ''}" title="${isFree ? t('header.timerModeTitleFree') : t('header.timerModeTitleStopwatch')}">${isFree ? t('header.timerModeFree') : t('header.timerModeStopwatch')}</button>
           <button id="btn-toggle-bgm" class="btn-icon">🔇 BGM</button>
           <button id="btn-toggle-sfx" class="btn-icon">🔊 SFX</button>
         </div>
@@ -137,7 +136,6 @@ class MatrixCubeApp {
             <div class="button-group" id="moves-button-group"></div>
           </div>
           <div class="settings-options-group">
-            <button id="btn-toggle-timer-mode" class="btn-option-pill ${recordManager.isFreeMode() ? 'active-timer-free' : ''}" title="${recordManager.isFreeMode() ? t('header.timerModeTitleFree') : t('header.timerModeTitleStopwatch')}">${recordManager.isFreeMode() ? t('header.timerModeFree') : t('header.timerModeStopwatch')}</button>
             <button id="btn-cycle-size" class="btn-option-pill" title="${t('settings.sizeTitle')}">📐 ${this.boardSize}×${this.boardSize}</button>
             <button id="btn-toggle-diag" class="btn-option-pill ${this.isDiagonalEnabled ? 'active-diag' : ''}" title="${this.isDiagonalEnabled ? t('settings.diagTitleOn') : t('settings.diagTitleOff')}">${this.isDiagonalEnabled ? t('settings.diagOn') : t('settings.diagOff')}</button>
           </div>
@@ -150,7 +148,7 @@ class MatrixCubeApp {
           <span id="label-stage-info">${t('status.stageInfo', { size: this.boardSize, moves: this.scrambleMoves })}</span>
         </div>
         <div class="timer-container">
-          <span class="timer-display ${isFree ? 'mode-free' : ''}" id="label-timer" style="cursor:pointer;" title="${t('status.timerTitleToggle')}">${isFree ? t('status.timerFree') : '00:00.0'}</span>
+          <span class="timer-display ${isFree ? 'timer-off' : 'timer-active'}" id="label-timer" style="cursor:pointer;" title="${isFree ? t('status.timerTooltipOff') : t('status.timerTooltipOn')}">${isFree ? t('status.timerOff') : '⏱️ 00:00.0'}</span>
           <span id="label-moves">${t('status.moves', { moves: this.movesCount })}</span>
           <span class="best-record-badge" id="badge-best-record">${t('status.bestRecordEmpty')}</span>
         </div>
@@ -422,7 +420,7 @@ class MatrixCubeApp {
       this.isGameStarted = false;
       this.updateTimerModeUI();
     };
-    document.getElementById('btn-toggle-timer-mode')?.addEventListener('click', toggleTimerModeAction);
+    // document.getElementById('btn-toggle-timer-mode')?.addEventListener('click', toggleTimerModeAction);
     document.getElementById('label-timer')?.addEventListener('click', toggleTimerModeAction);
 
     // 난이도(N수) 버튼 목록 초기 렌더링
@@ -503,7 +501,7 @@ class MatrixCubeApp {
     this.isGameStarted = false;
     recordManager.resetTimer();
     const timerEl = document.getElementById('label-timer');
-    if (timerEl) timerEl.innerText = recordManager.isFreeMode() ? t('status.timerFree') : '00:00.0';
+    if (timerEl) timerEl.innerText = recordManager.isFreeMode() ? t('status.timerOff') : '⏱️ 00:00.0';
 
     this.moveHistory = [];
     this.movesCount = 0;
@@ -516,19 +514,13 @@ class MatrixCubeApp {
   }
 
   private updateTimerModeUI() {
-    const btn = document.getElementById('btn-toggle-timer-mode');
     const isFree = recordManager.isFreeMode();
-    if (btn) {
-      btn.innerText = isFree ? t('header.timerModeFree') : t('header.timerModeStopwatch');
-      btn.title = isFree ? t('header.timerModeTitleFree') : t('header.timerModeTitleStopwatch');
-      btn.classList.toggle('active-timer-free', isFree);
-      btn.classList.toggle('active-free-mode', isFree);
-    }
     const timerEl = document.getElementById('label-timer');
     if (timerEl) {
-      timerEl.title = t('status.timerTitleToggle');
-      timerEl.classList.toggle('mode-free', isFree);
-      timerEl.innerText = isFree ? t('status.timerFree') : (this.isGameStarted ? recordManager.getFormattedTime() : '00:00.0');
+      timerEl.title = isFree ? t('status.timerTooltipOff') : t('status.timerTooltipOn');
+      timerEl.classList.toggle('timer-off', isFree);
+      timerEl.classList.toggle('timer-active', !isFree);
+      timerEl.innerText = isFree ? t('status.timerOff') : `⏱️ ${this.isGameStarted ? recordManager.getFormattedTime() : '00:00.0'}`;
     }
   }
 
@@ -786,7 +778,7 @@ class MatrixCubeApp {
           this.isGameStarted = true;
           recordManager.startTimer((formatted) => {
             const timerEl = document.getElementById('label-timer');
-            if (timerEl) timerEl.innerText = recordManager.isFreeMode() ? t('status.timerFree') : formatted;
+            if (timerEl) timerEl.innerText = recordManager.isFreeMode() ? t('status.timerOff') : `⏱️ ${formatted}`;
           });
         }
 
@@ -817,7 +809,7 @@ class MatrixCubeApp {
     this.isGameStarted = false;
     recordManager.resetTimer();
     const timerEl = document.getElementById('label-timer');
-    if (timerEl) timerEl.innerText = recordManager.isFreeMode() ? t('status.timerFree') : '00:00.0';
+    if (timerEl) timerEl.innerText = recordManager.isFreeMode() ? t('status.timerOff') : '⏱️ 00:00.0';
 
     const ops = generateExactKScramble(
       this.scrambleMoves,
@@ -947,7 +939,7 @@ class MatrixCubeApp {
       this.isGameStarted = false;
       const isFree = recordManager.isFreeMode();
       const elapsedMs = recordManager.stopTimer();
-      const timeFormatted = isFree ? t('status.timerFree') : recordManager.getFormattedTime();
+      const timeFormatted = isFree ? t('status.timerOff') : `⏱️ ${recordManager.getFormattedTime()}`;
       const saveResult = recordManager.saveRecord(this.boardSize, this.scrambleMoves, elapsedMs, this.movesCount);
       this.updateBestRecordBadge();
 

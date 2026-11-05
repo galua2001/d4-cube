@@ -136,37 +136,58 @@ describe('RecordManager 단위 테스트', () => {
       expect(recordManager.getFormattedTime()).toBe('00:00.0');
     });
 
-    it('시간 무제한 자유 모드(자유 ♾️)와 초시계(⏱️) 모드 전환, 리스너 및 영속성을 올바르게 관리해야 함', () => {
+    it('타이머 ON/OFF 모드 전환, 편의 메서드, 리스너 및 영속성을 올바르게 관리해야 함', () => {
       let notified = '';
       const unsub = recordManager.onTimerModeChange((m) => { notified = m; });
 
-      recordManager.setTimerMode('free');
-      expect(notified).toBe('free');
-      expect(recordManager.isFreeMode()).toBe(true);
-      expect(recordManager.getTimerMode()).toBe('free');
-      expect(recordManager.getFormattedTime()).toBe('♾️');
-      expect(mockStorage.getItem('matrix_cube_timer_mode')).toBe('free');
+      // 기본값은 'on'
+      expect(recordManager.getTimerMode()).toBe('on');
+      expect(recordManager.isTimerActive()).toBe(true);
+      expect(recordManager.isTimerOff()).toBe(false);
 
+      // 'off'로 변경
+      recordManager.setTimerMode('off');
+      expect(notified).toBe('off');
+      expect(recordManager.getTimerMode()).toBe('off');
+      expect(recordManager.isTimerActive()).toBe(false);
+      expect(recordManager.isTimerOff()).toBe(true);
+      expect(recordManager.isFreeMode()).toBe(true);
+      expect(recordManager.getFormattedTime()).toBe('OFF');
+      expect(mockStorage.getItem('matrix_cube_timer_mode')).toBe('off');
+
+      // 토글: off -> on
       const toggled = recordManager.toggleTimerMode();
-      expect(toggled).toBe('stopwatch');
-      expect(notified).toBe('stopwatch');
-      expect(recordManager.isFreeMode()).toBe(false);
-      expect(recordManager.getTimerMode()).toBe('stopwatch');
+      expect(toggled).toBe('on');
+      expect(notified).toBe('on');
+      expect(recordManager.isTimerActive()).toBe(true);
+      expect(recordManager.isTimerOff()).toBe(false);
+      expect(recordManager.getTimerMode()).toBe('on');
       expect(recordManager.getFormattedTime()).toBe('00:00.0');
 
-      unsub();
+      // 하위 호환성: 'free' 입력 시 'off'로 정규화
       recordManager.setTimerMode('free');
-      expect(notified).toBe('stopwatch'); // unsub 확인
+      expect(recordManager.isTimerOff()).toBe(true);
+      expect(recordManager.getTimerMode()).toBe('off');
+
+      // 하위 호환성: 'stopwatch' 입력 시 'on'으로 정규화
+      recordManager.setTimerMode('stopwatch');
+      expect(recordManager.isTimerActive()).toBe(true);
+      expect(recordManager.getTimerMode()).toBe('on');
+
+      unsub();
+      recordManager.setTimerMode('off');
+      expect(notified).toBe('on'); // unsub 확인
 
       // 저장된 모드 복원 확인
-      mockStorage.setItem('matrix_cube_timer_mode', 'free');
+      mockStorage.setItem('matrix_cube_timer_mode', 'off');
       const restored = new RecordManager();
-      expect(restored.getTimerMode()).toBe('free');
-      expect(restored.isFreeMode()).toBe(true);
+      expect(restored.getTimerMode()).toBe('off');
+      expect(restored.isTimerOff()).toBe(true);
+      expect(restored.isTimerActive()).toBe(false);
     });
 
-    it('자유 모드에서는 타이머가 카운트되지 않고 시간 무제한 ♾️ 상태를 유지하며 시간 신기록 갱신을 생략해야 함', () => {
-      recordManager.setTimerMode('free');
+    it('비활성(OFF) 모드에서는 타이머가 카운트되지 않고 OFF 상태를 유지하며 시간 신기록 갱신을 생략해야 함', () => {
+      recordManager.setTimerMode('off');
       let tickValue = '';
       recordManager.startTimer((formatted) => {
         tickValue = formatted;
@@ -174,9 +195,9 @@ describe('RecordManager 단위 테스트', () => {
 
       expect(recordManager.isTimerRunning()).toBe(false);
       expect(recordManager.getElapsedMs()).toBe(0);
-      expect(tickValue).toBe('♾️');
+      expect(tickValue).toBe('OFF');
 
-      // 자유 모드에서 클리어 시 시간 신기록 없이 최저 이동수만 갱신
+      // 비활성 모드에서 클리어 시 시간 신기록 없이 최저 이동수만 갱신
       const saveRes = recordManager.saveRecord(3, 3, 5000, 4);
       expect(saveRes.isNewBestTime).toBe(false);
       expect(saveRes.isNewBestMoves).toBe(true);

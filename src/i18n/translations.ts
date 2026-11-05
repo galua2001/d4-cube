@@ -97,8 +97,13 @@ export const translations: Record<Lang, Record<string, any>> = {
     'status.bestRecordEmpty': '🏆 BEST: -',
     'status.bestRecordEmptyTitle': 'No clear records yet',
     'status.bestRecordTitle': 'Best Record: {time} ({moves})',
-    'status.timerFree': '♾️ Free',
-    'status.timerTitleToggle': 'Click to toggle Free Play / Stopwatch',
+    'status.timerOff': '⏱️ OFF',
+    'status.timerFree': '⏱️ OFF',
+    'status.timerTitleOn': 'Timer ON (Click to turn OFF)',
+    'status.timerTitleOff': 'Timer OFF (Click to turn ON)',
+    'status.timerTitleToggle': 'Click to toggle Timer (⏱️ 00:00.0 ↔ ⏱️ OFF)',
+    'status.timerTooltipOn': 'Timer ON (Click to turn OFF)',
+    'status.timerTooltipOff': 'Timer OFF (Click to turn ON)',
 
     // Controller tile labels
     'board.row': 'R{n}',
@@ -344,8 +349,13 @@ export const translations: Record<Lang, Record<string, any>> = {
     'status.bestRecordEmpty': '🏆 BEST: -',
     'status.bestRecordEmptyTitle': '아직 클리어 기록이 없습니다',
     'status.bestRecordTitle': '최고 기록: {time} ({moves})',
-    'status.timerFree': '♾️ 무제한',
-    'status.timerTitleToggle': '클릭하여 시간 무제한 ↔ 초시계 모드 전환',
+    'status.timerFree': '⏱️ OFF',
+    'status.timerOff': '⏱️ OFF',
+    'status.timerTitleToggle': '클릭하여 시계 켜기/끄기 (⏱️ 00:00.0 ↔ ⏱️ OFF)',
+    'status.timerTooltipOn': '시계 켜짐 (클릭하면 끄기)',
+    'status.timerTooltipOff': '시계 꺼짐 (클릭하면 켜기)',
+    'status.timerTitleOn': '시계 켜짐 (클릭하면 끄기)',
+    'status.timerTitleOff': '시계 꺼짐 (클릭하면 켜기)',
 
     // Controller tile labels
     'board.row': '{n}행',

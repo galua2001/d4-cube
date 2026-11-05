@@ -1,6 +1,6 @@
 // 크기 및 난이도별 최고 기록(Best Time, Best Moves) 및 초시계 관리자
 
-export type TimerMode = 'stopwatch' | 'free';
+export type TimerMode = 'on' | 'off' | 'stopwatch' | 'free';
 
 export interface BestRecord {
   bestTimeMs: number | null; // 최고 시간 (밀리초)
@@ -39,7 +39,7 @@ export class RecordManager {
   private accumulatedMs = 0;
   private timerIntervalId: ReturnType<typeof setInterval> | null = null;
   private tickCallback: ((formatted: string, ms: number) => void) | null = null;
-  private timerMode: TimerMode = 'stopwatch';
+  private timerMode: TimerMode = 'on';
   private modeListeners: Array<(mode: TimerMode) => void> = [];
 
   constructor() {
@@ -51,8 +51,10 @@ export class RecordManager {
       const storage = this.getStorage();
       if (storage) {
         const saved = storage.getItem(TIMER_MODE_STORAGE_KEY);
-        if (saved === 'stopwatch' || saved === 'free') {
-          this.timerMode = saved;
+        if (saved === 'on' || saved === 'stopwatch') {
+          this.timerMode = 'on';
+        } else if (saved === 'off' || saved === 'free') {
+          this.timerMode = 'off';
         }
       }
     } catch {
@@ -61,27 +63,49 @@ export class RecordManager {
   }
 
   /**
-   * 타이머 모드 조회 ('stopwatch' | 'free')
+   * 타이머 모드 조회 ('on' | 'off')
    */
   public getTimerMode(): TimerMode {
     return this.timerMode;
   }
 
   /**
-   * 타이머 모드 설정 및 저장
+   * 타이머 활성화 상태(ON) 여부
+   */
+  public isTimerActive(): boolean {
+    return this.timerMode === 'on' || this.timerMode === 'stopwatch';
+  }
+
+  /**
+   * 타이머 비활성화 상태(OFF) 여부
+   */
+  public isTimerOff(): boolean {
+    return !this.isTimerActive();
+  }
+
+  /**
+   * 시간 무제한 자유 모드 여부 (isTimerOff 호환용)
+   */
+  public isFreeMode(): boolean {
+    return this.isTimerOff();
+  }
+
+  /**
+   * 타이머 모드 설정 및 저장 ('on' | 'off')
    */
   public setTimerMode(mode: TimerMode): void {
-    this.timerMode = mode;
+    const normalized: TimerMode = (mode === 'off' || mode === 'free') ? 'off' : 'on';
+    this.timerMode = normalized;
     this.resetTimer();
     try {
       const storage = this.getStorage();
       if (storage) {
-        storage.setItem(TIMER_MODE_STORAGE_KEY, mode);
+        storage.setItem(TIMER_MODE_STORAGE_KEY, normalized);
       }
     } catch {}
     this.modeListeners.forEach(cb => {
       try {
-        cb(mode);
+        cb(normalized);
       } catch {}
     });
   }
@@ -98,19 +122,12 @@ export class RecordManager {
   }
 
   /**
-   * 타이머 모드 토글 ('free' <-> 'stopwatch')
+   * 타이머 모드 토글 ('on' <-> 'off')
    */
   public toggleTimerMode(): TimerMode {
-    const nextMode: TimerMode = this.timerMode === 'free' ? 'stopwatch' : 'free';
+    const nextMode: TimerMode = this.isTimerActive() ? 'off' : 'on';
     this.setTimerMode(nextMode);
     return nextMode;
-  }
-
-  /**
-   * 시간 무제한 자유 모드 여부
-   */
-  public isFreeMode(): boolean {
-    return this.timerMode === 'free';
   }
 
   /**
@@ -162,8 +179,8 @@ export class RecordManager {
     let bestTime = existing?.bestTimeMs ?? null;
     let bestMoves = existing?.bestMoves ?? null;
 
-    // 자유 모드가 아니고 초시계 모드일 때만 시간 기록 갱신
-    if (!this.isFreeMode()) {
+    // 타이머 활성 모드일 때만 시간 기록 갱신
+    if (this.isTimerActive()) {
       if (bestTime === null || timeMs < bestTime) {
         bestTime = timeMs;
         isNewBestTime = true;
@@ -204,16 +221,16 @@ export class RecordManager {
   // ==========================================
 
   /**
-   * 타이머 시작 (자유 모드에서는 시간 측정을 건너뛰고 '♾️' 표시 유지)
+   * 타이머 시작 (비활성 모드에서는 시간 측정을 건너뛰고 'OFF' 표시 유지)
    */
   public startTimer(onTick?: (formatted: string, ms: number) => void) {
     if (onTick) {
       this.tickCallback = onTick;
     }
 
-    if (this.isFreeMode()) {
+    if (this.isTimerOff()) {
       if (this.tickCallback) {
-        this.tickCallback('♾️', 0);
+        this.tickCallback('OFF', 0);
       }
       return;
     }
@@ -253,7 +270,7 @@ export class RecordManager {
     this.accumulatedMs = 0;
     this.startTime = null;
     if (this.tickCallback) {
-      this.tickCallback(this.isFreeMode() ? '♾️' : formatTime(0), 0);
+      this.tickCallback(this.isTimerOff() ? 'OFF' : formatTime(0), 0);
     }
   }
 
@@ -261,7 +278,7 @@ export class RecordManager {
    * 현재까지의 총 경과 시간(밀리초) 반환
    */
   public getElapsedMs(): number {
-    if (this.isFreeMode()) return 0;
+    if (this.isTimerOff()) return 0;
     let current = this.accumulatedMs;
     if (this.startTime !== null) {
       current += performance.now() - this.startTime;
@@ -270,10 +287,10 @@ export class RecordManager {
   }
 
   /**
-   * 현재 경과 시간 포맷 반환 (자유 모드 시 '♾️')
+   * 현재 경과 시간 포맷 반환 (비활성 시 'OFF')
    */
   public getFormattedTime(): string {
-    if (this.isFreeMode()) return '♾️';
+    if (this.isTimerOff()) return 'OFF';
     return formatTime(this.getElapsedMs());
   }
 
