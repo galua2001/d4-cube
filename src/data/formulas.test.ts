@@ -338,7 +338,7 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
 
   it('18. 실전 빈출 2수 피니시 TOP 3 공식 카테고리(god-number, godTechnique) 및 총 공식 개수 검증', () => {
     const godNumberFormulas = getFormulasByCategory('god-number');
-    expect(godNumberFormulas.length).toBe(14);
+    expect(godNumberFormulas.length).toBe(17);
     expect(godNumberFormulas.some((f) => f.id === 'd4-double-cross-4')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-spiral-vortex-4')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-dual-diagonal-blitz-4')).toBe(true);

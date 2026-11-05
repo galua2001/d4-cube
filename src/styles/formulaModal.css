@@ -501,6 +501,132 @@
   -webkit-backdrop-filter: blur(16px);
 }
 
+/* 실시간 검색 바 및 태그 칩 영역 (Round 5) */
+.formula-search-bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.formula-search-box {
+  display: flex;
+  align-items: center;
+  position: relative;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  padding: 6px 12px;
+  transition: all 0.2s ease;
+}
+
+.formula-search-box:focus-within {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #60a5fa;
+  box-shadow: 0 0 14px rgba(96, 165, 250, 0.35);
+}
+
+.formula-search-icon {
+  font-size: 0.95rem;
+  margin-right: 8px;
+  color: #94a3b8;
+  pointer-events: none;
+  user-select: none;
+}
+
+.formula-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f8fafc;
+  font-size: 0.9rem;
+  padding: 4px 0;
+  width: 100%;
+}
+
+.formula-search-input::placeholder {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.formula-search-clear-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  transition: all 0.15s ease;
+}
+
+.formula-search-clear-btn.visible {
+  display: flex;
+}
+
+.formula-search-clear-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+/* 다차원 태그 칩 (Tag Chips) */
+.formula-tag-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 0;
+}
+
+.formula-tag-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.formula-tag-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.formula-tag-chip:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+}
+
+.formula-tag-chip.active {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: #60a5fa;
+  color: #93c5fd;
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+}
+
+.formula-empty-msg {
+  padding: 30px 16px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  margin: 10px 0;
+}
+
 .formula-category-tabs {
   display: flex;
   gap: 8px;

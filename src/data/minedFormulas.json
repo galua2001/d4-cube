@@ -2158,5 +2158,583 @@
       "An AI-mined formula verified by full BFS exploration in $D_4$ space (56 moves).",
       "Guaranteed minimal 4-move sequence with zero shortcuts."
     ]
+  },
+  {
+    "id": "d4-corner-ring-blitz-4",
+    "titleKo": "4대 코너 링 블리츠 (0·2·6·8 외곽 순환 4수 소거)",
+    "titleEn": "Corner Ring Blitz (4-Corner Outer Perimeter 4-Move Wipeout)",
+    "category": "ai-mined",
+    "badgeKo": "⚡ 코너 링 4수",
+    "badgeEn": "⚡ Corner Ring 4M",
+    "difficulty": 4,
+    "kMoves": 4,
+    "formulaSeq": "Row 1 R90 ➔ Col 3 R90 ➔ Row 3 R90 ➔ Col 1 R90",
+    "summaryKo": "중앙 타일(4번)은 완전한 ID를 유지하고 외곽 8개 타일이 R180/R270 위상차로 갇힌 외곽 링 병목을 [1행 R90] ➔ [3열 R90] ➔ [3행 R90] ➔ [1열 R90] 4변 둘레길 순환으로 연속 더블 킬 및 트리플 킬로 제압하는 D4 마스터 공식입니다.",
+    "summaryEn": "A bottleneck where center tile 4 is solved and 8 outer perimeter tiles are trapped in R180/R270 phase splits. Solved in 4 perimeter moves: [Row 1 R90] ➔ [Col 3 R90] ➔ [Row 3 R90] ➔ [Col 1 R90] via sequential double and triple kills.",
+    "diagramType": "interactive",
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (외곽 8타일 둘레길 병목)",
+        "labelEn": "Initial State (8-Tile Outer Perimeter Bottleneck)",
+        "label": "초기 배치",
+        "boardOps": [
+          "R180",
+          "R270",
+          "R180",
+          "R270",
+          "ID",
+          "R270",
+          "R180",
+          "R270",
+          "R180"
+        ],
+        "highlightCells": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          8
+        ],
+        "actionDescKo": "중앙 타일(4번)은 완벽히 ID로 안정되어 있고, 4개 코너(R180)와 4개 변(R270)이 외곽 링을 형성하고 있습니다.",
+        "actionDescEn": "Center tile 4 is solved, with 4 corners (R180) and 4 edges (R270) forming an outer bottleneck ring.",
+        "mathInsightKo": "외곽 8개 타일이 90°/180° 위상차로 갇혀 있는 고유 병목 패턴입니다.",
+        "mathInsightEn": "Perimeter ring bottleneck with corners at R180 and edges at R270.",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "외곽 8타일 둘레길 병목 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 1행 90° 시계 회전 (R90 원샷 소거)",
+        "labelEn": "Move 1: Row 1 Rotate 90° CW (R90 Single-Kill)",
+        "label": "1수: 1행 90° 시계 회전 (R90)",
+        "boardOps": [
+          "R270",
+          "ID",
+          "R270",
+          "R270",
+          "ID",
+          "R270",
+          "R180",
+          "R270",
+          "R180"
+        ],
+        "highlightCells": [
+          0,
+          1,
+          2
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 0
+        },
+        "actionDescKo": "1행 90° 시계 회전 (R90 원샷 소거)",
+        "actionDescEn": "Row 1 Rotate 90° CW (R90 Single-Kill)",
+        "mathInsightKo": "1행에 R90을 적용하여 상단 1번 변 타일(R270 ∘ R90 = ID) 즉시 소거! 코너 타일 0, 2번은 R270으로 전이됩니다.",
+        "mathInsightEn": "Applying R90 to Row 1 clears edge tile 1 (R270 ∘ R90 = ID)! Corners 0 & 2 transition to phase R270.",
+        "formulaBadge": "1수: 1행 R90",
+        "formulaText": "Row[0] ➔ R90",
+        "formulaDesc": "1행 시계 회전으로 1번 변 타일을 즉시 소거하고 상단 코너를 정돈합니다."
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 3열 90° 시계 회전 (R90 더블 킬)",
+        "labelEn": "Move 2: Col 3 Rotate 90° CW (R90 Double-Kill)",
+        "label": "2수: 3열 90° 시계 회전 (R90)",
+        "boardOps": [
+          "R270",
+          "ID",
+          "ID",
+          "R270",
+          "ID",
+          "ID",
+          "R180",
+          "R270",
+          "R270"
+        ],
+        "highlightCells": [
+          2,
+          5,
+          8
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 2
+        },
+        "actionDescKo": "3열 90° 시계 회전 (R90 더블 킬)",
+        "actionDescEn": "Col 3 Rotate 90° CW (R90 Double-Kill)",
+        "mathInsightKo": "3열에 R90을 적용하여 2번 코너와 5번 변 2개 타일을 동시 소거(더블 킬)! 외곽 포위망을 단숨에 압축합니다.",
+        "mathInsightEn": "Applying R90 to Col 3 achieves a Double-Kill on corner 2 and edge 5 (both R270 ∘ R90 = ID)!",
+        "formulaBadge": "2수: 3열 R90 더블 킬",
+        "formulaText": "Col[2] ➔ R90",
+        "formulaDesc": "3열 시계 회전으로 2번 코너와 5번 변을 동시 소거합니다."
+      },
+      {
+        "stepIndex": 3,
+        "subStep": 3,
+        "labelKo": "3수: 3행 90° 시계 회전 (R90 더블 킬)",
+        "labelEn": "Move 3: Row 3 Rotate 90° CW (R90 Double-Kill)",
+        "label": "3수: 3행 90° 시계 회전 (R90)",
+        "boardOps": [
+          "R270",
+          "ID",
+          "ID",
+          "R270",
+          "ID",
+          "ID",
+          "R270",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          6,
+          7,
+          8
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 2
+        },
+        "actionDescKo": "3행 90° 시계 회전 (R90 더블 킬)",
+        "actionDescEn": "Row 3 Rotate 90° CW (R90 Double-Kill)",
+        "mathInsightKo": "3행에 R90을 적용하여 7번 변과 8번 코너 타일을 동시 소거(더블 킬)! 이제 1열 3개 타일(0, 3, 6)만 R270으로 결집됩니다.",
+        "mathInsightEn": "Applying R90 to Row 3 executes a Double-Kill on edge 7 and corner 8! Concentrates remaining errors into Column 1.",
+        "formulaBadge": "3수: 3행 R90 더블 킬",
+        "formulaText": "Row[2] ➔ R90",
+        "formulaDesc": "3행 시계 회전으로 7번 변과 8번 코너를 동시 소거합니다."
+      },
+      {
+        "stepIndex": 4,
+        "subStep": 4,
+        "labelKo": "4수: 1열 90° 시계 회전 (R90 트리플 킬 피니시)",
+        "labelEn": "Move 4: Col 1 Rotate 90° CW (R90 Triple-Kill Finish)",
+        "label": "4수: 1열 90° 시계 회전 (R90 피니시)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          3,
+          6
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 0
+        },
+        "actionDescKo": "1열 90° 시계 회전 (R90 트리플 킬 피니시)",
+        "actionDescEn": "Col 1 Rotate 90° CW (R90 Triple-Kill Finish)",
+        "mathInsightKo": "1열에 R90을 작용시켜 0번 코너, 3번 변, 6번 코너 3개 타일 일제 소거(트리플 킬)! 100% ID 완전 복원 All Clear!",
+        "mathInsightEn": "Col 1 R90 triggers an explosive Triple-Kill on Column 1 (0, 3, 6), achieving 100% All Clear!",
+        "formulaBadge": "4수: 1열 R90 트리플 킬",
+        "formulaText": "Col[0] ➔ R90 ➔ 100% 클리어",
+        "formulaDesc": "1열 90° 회전으로 1열 전체를 폭파하여 전 타일 올클리어를 완성합니다."
+      }
+    ],
+    "tags": [
+      "4수",
+      "회전",
+      "코너",
+      "마스터",
+      "D4",
+      "신의 수 테크닉"
+    ],
+    "isInteractive": true,
+    "notesKo": [
+      "중앙 타일(4번)은 완벽히 보존된 채 외곽 8개 둘레길만 갇혀 있는 전형적인 코너 링 병목입니다.",
+      "1행 ➔ 3열 ➔ 3행 ➔ 1열의 시계방향 둘레길 순환으로 더블 킬 2회 및 트리플 킬 1회를 연속 폭파합니다."
+    ],
+    "notesEn": [
+      "A classic outer perimeter bottleneck with center tile intact and 8 outer tiles trapped.",
+      "Clockwise perimeter sequence (Row 1 ➔ Col 3 ➔ Row 3 ➔ Col 1) triggers consecutive double and triple kills."
+    ]
+  },
+  {
+    "id": "d4-cross-inversion-3",
+    "titleKo": "십자 변·중심 위상 도치 3수 킬 (Cross Inversion)",
+    "titleEn": "Cross Inversion (3-Move Center-Cross Phase Annihilation)",
+    "category": "ai-mined",
+    "badgeKo": "✝️ 십자 도치 3수",
+    "badgeEn": "✝️ Cross Inversion 3M",
+    "difficulty": 3,
+    "kMoves": 3,
+    "formulaSeq": "Row 2 R90 ➔ Col 2 MX ➔ Row 2 R90",
+    "summaryKo": "외곽 4대 코너는 완벽한 ID를 유지한 채, 십자 5개 타일(1, 3, 4, 5, 7)만 MX 반사 및 R180 회전으로 도치된 순수 십자 패턴을 [2행 R90] ➔ [2열 MX] ➔ [2행 R90] 단 3수로 더블 킬 및 트리플 킬 종결하는 마스터 공식입니다.",
+    "summaryEn": "A pure cross pattern where 4 corners are preserved and only 5 cross tiles (1, 3, 4, 5, 7) are inverted by MX and R180. Cleared in 3 swift moves: [Row 2 R90] ➔ [Col 2 MX] ➔ [Row 2 R90] via double-kill and center-row triple-kill.",
+    "diagramType": "interactive",
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (순수 십자 반사-회전 도치)",
+        "labelEn": "Initial State (Pure Cross Inversion Pattern)",
+        "label": "초기 배치",
+        "boardOps": [
+          "ID",
+          "MX",
+          "ID",
+          "R180",
+          "MX",
+          "R180",
+          "ID",
+          "MX",
+          "ID"
+        ],
+        "highlightCells": [
+          1,
+          3,
+          4,
+          5,
+          7
+        ],
+        "actionDescKo": "4개 코너(0, 2, 6, 8)는 완벽한 ID를 유지한 채, 십자 5개 타일만 반사 및 회전으로 도치된 순수 십자 병목입니다.",
+        "actionDescEn": "Corners are preserved while 5 cross tiles (1, 3, 4, 5, 7) are inverted in MX and R180 phases.",
+        "mathInsightKo": "순수 십자 5개 타일만 도치된 패턴으로, 코너 교란 없이 십자만 정밀 타격하는 최단 수순입니다.",
+        "mathInsightEn": "Pure cross inversion pattern solved via optimal orthogonal moves without touching corners.",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "순수 십자 반사-회전 도치 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 2행 90° 시계 회전 (R90 위상 비틀림)",
+        "labelEn": "Move 1: Row 2 Rotate 90° CW (R90 Phase Twist)",
+        "label": "1수: 2행 90° 시계 회전 (R90)",
+        "boardOps": [
+          "ID",
+          "MX",
+          "ID",
+          "R270",
+          "MD",
+          "R270",
+          "ID",
+          "MX",
+          "ID"
+        ],
+        "highlightCells": [
+          3,
+          4,
+          5
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 1
+        },
+        "actionDescKo": "2행 90° 시계 회전 (R90 위상 비틀림)",
+        "actionDescEn": "Row 2 Rotate 90° CW (R90 Phase Twist)",
+        "mathInsightKo": "중심 2행을 90° 회전시켜 수평 위상차를 수직 축과의 교차 반사 상쇄 레버리지 상태로 전환합니다.",
+        "mathInsightEn": "Row 2 R90 twists horizontal phases to align with vertical axis for reflection cancellation leverage.",
+        "formulaBadge": "1수: 2행 R90",
+        "formulaText": "Row[1] ➔ R90",
+        "formulaDesc": "중심 2행 회전으로 수평 위상차를 수직 축으로 비틀어 상쇄 레버리지를 만듭니다."
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 2열 상하 가로 반사 (MX 더블 킬)",
+        "labelEn": "Move 2: Col 2 Horizontal Reflection (MX Double-Kill)",
+        "label": "2수: 2열 상하 가로 반사 (MX)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "R270",
+          "R270",
+          "R270",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          1,
+          4,
+          7
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 1
+        },
+        "actionDescKo": "2열 상하 가로 반사 (MX 더블 킬)",
+        "actionDescEn": "Col 2 Horizontal Reflection (MX Double-Kill)",
+        "mathInsightKo": "중심 2열에 상하 반사(MX)를 가하여 상단(1) 및 하단(7) 십자 타일 동시 소거(MX ∘ MX = ID 더블 킬)! 4번 중심은 R270으로 동기화됩니다.",
+        "mathInsightEn": "Col 2 MX delivers a Double-Kill on top (1) and bottom (7) cross tiles via MX ∘ MX = ID; center transitions to R270.",
+        "formulaBadge": "2수: 2열 MX 더블 킬",
+        "formulaText": "Col[1] ➔ MX",
+        "formulaDesc": "2열 상하 반사로 1번과 7번 십자 타일을 동시 소거합니다."
+      },
+      {
+        "stepIndex": 3,
+        "subStep": 3,
+        "labelKo": "3수: 2행 90° 시계 회전 (R90 트리플 킬 피니시)",
+        "labelEn": "Move 3: Row 2 Rotate 90° CW (R90 Triple-Kill Finish)",
+        "label": "3수: 2행 90° 시계 회전 (R90 피니시)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          3,
+          4,
+          5
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 1
+        },
+        "actionDescKo": "2행 90° 시계 회전 (R90 트리플 킬 피니시)",
+        "actionDescEn": "Row 2 Rotate 90° CW (R90 Triple-Kill Finish)",
+        "mathInsightKo": "2행에 R90 추가 회전으로 중심(4)과 좌우(3, 5) 3개 타일 일제 소거(트리플 킬 폭파)! 100% ID 완전 복원!",
+        "mathInsightEn": "Row 2 R90 completes the sequence with an explosive Triple-Kill on tiles 3, 4, 5, restoring 100% ID!",
+        "formulaBadge": "3수: 2행 R90 트리플 킬",
+        "formulaText": "Row[1] ➔ R90 ➔ 100% 클리어",
+        "formulaDesc": "2행 시계 회전으로 2행 3개 타일을 일제히 폭파하여 올클리어를 완성합니다."
+      }
+    ],
+    "tags": [
+      "3수",
+      "십자",
+      "반사",
+      "회전",
+      "마스터",
+      "D4",
+      "신의 수 테크닉"
+    ],
+    "isInteractive": true,
+    "notesKo": [
+      "코너 4개 타일(0, 2, 6, 8)은 건드리지 않고 십자 5개 타일만 골라 소거하는 순수 십자 해법입니다.",
+      "2행(R90) ➔ 2열(MX) ➔ 2행(R90)의 직교 샌드위치 구조로 3수 최단 올킬을 달성합니다."
+    ],
+    "notesEn": [
+      "A pure cross resolution leaving all 4 corners completely untouched while clearing 5 cross tiles.",
+      "Orthogonal sandwich structure (Row 2 R90 ➔ Col 2 MX ➔ Row 2 R90) achieves minimal 3-move victory."
+    ]
+  },
+  {
+    "id": "d4-diagonal-windmill-4",
+    "titleKo": "대각선·직교 풍차형 위상차 4수 올킬 (Diagonal Windmill)",
+    "titleEn": "Diagonal Windmill (4-Move Diagonal-Orthogonal Phase Blitz)",
+    "category": "ai-mined",
+    "badgeKo": "🌪️ 풍차 올킬 4수",
+    "badgeEn": "🌪️ Windmill Blitz 4M",
+    "difficulty": 4,
+    "kMoves": 4,
+    "formulaSeq": "Diag Main R90 ➔ Col 2 R90 ➔ Diag Anti R90 ➔ Row 2 MX",
+    "summaryKo": "주대각선 반사(MD), 수평 가로 반사(MX), 회전 위상이 9개 타일 전체에 걸쳐 대각-직교 풍차 구조를 형성한 고난도 배치를 [주대각 R90] ➔ [2열 R90] ➔ [부대각 R90] ➔ [2행 MX] 4수로 연속 3회 더블 킬 및 중심행 트리플 킬로 분쇄하는 마스터 공식입니다.",
+    "summaryEn": "A complex windmill pattern where diagonal reflection (MD), horizontal reflection (MX), and rotations entangle all 9 tiles. Cleared in 4 moves: [Main Diag R90] ➔ [Col 2 R90] ➔ [Anti Diag R90] ➔ [Row 2 MX] through three consecutive double-kills and a center-row triple-kill finish.",
+    "diagramType": "interactive",
+    "steps": [
+      {
+        "stepIndex": 0,
+        "subStep": 0,
+        "labelKo": "초기 배치 (대각-직교 풍차형 위상차)",
+        "labelEn": "Initial State (Diagonal-Orthogonal Windmill Dilemma)",
+        "label": "초기 배치",
+        "boardOps": [
+          "R270",
+          "R270",
+          "R270",
+          "MX",
+          "MD",
+          "MX",
+          "R270",
+          "R270",
+          "R270"
+        ],
+        "highlightCells": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "actionDescKo": "9개 전 타일에 주대각선 반사(MD), 수평 반사(MX), 회전 위상이 풍차형으로 얽혀 있는 최고난도 병목입니다.",
+        "actionDescEn": "A complex dilemma where all 9 tiles are entangled with diagonal reflection (MD), orthogonal reflection (MX), and rotations.",
+        "mathInsightKo": "주대각선 반사와 직교 반사, 회전 위상이 전 타일에 걸쳐 바람개비형으로 결합된 고차원 병목입니다.",
+        "mathInsightEn": "High-order windmill dilemma coupling diagonal reflection (MD) and horizontal reflections (MX).",
+        "formulaBadge": "초기 상태",
+        "formulaText": "Initial Board",
+        "formulaDesc": "대각-직교 풍차형 위상차 배치"
+      },
+      {
+        "stepIndex": 1,
+        "subStep": 1,
+        "labelKo": "1수: 주대각선(↖) 90° 시계 회전 (R90 더블 킬)",
+        "labelEn": "Move 1: Main Diag (↖) Rotate 90° CW (R90 Double-Kill)",
+        "label": "1수: 주대각선(↖) 90° 회전 (R90)",
+        "boardOps": [
+          "ID",
+          "R270",
+          "R270",
+          "MX",
+          "MY",
+          "MX",
+          "R270",
+          "R270",
+          "ID"
+        ],
+        "highlightCells": [
+          0,
+          4,
+          8
+        ],
+        "highlightLine": {
+          "type": "diag",
+          "index": "main"
+        },
+        "actionDescKo": "주대각선(↖) 90° 시계 회전 (R90 더블 킬)",
+        "actionDescEn": "Main Diag (↖) Rotate 90° CW (R90 Double-Kill)",
+        "mathInsightKo": "주대각선에 R90을 적용하여 0번과 8번 대각 코너 타일(R270 ∘ R90 = ID) 동시 소거(더블 킬)! 4번 중심은 MY로 전이됩니다.",
+        "mathInsightEn": "Main Diag R90 clears corners 0 and 8 simultaneously (R270 ∘ R90 = ID Double-Kill); center transitions to MY.",
+        "formulaBadge": "1수: 주대각 R90 더블 킬",
+        "formulaText": "Diag[main] ➔ R90",
+        "formulaDesc": "주대각선 시계 회전으로 0번과 8번 코너 타일을 동시 소거합니다."
+      },
+      {
+        "stepIndex": 2,
+        "subStep": 2,
+        "labelKo": "2수: 2열 90° 시계 회전 (R90 더블 킬)",
+        "labelEn": "Move 2: Col 2 Rotate 90° CW (R90 Double-Kill)",
+        "label": "2수: 2열 90° 시계 회전 (R90)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "R270",
+          "MX",
+          "MAD",
+          "MX",
+          "R270",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          1,
+          4,
+          7
+        ],
+        "highlightLine": {
+          "type": "col",
+          "index": 1
+        },
+        "actionDescKo": "2열 90° 시계 회전 (R90 더블 킬)",
+        "actionDescEn": "Col 2 Rotate 90° CW (R90 Double-Kill)",
+        "mathInsightKo": "중심 2열에 R90을 가하여 수직 십자 변인 1번과 7번 타일(R270 ∘ R90 = ID) 동시 소거(더블 킬)! 중심은 MAD로 전환됩니다.",
+        "mathInsightEn": "Col 2 R90 clears vertical edge tiles 1 and 7 (R270 ∘ R90 = ID Double-Kill); center transitions to MAD.",
+        "formulaBadge": "2수: 2열 R90 더블 킬",
+        "formulaText": "Col[1] ➔ R90",
+        "formulaDesc": "2열 시계 회전으로 1번과 7번 변 타일을 동시 소거합니다."
+      },
+      {
+        "stepIndex": 3,
+        "subStep": 3,
+        "labelKo": "3수: 부대각선(↗) 90° 시계 회전 (R90 더블 킬)",
+        "labelEn": "Move 3: Anti Diag (↗) Rotate 90° CW (R90 Double-Kill)",
+        "label": "3수: 부대각선(↗) 90° 회전 (R90)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "MX",
+          "MX",
+          "MX",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          2,
+          4,
+          6
+        ],
+        "highlightLine": {
+          "type": "diag",
+          "index": "anti"
+        },
+        "actionDescKo": "부대각선(↗) 90° 시계 회전 (R90 더블 킬)",
+        "actionDescEn": "Anti Diag (↗) Rotate 90° CW (R90 Double-Kill)",
+        "mathInsightKo": "부대각선에 R90을 가하여 2번과 6번 반대편 대각 코너 타일(R270 ∘ R90 = ID) 동시 소거(더블 킬)! 중심 타일이 MX로 동기화되어 2행(3, 4, 5) 전체가 순수 MX로 완성!",
+        "mathInsightEn": "Anti Diag R90 clears corners 2 and 6 (R270 ∘ R90 = ID Double-Kill); synchronizes Row 2 (3, 4, 5) into pure MX.",
+        "formulaBadge": "3수: 부대각 R90 더블 킬",
+        "formulaText": "Diag[anti] ➔ R90",
+        "formulaDesc": "부대각선 시계 회전으로 2번과 6번 코너 타일을 동시 소거합니다."
+      },
+      {
+        "stepIndex": 4,
+        "subStep": 4,
+        "labelKo": "4수: 2행 상하 가로 반사 (MX 트리플 킬 피니시)",
+        "labelEn": "Move 4: Row 2 Horizontal Reflection (MX Triple-Kill Finish)",
+        "label": "4수: 2행 상하 가로 반사 (MX 피니시)",
+        "boardOps": [
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID",
+          "ID"
+        ],
+        "highlightCells": [
+          3,
+          4,
+          5
+        ],
+        "highlightLine": {
+          "type": "row",
+          "index": 1
+        },
+        "actionDescKo": "2행 상하 가로 반사 (MX 트리플 킬 피니시)",
+        "actionDescEn": "Row 2 Horizontal Reflection (MX Triple-Kill Finish)",
+        "mathInsightKo": "2행에 가로 반사(MX)를 가하여 남은 중심행 타일(3, 4, 5)을 일제히 소거(트리플 킬 폭파)! 100% ID 완전 복원 All Clear!",
+        "mathInsightEn": "Row 2 MX triggers an explosive Triple-Kill on Row 2 (3, 4, 5), achieving 100% All Clear!",
+        "formulaBadge": "4수: 2행 MX 트리플 킬",
+        "formulaText": "Row[1] ➔ MX ➔ 100% 클리어",
+        "formulaDesc": "2행 가로 반사로 2행 전체를 폭파하여 전 타일 올클리어를 완성합니다."
+      }
+    ],
+    "tags": [
+      "4수",
+      "대각선",
+      "풍차",
+      "반사",
+      "마스터",
+      "D4",
+      "신의 수 테크닉"
+    ],
+    "isInteractive": true,
+    "notesKo": [
+      "주대각선 반사(MD), 수평 반사(MX), 회전이 바람개비 형태로 결합된 9개 타일 전체 위상차 패턴입니다.",
+      "주대각 ➔ 2열 ➔ 부대각 ➔ 2행의 대각-직교 교차 연산으로 3연속 더블 킬 후 2행 트리플 킬로 깔끔하게 올킬합니다."
+    ],
+    "notesEn": [
+      "A 9-tile windmill pattern coupling diagonal reflection (MD), horizontal reflection (MX), and rotations.",
+      "Diagonal-orthogonal alternation (Main Diag ➔ Col 2 ➔ Anti Diag ➔ Row 2) scores 3 consecutive double-kills and a triple-kill finish."
+    ]
   }
 ]

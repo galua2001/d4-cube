@@ -2,20 +2,39 @@
  * @file formulaModal.ts
  * @description 갈루아 큐브 공식 비법서(Formula Guidebook) 대화형 뷰어 모달
  * 군론 대칭 공식 및 신의 수 테크닉을 3×3 대화형 미니 보드와 함께 인터랙티브하게 학습하는 모달 컨트롤러
+ * Round 5: 실시간 검색(Search Bar) 및 다차원 태그 칩(Tag Chips) 필터링 시스템 탑재
  */
 
 import {
   FORMULAS,
   FormulaCategory,
-  FormulaStep,
   FormulaItem,
-  getFormulasByCategory,
-  getFormulaById
+  getFormulaById,
+  filterFormulas
 } from '../data/formulas';
 import { t, getCurrentLang, onLangChange } from '../i18n/translations';
 import { getThemeImages, onThemeChange } from '../theme/characterTheme';
 import { renderCharacterTileCanvas } from './tileRenderer';
 import { soundEngine } from '../audio/audioEngine';
+
+interface TagPreset {
+  id: string;
+  labelKo: string;
+  labelEn: string;
+}
+
+const TAG_PRESETS: TagPreset[] = [
+  { id: 'all', labelKo: '전체', labelEn: 'All' },
+  { id: '2수', labelKo: '2수', labelEn: '2-Move' },
+  { id: '3수', labelKo: '3수', labelEn: '3-Move' },
+  { id: '4수', labelKo: '4수', labelEn: '4-Move' },
+  { id: '코너', labelKo: '코너', labelEn: 'Corner' },
+  { id: '십자', labelKo: '십자', labelEn: 'Cross' },
+  { id: '회전', labelKo: '회전', labelEn: 'Rotation' },
+  { id: '반사', labelKo: '반사', labelEn: 'Reflection' },
+  { id: '대각선', labelKo: '대각선', labelEn: 'Diagonal' },
+  { id: '마스터', labelKo: '마스터', labelEn: 'Master' }
+];
 
 export class FormulaModalController {
   private onPracticeCallback?: (formula: FormulaItem) => void;
@@ -23,6 +42,7 @@ export class FormulaModalController {
   public setPracticeCallback(cb: (formula: FormulaItem) => void): void {
     this.onPracticeCallback = cb;
   }
+
   private overlay: HTMLElement | null = null;
   private currentCategory: FormulaCategory | 'all' = 'all';
   private currentFormulaId: string = 'center-inversion';
@@ -32,6 +52,10 @@ export class FormulaModalController {
   private langUnsubscribe: (() => void) | null = null;
   private themeUnsubscribe: (() => void) | null = null;
   private keyDownHandler: ((e: KeyboardEvent) => void) | null = null;
+
+  // Round 5: 실시간 검색 및 태그 필터 상태
+  private searchQuery: string = '';
+  private selectedTag: string | 'all' = 'all';
 
   constructor() {
     this.langUnsubscribe = onLangChange(() => {
@@ -73,7 +97,6 @@ export class FormulaModalController {
     this.render();
     this.bindGlobalKeys();
   }
-
 
   public destroy(): void {
     if (this.langUnsubscribe) {
@@ -118,16 +141,39 @@ export class FormulaModalController {
     this.currentCategory = cat;
     soundEngine.playTap();
 
-    const filtered = getFormulasByCategory(this.currentCategory);
-    if (filtered.length > 0 && !filtered.some((f) => f.id === this.currentFormulaId)) {
-      this.currentFormulaId = filtered[0].id;
-      this.currentStepIndex = 0;
-      this.stopAutoPlay();
-    }
-
     this.renderTabs();
-    this.renderFormulaList();
-    this.renderDetail();
+    this.applyFilterAndRender();
+  }
+
+  /**
+   * 실시간 검색 쿼리 설정 및 목록 필터링
+   */
+  public setSearchQuery(query: string): void {
+    this.searchQuery = query;
+    const inputEl = this.overlay?.querySelector('#formula-search-input') as HTMLInputElement | null;
+    if (inputEl && inputEl.value !== query) {
+      inputEl.value = query;
+    }
+    this.updateSearchClearButton();
+    this.applyFilterAndRender();
+  }
+
+  /**
+   * 태그 칩 선택 설정 및 목록 필터링
+   */
+  public setSelectedTag(tag: string | 'all'): void {
+    this.selectedTag = tag;
+    soundEngine.playTap();
+    this.renderTagChips();
+    this.applyFilterAndRender();
+  }
+
+  public getSearchQuery(): string {
+    return this.searchQuery;
+  }
+
+  public getSelectedTag(): string | 'all' {
+    return this.selectedTag;
   }
 
   public setStep(stepIdx: number): void {
@@ -153,6 +199,17 @@ export class FormulaModalController {
   public resetStep(): void {
     this.stopAutoPlay();
     this.setStep(0);
+  }
+
+  private applyFilterAndRender(): void {
+    const filtered = filterFormulas(FORMULAS, this.searchQuery, this.currentCategory, this.selectedTag);
+    if (filtered.length > 0 && !filtered.some((f) => f.id === this.currentFormulaId)) {
+      this.currentFormulaId = filtered[0].id;
+      this.currentStepIndex = 0;
+      this.stopAutoPlay();
+      this.renderDetail();
+    }
+    this.renderFormulaList();
   }
 
   private startAutoPlay(): void {
@@ -200,6 +257,9 @@ export class FormulaModalController {
           this.setStep(this.currentStepIndex - 1);
         }
       } else if (e.key === ' ') {
+        // 검색 인풋창 포커스 중에는 스페이스바 자동재생 토글 제외
+        const activeTag = document.activeElement?.tagName?.toLowerCase();
+        if (activeTag === 'input' || activeTag === 'textarea') return;
         e.preventDefault();
         this.togglePlay();
       }
@@ -224,6 +284,29 @@ export class FormulaModalController {
             <span class="formula-subtitle">${t('formula.subtitle')}</span>
           </div>
           <button id="btn-formula-close" class="formula-close-btn" aria-label="${t('formula.close')}">✕</button>
+        </div>
+
+        <!-- 실시간 검색 바 및 태그 칩 영역 -->
+        <div class="formula-search-bar-wrapper">
+          <div class="formula-search-box">
+            <span class="formula-search-icon">🔍</span>
+            <input
+              type="text"
+              id="formula-search-input"
+              class="formula-search-input"
+              placeholder="${t('formula.searchPlaceholder')}"
+              value="${this.searchQuery}"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button
+              type="button"
+              id="btn-formula-search-clear"
+              class="formula-search-clear-btn ${this.searchQuery ? 'visible' : ''}"
+              aria-label="${t('formula.searchClearBtn')}"
+            >✕</button>
+          </div>
+          <div class="formula-tag-chips" id="formula-tag-chips"></div>
         </div>
 
         <!-- 카테고리 탭 바 -->
@@ -251,10 +334,37 @@ export class FormulaModalController {
         this.close();
       }
     });
+
+    // 실시간 검색 인풋 이벤트
+    const searchInput = this.overlay.querySelector('#formula-search-input') as HTMLInputElement | null;
+    searchInput?.addEventListener('input', (e) => {
+      const val = (e.target as HTMLInputElement).value;
+      this.searchQuery = val;
+      this.updateSearchClearButton();
+      this.applyFilterAndRender();
+    });
+
+    // 검색어 지우기 버튼 이벤트
+    const clearBtn = this.overlay.querySelector('#btn-formula-search-clear');
+    clearBtn?.addEventListener('click', () => {
+      this.setSearchQuery('');
+      searchInput?.focus();
+    });
+  }
+
+  private updateSearchClearButton(): void {
+    const clearBtn = this.overlay?.querySelector('#btn-formula-search-clear');
+    if (!clearBtn) return;
+    if (this.searchQuery.trim().length > 0) {
+      clearBtn.classList.add('visible');
+    } else {
+      clearBtn.classList.remove('visible');
+    }
   }
 
   private render(): void {
     this.renderTabs();
+    this.renderTagChips();
     this.renderFormulaList();
     this.renderDetail();
   }
@@ -292,15 +402,46 @@ export class FormulaModalController {
     });
   }
 
+  private renderTagChips(): void {
+    const chipsContainer = this.overlay?.querySelector('#formula-tag-chips');
+    if (!chipsContainer) return;
+
+    const isKo = getCurrentLang() === 'ko';
+    chipsContainer.innerHTML = TAG_PRESETS.map((p) => {
+      const label = isKo ? p.labelKo : p.labelEn;
+      const isActive = this.selectedTag === p.id;
+      return `
+        <button
+          type="button"
+          class="formula-tag-chip ${isActive ? 'active' : ''}"
+          data-tag="${p.id}"
+          id="tag-chip-${p.id}"
+        >
+          ${label}
+        </button>
+      `;
+    }).join('');
+
+    chipsContainer.querySelectorAll('.formula-tag-chip').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const tag = (e.currentTarget as HTMLElement).dataset.tag as string;
+        if (tag) this.setSelectedTag(tag);
+      });
+    });
+  }
+
   private renderFormulaList(): void {
     const listNav = this.overlay?.querySelector('#formula-list-nav');
     if (!listNav) return;
 
     const isKo = getCurrentLang() === 'ko';
-    const formulas = getFormulasByCategory(this.currentCategory);
+    const formulas = filterFormulas(FORMULAS, this.searchQuery, this.currentCategory, this.selectedTag);
 
     if (formulas.length === 0) {
-      listNav.innerHTML = `<div class="formula-empty-msg">${isKo ? '해당 카테고리의 공식이 없습니다.' : 'No formulas found in this category.'}</div>`;
+      const msg = this.searchQuery.trim()
+        ? t('formula.searchEmptyMsg')
+        : (isKo ? '해당 카테고리의 공식이 없습니다.' : 'No formulas found in this category.');
+      listNav.innerHTML = `<div class="formula-empty-msg">${msg}</div>`;
       return;
     }
 
@@ -454,113 +595,110 @@ export class FormulaModalController {
     `;
 
     if (hasSteps) {
-      this.bindStepControls(steps);
+      this.bindDetailEvents(formula);
       this.renderStepInfo();
       this.renderMiniBoard();
     }
-    this.bindPracticeButton(formula);
   }
 
-  private bindPracticeButton(formula: FormulaItem): void {
-    const btn = this.overlay?.querySelector('#btn-practice-formula');
-    btn?.addEventListener('click', () => {
-      soundEngine.playTap();
-      this.close();
-      if (this.onPracticeCallback) {
-        this.onPracticeCallback(formula);
-      }
-    });
-  }
+  private bindDetailEvents(formula: FormulaItem): void {
+    const panel = this.overlay?.querySelector('#formula-detail-panel');
+    if (!panel) return;
 
-  private bindStepControls(steps: FormulaStep[]): void {
-    const prevBtn = this.overlay?.querySelector('#btn-step-prev');
-    const nextBtn = this.overlay?.querySelector('#btn-step-next');
-    const playBtn = this.overlay?.querySelector('#btn-step-play');
-    const resetBtn = this.overlay?.querySelector('#btn-step-reset');
-
-    prevBtn?.addEventListener('click', () => {
+    panel.querySelector('#btn-step-prev')?.addEventListener('click', () => {
       this.stopAutoPlay();
       if (this.currentStepIndex > 0) {
         this.setStep(this.currentStepIndex - 1);
       }
     });
 
-    nextBtn?.addEventListener('click', () => {
+    panel.querySelector('#btn-step-next')?.addEventListener('click', () => {
       this.stopAutoPlay();
+      const steps = formula.steps ?? [];
       if (this.currentStepIndex < steps.length - 1) {
         this.setStep(this.currentStepIndex + 1);
       }
     });
 
-    playBtn?.addEventListener('click', () => {
+    panel.querySelector('#btn-step-play')?.addEventListener('click', () => {
       this.togglePlay();
     });
 
-    resetBtn?.addEventListener('click', () => {
+    panel.querySelector('#btn-step-reset')?.addEventListener('click', () => {
       this.resetStep();
+    });
+
+    // 실전 보드 연습하기 버튼 이벤트
+    panel.querySelector('#btn-practice-formula')?.addEventListener('click', () => {
+      soundEngine.playTap();
+      if (this.onPracticeCallback) {
+        this.onPracticeCallback(formula);
+      }
+      this.close();
     });
   }
 
   private renderStepInfo(): void {
     const formula = getFormulaById(this.currentFormulaId);
-    if (!formula || !formula.steps) return;
+    if (!formula || !formula.steps || formula.steps.length === 0) return;
 
     const steps = formula.steps;
-    const curIdx = this.currentStepIndex;
-    const step = steps[curIdx];
-    if (!step) return;
+    const currentStep = steps[this.currentStepIndex];
+    if (!currentStep) return;
 
     const isKo = getCurrentLang() === 'ko';
 
-    // 카운터 알약
+    // 카운터 뱃지
     const counterEl = this.overlay?.querySelector('#formula-step-counter');
     if (counterEl) {
-      counterEl.textContent = t('formula.stepCount', {
-        current: curIdx + 1,
-        total: steps.length
-      });
+      counterEl.textContent = `${this.currentStepIndex} / ${steps.length - 1} ${t('formula.stepMove', { step: '' }).trim()}`;
     }
 
-    // 텍스트 설명
+    // 단계 액션 제목
     const titleEl = this.overlay?.querySelector('#step-action-title');
-    const descEl = this.overlay?.querySelector('#step-action-desc');
-    const insightEl = this.overlay?.querySelector('#step-math-insight');
-
     if (titleEl) {
-      titleEl.textContent = step.formulaBadge ?? (curIdx === 0 ? t('formula.stepInitial') : `${curIdx}수`);
+      titleEl.textContent = isKo ? currentStep.labelKo : currentStep.labelEn;
     }
 
+    // 설명 텍스트
+    const descEl = this.overlay?.querySelector('#step-action-desc');
     if (descEl) {
-      descEl.textContent = isKo ? step.actionDescKo : step.actionDescEn;
+      descEl.textContent = isKo ? currentStep.actionDescKo : currentStep.actionDescEn;
     }
 
+    // 수학적 통찰
+    const insightEl = this.overlay?.querySelector('#step-math-insight');
     if (insightEl) {
-      const insight = isKo ? step.mathInsightKo : step.mathInsightEn;
+      const insight = isKo ? currentStep.mathInsightKo : currentStep.mathInsightEn;
       if (insight) {
         insightEl.textContent = `💡 ${insight}`;
-        (insightEl as HTMLElement).style.display = 'inline-block';
+        insightEl.classList.remove('hidden');
       } else {
-        (insightEl as HTMLElement).style.display = 'none';
+        insightEl.classList.add('hidden');
       }
     }
 
-    // 단계 점프 버튼 렌더링
+    // 점프 버튼 렌더링
     const jumpContainer = this.overlay?.querySelector('#step-jump-buttons');
     if (jumpContainer) {
       jumpContainer.innerHTML = steps
         .map((_, idx) => {
-          const label = idx === 0 ? (isKo ? '초기' : 'Init') : `${idx}수`;
-          const activeClass = idx === curIdx ? 'active-step' : '';
-          return `<button class="step-pill-btn ${activeClass}" data-step="${idx}">${label}</button>`;
+          const isActive = idx === this.currentStepIndex;
+          const label = idx === 0 ? t('formula.stepInitial') : `${idx}${isKo ? '수' : 'M'}`;
+          return `
+            <button class="step-jump-btn ${isActive ? 'active' : ''}" data-step="${idx}">
+              ${label}
+            </button>
+          `;
         })
         .join('');
 
-      jumpContainer.querySelectorAll('.step-pill-btn').forEach((btn) => {
+      jumpContainer.querySelectorAll('.step-jump-btn').forEach((btn) => {
         btn.addEventListener('click', (e) => {
-          this.stopAutoPlay();
-          const targetStep = Number((e.currentTarget as HTMLElement).dataset.step);
-          if (!isNaN(targetStep)) {
-            this.setStep(targetStep);
+          const s = Number((e.currentTarget as HTMLElement).dataset.step);
+          if (!isNaN(s)) {
+            this.stopAutoPlay();
+            this.setStep(s);
           }
         });
       });
@@ -572,37 +710,43 @@ export class FormulaModalController {
   private updatePlayButton(): void {
     const playBtn = this.overlay?.querySelector('#btn-step-play');
     if (!playBtn) return;
-    playBtn.textContent = this.isPlaying ? `⏸ ${t('formula.btnPause')}` : `▶ ${t('formula.btnPlay')}`;
-    playBtn.classList.toggle('playing', this.isPlaying);
+    if (this.isPlaying) {
+      playBtn.innerHTML = `⏸ ${t('formula.btnPause')}`;
+      playBtn.classList.add('playing');
+    } else {
+      playBtn.innerHTML = `▶ ${t('formula.btnPlay')}`;
+      playBtn.classList.remove('playing');
+    }
   }
 
   private renderMiniBoard(): void {
     const formula = getFormulaById(this.currentFormulaId);
-    if (!formula || !formula.steps) return;
+    if (!formula || !formula.steps || formula.steps.length === 0) return;
 
-    const step = formula.steps[this.currentStepIndex];
-    if (!step) return;
+    const currentStep = formula.steps[this.currentStepIndex];
+    if (!currentStep) return;
 
-    const { front, back } = getThemeImages();
+    const boardOps = currentStep.boardOps;
+    const highlightCells = new Set(currentStep.highlightCells ?? []);
+    const themeImages = getThemeImages();
 
-    for (let idx = 0; idx < 9; idx++) {
-      const canvas = this.overlay?.querySelector(`#formula-canvas-${idx}`) as HTMLCanvasElement | null;
-      const badge = this.overlay?.querySelector(`#formula-badge-${idx}`);
-      const tileBox = this.overlay?.querySelector(`#formula-tile-${idx}`);
-
-      const op = step.boardOps[idx] ?? 'ID';
-
-      if (canvas) {
-        renderCharacterTileCanvas(canvas, op, front, back);
-      }
-
-      if (badge) {
-        badge.textContent = op === 'ID' ? '0' : op;
-      }
+    for (let i = 0; i < 9; i++) {
+      const tileBox = this.overlay?.querySelector(`#formula-tile-${i}`);
+      const canvas = this.overlay?.querySelector(`#formula-canvas-${i}`) as HTMLCanvasElement | null;
+      const badge = this.overlay?.querySelector(`#formula-badge-${i}`);
 
       if (tileBox) {
-        const isHighlight = step.highlightCells?.includes(idx);
-        tileBox.classList.toggle('highlighted', Boolean(isHighlight));
+        tileBox.classList.toggle('highlight', highlightCells.has(i));
+      }
+
+      const op = boardOps[i];
+      if (badge) {
+        badge.textContent = op === 'ID' ? 'ID' : String(op);
+        badge.className = `formula-mini-badge ${op === 'ID' ? 'identity' : 'active'}`;
+      }
+
+      if (canvas) {
+        renderCharacterTileCanvas(canvas, op, themeImages.front, themeImages.back);
       }
     }
   }

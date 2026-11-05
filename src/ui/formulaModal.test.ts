@@ -29,6 +29,7 @@ describe('FormulaModalController (공식 비법서 모달 및 인터랙티브 �
         restore: vi.fn(),
         translate: vi.fn(),
         rotate: vi.fn(),
+        scale: vi.fn(),
         drawImage: vi.fn(),
         beginPath: vi.fn(),
         arc: vi.fn(),
