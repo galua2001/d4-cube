@@ -884,6 +884,157 @@ const diagSpineFlushSteps = createInteractiveSteps(diagSpineFlushInitialBoard, [
   }
 ]);
 
+// 15. [다이아몬드 십자 3수 파괴 공식 인터랙티브 스텝]
+// 초기 보드: 십자 에지와 대각 모서리가 결합된 다이아몬드 십자 형태
+const diamondCrossInitialBoard: D4Op[] = [
+  D4.MD, D4.MY,  D4.ID,
+  D4.MX, D4.MAD, D4.MX,
+  D4.ID, D4.MY,  D4.MD
+];
+
+const diamondCrossSteps = createInteractiveSteps(diamondCrossInitialBoard, [
+  {
+    lineType: 'row',
+    lineIndex: 1,
+    op: D4.MX,
+    actionDescKo: '1수: 2행 상하 반전 (MX)',
+    actionDescEn: 'Move 1: Row 2 Vertical Flip (MX)',
+    mathInsightKo: '2행의 좌우 에지(3, 5번)가 MX² = ID로 즉시 소거되고, 중심 4번은 MAD ∘ MX = R90으로 변환됩니다.',
+    mathInsightEn: 'Row 2 left/right edges (3, 5) clear via MX² = ID, and center 4 transitions via MAD ∘ MX = R90.',
+    highlightCells: [3, 4, 5],
+    formulaBadge: '1수: 2행 MX',
+    formulaText: 'Row₂ ➔ MX',
+    formulaDesc: '2행 상하 반전으로 좌우 에지를 소거하고 중심 타일을 90° 위상으로 전환합니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 1,
+    op: D4.MY,
+    actionDescKo: '2수: 2열 좌우 반전 (MY)',
+    actionDescEn: 'Move 2: Col 2 Horizontal Flip (MY)',
+    mathInsightKo: '2열의 상하 에지(1, 7번)가 MY² = ID로 소거되고, 중심 4번은 R90 ∘ MY = MD로 변환되어 주대각선 전체(0, 4, 8)가 MD로 동기화됩니다.',
+    mathInsightEn: 'Col 2 top/bottom edges (1, 7) clear via MY² = ID, and center 4 converts to MD, synchronizing main diagonal (0, 4, 8) to MD.',
+    highlightCells: [1, 4, 7],
+    formulaBadge: '2수: 2열 MY',
+    formulaText: 'Col₂ ➔ MY',
+    formulaDesc: '2열 좌우 반전으로 상하 에지를 소거하고 주대각선 3개 타일을 MD로 동기화합니다.'
+  },
+  {
+    lineType: 'diag',
+    lineIndex: 'main',
+    op: D4.MD,
+    actionDescKo: '3수: 주대각선 주대각 반사 (MD 피니시)',
+    actionDescEn: 'Move 3: Main Diagonal Reflection (MD Finish)',
+    mathInsightKo: '주대각선에 정렬된 0, 4, 8번 타일이 MD² = ID로 일괄 소거되며 보드 전체 100% 올클리어 완성!',
+    mathInsightEn: 'Synchronized tiles (0, 4, 8) on the main diagonal resolve via MD² = ID, completing 100% all-clear!',
+    highlightCells: [0, 4, 8],
+    formulaBadge: '3수: 주대각 MD 피니시',
+    formulaText: 'Diag(Main) ➔ MD ➔ 100% 클리어',
+    formulaDesc: '주대각선 대칭 반사로 남아있는 대각선 전체를 정위치로 일괄 복원합니다.'
+  }
+]);
+
+// 16. [ㄱ자 사선연계 3수 공식 인터랙티브 스텝]
+// 초기 보드: 1행과 1열의 'ㄱ자' 테두리와 부대각선이 얽힌 형태
+const lDiagCascadeInitialBoard: D4Op[] = [
+  D4.R180, D4.MY,  D4.R270,
+  D4.MX,   D4.MAD, D4.ID,
+  D4.R90,  D4.ID,  D4.ID
+];
+
+const lDiagCascadeSteps = createInteractiveSteps(lDiagCascadeInitialBoard, [
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.MY,
+    actionDescKo: '1수: 1행 좌우 반전 (MY)',
+    actionDescEn: 'Move 1: Row 1 Horizontal Flip (MY)',
+    mathInsightKo: '1행의 1번 에지가 MY² = ID로 소거되고, 코너 0번은 MX, 2번은 MAD로 변환됩니다.',
+    mathInsightEn: 'Row 1 edge 1 clears via MY² = ID; corner 0 transitions to MX and corner 2 to MAD.',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '1수: 1행 MY',
+    formulaText: 'Row₁ ➔ MY',
+    formulaDesc: '1행 좌우 반전으로 1번 타일을 소거하고 코너의 위상을 정렬합니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 0,
+    op: D4.MX,
+    actionDescKo: '2수: 1열 상하 반전 (MX)',
+    actionDescEn: 'Move 2: Col 1 Vertical Flip (MX)',
+    mathInsightKo: '1열의 0, 3번 타일이 MX² = ID로 동시 소거되고, 6번 타일은 R90 ∘ MX = MAD로 변환되어 부대각선(2, 4, 6)이 모두 MAD로 통일됩니다.',
+    mathInsightEn: 'Col 1 tiles 0 and 3 eliminate via MX² = ID, and tile 6 becomes MAD, unifying the entire anti-diagonal (2, 4, 6) into MAD.',
+    highlightCells: [0, 3, 6],
+    formulaBadge: '2수: 1열 MX',
+    formulaText: 'Col₁ ➔ MX',
+    formulaDesc: '1열 상하 반전으로 1열을 완전 소거하고 부대각선 전체를 MAD로 동기화합니다.'
+  },
+  {
+    lineType: 'diag',
+    lineIndex: 'anti',
+    op: D4.MAD,
+    actionDescKo: '3수: 부대각선 부대각 반사 (MAD 피니시)',
+    actionDescEn: 'Move 3: Anti-Diagonal Reflection (MAD Finish)',
+    mathInsightKo: '동기화된 부대각선(2, 4, 6번) 타일이 MAD² = ID로 일괄 소거되며 보드 전체 100% 올클리어 완성!',
+    mathInsightEn: 'Synchronized anti-diagonal tiles (2, 4, 6) eliminate simultaneously via MAD² = ID, achieving 100% all-clear!',
+    highlightCells: [2, 4, 6],
+    formulaBadge: '3수: 부대각 MAD 피니시',
+    formulaText: 'Diag(Anti) ➔ MAD ➔ 100% 클리어',
+    formulaDesc: '부대각선 반사로 남아있는 부대각선 3개 타일을 정위치로 일괄 복원합니다.'
+  }
+]);
+
+// 17. [X-크로스 3수 공식 인터랙티브 스텝]
+// 초기 보드: 주대각선, 부대각선 교차와 2행 날개가 결합된 X자 대칭 패턴
+const xCrossInitialBoard: D4Op[] = [
+  D4.MD,   D4.ID,  D4.MAD,
+  D4.R180, D4.ID,  D4.R180,
+  D4.MAD,  D4.ID,  D4.MD
+];
+
+const xCrossSteps = createInteractiveSteps(xCrossInitialBoard, [
+  {
+    lineType: 'diag',
+    lineIndex: 'main',
+    op: D4.MD,
+    actionDescKo: '1수: 주대각선 주대각 반사 (MD)',
+    actionDescEn: 'Move 1: Main Diagonal Reflection (MD)',
+    mathInsightKo: '주대각선 코너(0, 8번)가 MD² = ID로 즉시 소거되고, 중심 4번 타일은 ID ∘ MD = MD 상태로 변환됩니다.',
+    mathInsightEn: 'Main diagonal corners (0, 8) instantly clear via MD² = ID, and center tile 4 becomes MD.',
+    highlightCells: [0, 4, 8],
+    formulaBadge: '1수: 주대각 MD',
+    formulaText: 'Diag(Main) ➔ MD',
+    formulaDesc: '주대각선 반사로 0, 8번 코너를 소거하고 중심 타일을 전이합니다.'
+  },
+  {
+    lineType: 'diag',
+    lineIndex: 'anti',
+    op: D4.MAD,
+    actionDescKo: '2수: 부대각선 부대각 반사 (MAD)',
+    actionDescEn: 'Move 2: Anti-Diagonal Reflection (MAD)',
+    mathInsightKo: '부대각선 코너(2, 6번)가 MAD² = ID로 즉시 소거되고, 중심 4번은 MD ∘ MAD = R180으로 합성되어 2행 전체(3, 4, 5)가 R180으로 동기화됩니다.',
+    mathInsightEn: 'Anti-diagonal corners (2, 6) clear via MAD² = ID, and center 4 composes into MD ∘ MAD = R180, synchronizing all Row 2 tiles (3, 4, 5) to R180.',
+    highlightCells: [2, 4, 6],
+    formulaBadge: '2수: 부대각 MAD',
+    formulaText: 'Diag(Anti) ➔ MAD',
+    formulaDesc: '부대각선 코너를 소거하고 2행(3, 4, 5) 전체를 180° 회전으로 통일합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 1,
+    op: D4.R180,
+    actionDescKo: '3수: 2행 180° 회전 (R180 피니시)',
+    actionDescEn: 'Move 3: Row 2 Rotate 180° (R180 Finish)',
+    mathInsightKo: '동기화된 2행의 3, 4, 5번 타일이 R180² = ID로 일괄 소거되며 보드 전체 100% 올클리어 완성!',
+    mathInsightEn: 'Synchronized Row 2 tiles (3, 4, 5) resolve via R180² = ID, completing 100% board clearance!',
+    highlightCells: [3, 4, 5],
+    formulaBadge: '3수: 2행 R180 피니시',
+    formulaText: 'Row₂ ➔ R180 ➔ 100% 클리어',
+    formulaDesc: '2행 더블탭으로 남아있는 2행 전체를 정위치로 일괄 복원합니다.'
+  }
+]);
+
+
 const BASE_FORMULAS: FormulaItem[] = [
   {
     id: 'master-method-3step',
@@ -1064,6 +1215,82 @@ const BASE_FORMULAS: FormulaItem[] = [
     tags: ['사선 척추 상쇄', '3수 피니시', '사선 반사', '신의 수', '척추 소거', '신의 수 테크닉'],
     isInteractive: true
   },
+  {
+    id: 'diamond-cross-3m',
+    titleKo: '다이아몬드 십자 3수 파괴 공식',
+    titleEn: 'Diamond Cross 3-Move Break Formula',
+    category: 'god-number',
+    badgeKo: '다이아몬드 십자',
+    badgeEn: 'Diamond Cross',
+    difficulty: 4,
+    formulaSeq: '2행 MX ➔ 2열 MY ➔ 주대각 MD = 전 타일 올클리어',
+    summaryKo: '십자 에지(1, 3, 5, 7)와 대각 모서리가 교차하는 다이아몬드 십자형 뒤틀림! [2행 MX] ➔ [2열 MY] ➔ [주대각 MD] 단 3수로 십자축과 대각선을 완벽 소거하며 올클리어합니다.',
+    summaryEn: 'A diamond cross distortion where cross edges and diagonal corners intersect! [Row 2 MX] ➔ [Col 2 MY] ➔ [Main Diag MD] completely purges axes and diagonals in 3 moves.',
+    diagramType: 'interactive',
+    steps: diamondCrossSteps,
+    latexFormula: '\\text{Row}_2(\\text{MX}) \\circ \\text{Col}_2(\\text{MY}) \\circ \\text{Diag}_M(\\text{MD}) = \\text{ID}',
+    notesKo: [
+      '2행 MX와 2열 MY를 순차 실행하여 십자 에지 4개를 소거하고, 중심 타일을 대각선과 동기화합니다.',
+      '최종 3수째 주대각선 MD 반사로 0, 4, 8번 타일을 동시 소거하며 퍼즐을 완벽 클리어합니다.'
+    ],
+    notesEn: [
+      'Sequential Row 2 MX and Col 2 MY clears all 4 cross edges and aligns center tile with the diagonal.',
+      'Final Main Diag MD simultaneous purge clears tiles 0, 4, and 8 for a perfect solve.'
+    ],
+    tags: ['다이아몬드 십자', '3수 피니시', '십자 에지', '대각선 공식', '신의 수 테크닉'],
+    isInteractive: true
+  },
+  {
+    id: 'l-diag-cascade-3m',
+    titleKo: 'ㄱ자 사선연계 3수 공식',
+    titleEn: 'L-Shape Diagonal Cascade 3-Move Formula',
+    category: 'god-number',
+    badgeKo: 'ㄱ자 사선연계',
+    badgeEn: 'L-Diag Cascade',
+    difficulty: 3,
+    formulaSeq: '1행 MY ➔ 1열 MX ➔ 부대각 MAD = 전 타일 올클리어',
+    summaryKo: '1행과 1열의 \'ㄱ자\' 테두리와 부대각선 축이 서로 얽힌 기하학적 난패턴! [1행 MY] ➔ [1열 MX] ➔ [부대각 MAD] 3수의 연속 파동으로 직교와 사선을 일거에 정리합니다.',
+    summaryEn: 'An intricate geometric pattern entangling an \'L-shape\' frame (Row 1, Col 1) with the anti-diagonal! [Row 1 MY] ➔ [Col 1 MX] ➔ [Anti Diag MAD] purges orthogonal and diagonal lines in 3 moves.',
+    diagramType: 'interactive',
+    steps: lDiagCascadeSteps,
+    latexFormula: '\\text{Row}_1(\\text{MY}) \\circ \\text{Col}_1(\\text{MX}) \\circ \\text{Diag}_A(\\text{MAD}) = \\text{ID}',
+    notesKo: [
+      '1행 MY와 1열 MX의 연속 직교 반사로 테두리 타일들을 소거하고, 6번 코너를 부대각선 위상으로 전환합니다.',
+      '부대각선(2, 4, 6번)이 모두 동일한 MAD 위상으로 통일되어 마지막 부대각 반사 한 방으로 클리어됩니다.'
+    ],
+    notesEn: [
+      'Sequential Row 1 MY and Col 1 MX clears perimeter tiles and transitions corner 6 into anti-diagonal phase.',
+      'Anti-diagonal (2, 4, 6) becomes completely unified in MAD phase, resolved with a single final swipe.'
+    ],
+    tags: ['ㄱ자 사선연계', '3수 피니시', 'L자 테두리', '부대각선 공식', '신의 수 테크닉'],
+    isInteractive: true
+  },
+  {
+    id: 'x-cross-3m',
+    titleKo: 'X-크로스 3수 공식',
+    titleEn: 'X-Cross 3-Move Formula',
+    category: 'god-number',
+    badgeKo: 'X-크로스 3수',
+    badgeEn: 'X-Cross 3M',
+    difficulty: 3,
+    formulaSeq: '주대각 MD ➔ 부대각 MAD ➔ 2행 R180 = 전 타일 올클리어',
+    summaryKo: '주대각선과 부대각선의 교차점과 2행의 양 날개가 \'X자\' 형태로 뒤틀린 대칭 패턴! [주대각 MD] ➔ [부대각 MAD] ➔ [2행 R180] 단 3수로 2개 대각선과 중심축을 정복합니다.',
+    summaryEn: 'A symmetric \'X-Cross\' pattern where intersecting diagonals and Row 2 wings are twisted! [Main Diag MD] ➔ [Anti Diag MAD] ➔ [Row 2 R180] completely conquers diagonals and central axis in 3 moves.',
+    diagramType: 'interactive',
+    steps: xCrossSteps,
+    latexFormula: '\\text{Diag}_M(\\text{MD}) \\circ \\text{Diag}_A(\\text{MAD}) \\circ \\text{Row}_2(\\text{R180}) = \\text{ID}',
+    notesKo: [
+      '주대각선과 부대각선을 연속 반사하여 4개 코너(0, 2, 6, 8)를 즉시 소거하고 중심을 180° 회전으로 합성합니다.',
+      '중심 4번과 좌우 3, 5번이 모두 R180으로 완벽 동기화되어 2행 180° 회전으로 한 번에 종결됩니다.'
+    ],
+    notesEn: [
+      'Successive diagonal reflections clear all 4 corners (0, 2, 6, 8) and compose the center into 180° rotation.',
+      'Center tile 4 and wings 3, 5 become unified in R180, finishing cleanly in a single Row 2 swipe.'
+    ],
+    tags: ['X-크로스', '3수 피니시', '대각선 크로스', '신의 수 테크닉'],
+    isInteractive: true
+  },
+
   {
     id: 'center-inversion',
     titleKo: '중심 타일 180° 반전 공식',
