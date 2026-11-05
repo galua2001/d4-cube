@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { FORMULAS, getFormulasByCategory, getFormulaById } from './formulas';
+import { FORMULAS, getFormulasByCategory, getFormulaById, filterFormulas } from './formulas';
 import { D4, composeOps } from '../core/group';
 
 describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 및 수학적 정밀성 검증', () => {
@@ -839,6 +839,176 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     expect(translations.en['formula.btnPracticeOnBoard']).toContain('Practice on Board');
     expect(translations.ko['practice.badgeTitle']).toContain('연습 모드');
     expect(translations.en['practice.badgeTitle']).toContain('Practice');
+  });
+
+  it('43. [Round 5 D4 마스터 공식 1: d4-corner-ring-blitz-4] 4대 코너 링 블리츠 4수 단계별 소거 및 All-ID 검증', () => {
+    const f = getFormulaById('d4-corner-ring-blitz-4');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('d4-corner-ring-blitz-4');
+    expect(f?.category).toBe('god-number');
+    expect(f?.difficulty).toBe(4);
+    expect(f?.steps?.length).toBe(5); // 0단계(초기) + 4수
+
+    // 0단계: 중앙 4번 ID, 코너 0, 2, 6, 8은 R180, 변 1, 3, 5, 7은 R270
+    const s0 = f!.steps![0].boardOps;
+    expect(s0[4]).toBe(D4.ID);
+    [0, 2, 6, 8].forEach((idx) => expect(s0[idx]).toBe(D4.R180));
+    [1, 3, 5, 7].forEach((idx) => expect(s0[idx]).toBe(D4.R270));
+
+    // 1수: 1행 R90 ➔ 1번 변 소거 (R270 ∘ R90 = ID), 남은 에러 7개
+    const s1 = f!.steps![1].boardOps;
+    expect(s1[1]).toBe(D4.ID);
+    expect(s1[4]).toBe(D4.ID);
+    expect(s1.filter((op) => op !== D4.ID).length).toBe(7);
+
+    // 2수: 3열 R90 ➔ 2번 코너, 5번 변 동시 소거 (더블 킬), 남은 에러 5개
+    const s2 = f!.steps![2].boardOps;
+    expect(s2[2]).toBe(D4.ID);
+    expect(s2[5]).toBe(D4.ID);
+    expect(s2.filter((op) => op !== D4.ID).length).toBe(5);
+
+    // 3수: 3행 R90 ➔ 7번 변, 8번 코너 동시 소거 (더블 킬), 남은 에러 3개
+    const s3 = f!.steps![3].boardOps;
+    expect(s3[7]).toBe(D4.ID);
+    expect(s3[8]).toBe(D4.ID);
+    expect(s3.filter((op) => op !== D4.ID).length).toBe(3);
+
+    // 4수: 1열 R90 ➔ 0번, 3번, 6번 일제 소거 (트리플 킬 피니시) ➔ 전 타일 100% ID
+    const s4 = f!.steps![4].boardOps;
+    expect(s4.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('44. [Round 5 D4 마스터 공식 2: d4-cross-inversion-3] 십자 변·중심 위상 도치 3수 킬 단계별 소거 및 All-ID 검증', () => {
+    const f = getFormulaById('d4-cross-inversion-3');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('d4-cross-inversion-3');
+    expect(f?.category).toBe('god-number');
+    expect(f?.difficulty).toBe(3);
+    expect(f?.steps?.length).toBe(4); // 0단계(초기) + 3수
+
+    // 0단계: 코너 0, 2, 6, 8은 ID, 십자 1, 3, 4, 5, 7만 뒤틀림
+    const s0 = f!.steps![0].boardOps;
+    [0, 2, 6, 8].forEach((idx) => expect(s0[idx]).toBe(D4.ID));
+    expect(s0[1]).toBe(D4.MX);
+    expect(s0[3]).toBe(D4.R180);
+    expect(s0[4]).toBe(D4.MX);
+    expect(s0[5]).toBe(D4.R180);
+    expect(s0[7]).toBe(D4.MX);
+
+    // 1수: 2행 R90 ➔ 상태 전이 레버리지 형성
+    const s1 = f!.steps![1].boardOps;
+    [0, 2, 6, 8].forEach((idx) => expect(s1[idx]).toBe(D4.ID));
+    expect(s1[4]).toBe(D4.MD);
+
+    // 2수: 2열 MX ➔ 1번, 7번 상하 변 동시 소거 (더블 킬, MX ∘ MX = ID), 남은 에러 3개
+    const s2 = f!.steps![2].boardOps;
+    expect(s2[1]).toBe(D4.ID);
+    expect(s2[7]).toBe(D4.ID);
+    expect(s2[3]).toBe(D4.R270);
+    expect(s2[4]).toBe(D4.R270);
+    expect(s2[5]).toBe(D4.R270);
+
+    // 3수: 2행 R90 ➔ 3번, 4번, 5번 중심행 타일 일제 소거 (트리플 킬 폭파) ➔ 전 타일 100% ID
+    const s3 = f!.steps![3].boardOps;
+    expect(s3.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('45. [Round 5 D4 마스터 공식 3: d4-diagonal-windmill-4] 대각선·직교 풍차형 위상차 4수 올킬 단계별 소거 및 All-ID 검증', () => {
+    const f = getFormulaById('d4-diagonal-windmill-4');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('d4-diagonal-windmill-4');
+    expect(f?.category).toBe('god-number');
+    expect(f?.difficulty).toBe(4);
+    expect(f?.steps?.length).toBe(5); // 0단계(초기) + 4수
+
+    // 0단계: 9개 전 타일 풍차형 위상차 (0, 1, 2, 6, 7, 8: R270 / 3, 5: MX / 4: MD)
+    const s0 = f!.steps![0].boardOps;
+    [0, 1, 2, 6, 7, 8].forEach((idx) => expect(s0[idx]).toBe(D4.R270));
+    expect(s0[3]).toBe(D4.MX);
+    expect(s0[5]).toBe(D4.MX);
+    expect(s0[4]).toBe(D4.MD);
+
+    // 1수: 주대각선(↖) R90 ➔ 0번, 8번 대각 코너 동시 소거 (더블 킬)
+    const s1 = f!.steps![1].boardOps;
+    expect(s1[0]).toBe(D4.ID);
+    expect(s1[8]).toBe(D4.ID);
+
+    // 2수: 2열 R90 ➔ 1번, 7번 수직 변 동시 소거 (더블 킬)
+    const s2 = f!.steps![2].boardOps;
+    expect(s2[1]).toBe(D4.ID);
+    expect(s2[7]).toBe(D4.ID);
+
+    // 3수: 부대각선(↗) R90 ➔ 2번, 6번 반대편 대각 코너 동시 소거 (더블 킬)
+    const s3 = f!.steps![3].boardOps;
+    expect(s3[2]).toBe(D4.ID);
+    expect(s3[6]).toBe(D4.ID);
+    // 중심 2행(3, 4, 5)만 MX로 단일 동기화
+    expect(s3[3]).toBe(D4.MX);
+    expect(s3[4]).toBe(D4.MX);
+    expect(s3[5]).toBe(D4.MX);
+
+    // 4수: 2행 MX ➔ 3번, 4번, 5번 중심행 타일 일제 소거 (트리플 킬 폭파) ➔ 전 타일 100% ID
+    const s4 = f!.steps![4].boardOps;
+    expect(s4.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('46. [Round 5 i18n & 카테고리 검증] Round 5 신규 공식 3선 i18n 번역 키 및 god-number 총 개수(17개) 검증', async () => {
+    const { translations } = await import('../i18n/translations');
+    expect(translations.ko['formula.item.d4CornerRingBlitz4.title']).toContain('코너 링');
+    expect(translations.en['formula.item.d4CornerRingBlitz4.title']).toContain('Corner Ring');
+    expect(translations.ko['formula.item.d4CrossInversion3.title']).toContain('십자 변');
+    expect(translations.en['formula.item.d4CrossInversion3.title']).toContain('Cross Inversion');
+    expect(translations.ko['formula.item.d4DiagonalWindmill4.title']).toContain('풍차');
+    expect(translations.en['formula.item.d4DiagonalWindmill4.title']).toContain('Windmill');
+
+    // 검색 관련 키 검증
+    expect(translations.ko['formula.searchPlaceholder']).toContain('검색');
+    expect(translations.en['formula.searchPlaceholder']).toContain('Search');
+    expect(translations.ko['formula.searchEmptyMsg']).toContain('결과');
+    expect(translations.en['formula.searchEmptyMsg']).toContain('No matching');
+    expect(translations.ko['formula.searchClearBtn']).toContain('지우기');
+    expect(translations.en['formula.searchClearBtn']).toContain('Clear');
+
+    const godNumberFormulas = getFormulasByCategory('god-number');
+    expect(godNumberFormulas.length).toBe(17);
+    expect(godNumberFormulas.some((f) => f.id === 'd4-corner-ring-blitz-4')).toBe(true);
+    expect(godNumberFormulas.some((f) => f.id === 'd4-cross-inversion-3')).toBe(true);
+    expect(godNumberFormulas.some((f) => f.id === 'd4-diagonal-windmill-4')).toBe(true);
+  });
+
+  it('47. [Round 5 비법서 실시간 검색 & 다차원 태그 칩 필터링: filterFormulas] 검색 로직 단위 검증', () => {
+    // 1. 전체 검색 (빈 쿼리)
+    const all = filterFormulas(FORMULAS, '', 'all', 'all');
+    expect(all.length).toBe(FORMULAS.length);
+
+    // 2. 카테고리 필터링
+    const basics = filterFormulas(FORMULAS, '', 'basics', 'all');
+    expect(basics.every((f) => f.category === 'basics')).toBe(true);
+
+    const godOnly = filterFormulas(FORMULAS, '', 'god-number', 'all');
+    expect(godOnly.length).toBe(17);
+
+    // 3. 태그 칩 필터링
+    const tag4Move = filterFormulas(FORMULAS, '', 'all', '4수');
+    expect(tag4Move.length).toBeGreaterThanOrEqual(2);
+    expect(tag4Move.every((f) => f.tags?.some((t) => t.includes('4수')))).toBe(true);
+
+    // 4. 키워드 검색 (제목 검색)
+    const searchWindmill = filterFormulas(FORMULAS, '풍차', 'all', 'all');
+    expect(searchWindmill.some((f) => f.id === 'd4-diagonal-windmill-4')).toBe(true);
+
+    // 5. ID 검색
+    const searchById = filterFormulas(FORMULAS, 'd4-corner-ring', 'all', 'all');
+    expect(searchById.length).toBe(1);
+    expect(searchById[0].id).toBe('d4-corner-ring-blitz-4');
+
+    // 6. 복합 AND 필터링: god-number 카테고리 + 3수 태그 + 십자 검색
+    const combo = filterFormulas(FORMULAS, '십자', 'god-number', '3수');
+    expect(combo.some((f) => f.id === 'd4-cross-inversion-3')).toBe(true);
+
+    // 7. 불일치 검색어 결과 비어있음 검증
+    const empty = filterFormulas(FORMULAS, 'non-existent-xyz-random-12345', 'all', 'all');
+    expect(empty.length).toBe(0);
   });
 
 });
