@@ -1,4 +1,5 @@
 import './styles/main.css';
+import './styles/formulaModal.css';
 import { D4Op, D4, SymmetryGroupKey } from './core/group';
 import { generateLines, generateLineCells, LineTarget, applyLineMoveGeneric } from './core/board';
 import { solveBoard, MoveStep } from './core/solver';
@@ -11,6 +12,7 @@ import { GestureRecognizer } from './ui/gesture';
 import { solutionInlinePanel } from './ui/solutionModal';
 import { showAboutModal } from './ui/aboutModal';
 import { showTutorialModal, isTutorialCompleted } from './ui/tutorialModal';
+import { showFormulaModal } from './ui/formulaModal';
 import { victoryManager } from './ui/victoryEffect';
 import { initPWAManager } from './pwaManager';
 import { t, getCurrentLang, setLang, onLangChange, Lang } from './i18n/translations';
@@ -120,6 +122,7 @@ class MatrixCubeApp {
         </div>
         <div class="header-actions">
           <button id="btn-header-tutorial" class="btn-icon btn-nav-tutorial" title="${t('header.tutorialTitle')}">${t('header.tutorial')}</button>
+          <button id="btn-header-formula" class="btn-icon btn-nav-formula" title="${t('header.formulaBookTitle')}">${t('header.formulaBook')}</button>
           <button id="btn-about" class="btn-icon" title="${t('header.aboutTitle')}">${t('header.about')}</button>
           <button id="btn-toggle-guide" class="btn-icon" title="${t('header.guideTitle')}">${t('header.guide')}</button>
           <button id="btn-toggle-bgm" class="btn-icon">🔇 BGM</button>
@@ -375,6 +378,12 @@ class MatrixCubeApp {
     });
 
     // 공모전 소개 모달 버튼
+    // 공식 비법서 모달 버튼
+    document.getElementById('btn-header-formula')?.addEventListener('click', () => {
+      soundEngine.playTap();
+      showFormulaModal();
+    });
+
     document.getElementById('btn-about')?.addEventListener('click', () => {
       soundEngine.playTap();
       showAboutModal();
