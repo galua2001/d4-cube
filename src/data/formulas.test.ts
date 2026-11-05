@@ -338,7 +338,7 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
 
   it('18. 실전 빈출 2수 피니시 TOP 3 공식 카테고리(god-number, godTechnique) 및 총 공식 개수 검증', () => {
     const godNumberFormulas = getFormulasByCategory('god-number');
-    expect(godNumberFormulas.length).toBe(26);
+    expect(godNumberFormulas.length).toBe(29);
     expect(godNumberFormulas.some((f) => f.id === 'd4-double-cross-4')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-spiral-vortex-4')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-dual-diagonal-blitz-4')).toBe(true);
@@ -970,7 +970,7 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     expect(translations.en['formula.searchClearBtn']).toContain('Clear');
 
     const godNumberFormulas = getFormulasByCategory('god-number');
-    expect(godNumberFormulas.length).toBe(26);
+    expect(godNumberFormulas.length).toBe(29);
     expect(godNumberFormulas.some((f) => f.id === 'd4-corner-ring-blitz-4')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-cross-inversion-3')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-diagonal-windmill-4')).toBe(true);
@@ -986,7 +986,7 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     expect(basics.every((f) => f.category === 'basics')).toBe(true);
 
     const godOnly = filterFormulas(FORMULAS, '', 'god-number', 'all');
-    expect(godOnly.length).toBe(26);
+    expect(godOnly.length).toBe(29);
 
     // 3. 태그 칩 필터링
     const tag4Move = filterFormulas(FORMULAS, '', 'all', '4수');
@@ -1153,7 +1153,7 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
 
     // 총 god-number 개수 정확히 20개 검증
     const godNumberFormulas = getFormulasByCategory('god-number');
-    expect(godNumberFormulas.length).toBe(26);
+    expect(godNumberFormulas.length).toBe(29);
     expect(godNumberFormulas.some((f) => f.id === 'd4-twin-column-flux-4')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-h-bracket-smash-3')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-star-burst-vortex-4')).toBe(true);
@@ -1301,9 +1301,9 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     expect(translations.ko['formula.btnRemoveFromFavorites']).toBe('즐겨찾기에서 제거');
     expect(translations.en['formula.btnRemoveFromFavorites']).toBe('Remove from Favorites');
 
-    // 총 god-number 개수 정확히 23개 검증
+    // 총 god-number 개수 정확히 26개 검증
     const godNumberFormulas = getFormulasByCategory('god-number');
-    expect(godNumberFormulas.length).toBe(23);
+    expect(godNumberFormulas.length).toBe(29);
     expect(godNumberFormulas.some((f) => f.id === 'd4-corner-kite-flux-4')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-plus-omega-cross-3')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-hyper-cube-frame-4')).toBe(true);
