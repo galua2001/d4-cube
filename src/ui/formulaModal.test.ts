@@ -210,4 +210,19 @@ describe('FormulaModalController (공식 비법서 모달 및 인터랙티브 �
     controller.close();
     expect(controller.isOpen()).toBe(false);
   });
+
+  it('12. 신규 180° 쌍 공식(parallel-180-pair, diagonal-180-pair) 모달 열기 및 인터랙티브 스텝 제어 검증', () => {
+    controller.open('parallel-180-pair');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+
+    controller.selectFormula('diagonal-180-pair');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(4);
+    controller.close();
+    expect(controller.isOpen()).toBe(false);
+  });
 });
