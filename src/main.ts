@@ -71,7 +71,7 @@ class MatrixCubeApp {
     });
 
     recordManager.onTimerModeChange(() => {
-      this.updateTimerModeUI();
+      this.updateTimerDisplay();
     });
   }
 
@@ -97,7 +97,6 @@ class MatrixCubeApp {
     const curLang = getCurrentLang();
     const curTheme = getCurrentTheme();
     const curColorMode = getColorMode();
-    const isFree = recordManager.isFreeMode();
     app.innerHTML = `
       <div class="header-bar">
         <div class="header-top-row">
@@ -148,7 +147,7 @@ class MatrixCubeApp {
           <span id="label-stage-info">${t('status.stageInfo', { size: this.boardSize, moves: this.scrambleMoves })}</span>
         </div>
         <div class="timer-container">
-          <span class="timer-display ${isFree ? 'timer-off' : 'timer-active'}" id="label-timer" style="cursor:pointer;" title="${isFree ? t('status.timerTooltipOff') : t('status.timerTooltipOn')}">${isFree ? t('status.timerOff') : '⏱️ 00:00.0'}</span>
+          <span class="timer-display ${recordManager.isTimerActive() ? 'timer-active' : 'timer-off'}" id="label-timer" style="cursor:pointer;" title="${recordManager.isTimerActive() ? t('status.timerTooltipOn') : t('status.timerTooltipOff')}">${recordManager.isTimerActive() ? '⏱️ 00:00.0' : t('status.timerOff')}</span>
           <span id="label-moves">${t('status.moves', { moves: this.movesCount })}</span>
           <span class="best-record-badge" id="badge-best-record">${t('status.bestRecordEmpty')}</span>
         </div>
@@ -413,15 +412,12 @@ class MatrixCubeApp {
       this.toggleDiagonal();
     });
 
-    // 타이머 모드 토글 이벤트 (자유 ♾️ vs 초시계 ⏱️)
-    const toggleTimerModeAction = () => {
+    // 단일 시계 원클릭 활성/비활성 토글 이벤트 (⏱️ 00:00.0 <-> ⏱️ OFF)
+    document.getElementById('label-timer')?.addEventListener('click', () => {
       soundEngine.playTap();
       recordManager.toggleTimerMode();
-      this.isGameStarted = false;
-      this.updateTimerModeUI();
-    };
-    // document.getElementById('btn-toggle-timer-mode')?.addEventListener('click', toggleTimerModeAction);
-    document.getElementById('label-timer')?.addEventListener('click', toggleTimerModeAction);
+      this.updateTimerDisplay();
+    });
 
     // 난이도(N수) 버튼 목록 초기 렌더링
     this.updateDifficultyButtons();
@@ -500,8 +496,7 @@ class MatrixCubeApp {
 
     this.isGameStarted = false;
     recordManager.resetTimer();
-    const timerEl = document.getElementById('label-timer');
-    if (timerEl) timerEl.innerText = recordManager.isFreeMode() ? t('status.timerOff') : '⏱️ 00:00.0';
+    this.updateTimerDisplay();
 
     this.moveHistory = [];
     this.movesCount = 0;
@@ -513,14 +508,21 @@ class MatrixCubeApp {
     this.scrambleBoard();
   }
 
-  private updateTimerModeUI() {
-    const isFree = recordManager.isFreeMode();
+  private updateTimerDisplay() {
     const timerEl = document.getElementById('label-timer');
-    if (timerEl) {
-      timerEl.title = isFree ? t('status.timerTooltipOff') : t('status.timerTooltipOn');
-      timerEl.classList.toggle('timer-off', isFree);
-      timerEl.classList.toggle('timer-active', !isFree);
-      timerEl.innerText = isFree ? t('status.timerOff') : `⏱️ ${this.isGameStarted ? recordManager.getFormattedTime() : '00:00.0'}`;
+    if (!timerEl) return;
+    const isActive = recordManager.isTimerActive();
+
+    timerEl.classList.toggle('timer-active', isActive);
+    timerEl.classList.toggle('timer-off', !isActive);
+
+    if (isActive) {
+      timerEl.title = t('status.timerTooltipOn');
+      const timeText = this.isGameStarted ? recordManager.getFormattedTime() : '00:00.0';
+      timerEl.innerText = `⏱️ ${timeText}`;
+    } else {
+      timerEl.title = t('status.timerTooltipOff');
+      timerEl.innerText = t('status.timerOff');
     }
   }
 
@@ -776,10 +778,15 @@ class MatrixCubeApp {
       if (recordHistory) {
         if (!this.isGameStarted) {
           this.isGameStarted = true;
-          recordManager.startTimer((formatted) => {
-            const timerEl = document.getElementById('label-timer');
-            if (timerEl) timerEl.innerText = recordManager.isFreeMode() ? t('status.timerOff') : `⏱️ ${formatted}`;
-          });
+          if (recordManager.isTimerActive()) {
+            recordManager.startTimer((formatted) => {
+              const timerEl = document.getElementById('label-timer');
+              if (timerEl && recordManager.isTimerActive()) {
+                timerEl.innerText = `⏱️ ${formatted}`;
+              }
+            });
+          }
+          this.updateTimerDisplay();
         }
 
         this.moveHistory.push({ lineId, op, prevOps });
@@ -808,8 +815,7 @@ class MatrixCubeApp {
     solutionInlinePanel.close();
     this.isGameStarted = false;
     recordManager.resetTimer();
-    const timerEl = document.getElementById('label-timer');
-    if (timerEl) timerEl.innerText = recordManager.isFreeMode() ? t('status.timerOff') : '⏱️ 00:00.0';
+    this.updateTimerDisplay();
 
     const ops = generateExactKScramble(
       this.scrambleMoves,
@@ -937,10 +943,11 @@ class MatrixCubeApp {
     if (isWin) {
       // 1. 타이머 정지 및 기록 저장 & 최고 기록 갱신 여부 판정
       this.isGameStarted = false;
-      const isFree = recordManager.isFreeMode();
       const elapsedMs = recordManager.stopTimer();
-      const timeFormatted = isFree ? t('status.timerOff') : `⏱️ ${recordManager.getFormattedTime()}`;
+      const isActive = recordManager.isTimerActive();
+      const timeFormatted = isActive ? `⏱️ ${recordManager.getFormattedTime()}` : t('status.timerOff');
       const saveResult = recordManager.saveRecord(this.boardSize, this.scrambleMoves, elapsedMs, this.movesCount);
+      this.updateTimerDisplay();
       this.updateBestRecordBadge();
 
       // 2. 신나는 다성부 승리 팡파르 + 마법 차임벨 사운드
@@ -965,7 +972,7 @@ class MatrixCubeApp {
         stars,
         {
           timeFormatted,
-          isNewBestTime: isFree ? false : saveResult.isNewBestTime,
+          isNewBestTime: isActive ? saveResult.isNewBestTime : false,
           isNewBestMoves: saveResult.isNewBestMoves,
           bestTimeFormatted: saveResult.bestTimeMs !== null ? formatTime(saveResult.bestTimeMs) : '-',
           bestMoves: saveResult.bestMoves
