@@ -286,4 +286,30 @@ describe('FormulaModalController (공식 비법서 모달 및 인터랙티브 �
     controller.close();
     expect(controller.isOpen()).toBe(false);
   });
+  it('16. D4 신규 마스터 공식 3선 (d4-diamond-cross-3, d4-l-diag-combo-3, d4-x-cross-3) 모달 인터랙티브 제어 및 스텝 시뮬레이션 검증', () => {
+    controller.open('d4-diamond-cross-3');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+
+    controller.selectFormula('d4-l-diag-combo-3');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+
+    controller.selectFormula('d4-x-cross-3');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+
+    controller.setCategory('god-number');
+    expect(controller.isOpen()).toBe(true);
+
+    controller.close();
+    expect(controller.isOpen()).toBe(false);
+  });
 });
+

@@ -338,10 +338,10 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
 
   it('18. 실전 빈출 2수 피니시 TOP 3 공식 카테고리(god-number, godTechnique) 및 총 공식 개수 검증', () => {
     const godNumberFormulas = getFormulasByCategory('god-number');
-    expect(godNumberFormulas.length).toBe(11);
-    expect(godNumberFormulas.some((f) => f.id === 'diamond-cross-3m')).toBe(true);
-    expect(godNumberFormulas.some((f) => f.id === 'l-diag-cascade-3m')).toBe(true);
-    expect(godNumberFormulas.some((f) => f.id === 'x-cross-3m')).toBe(true);
+    expect(godNumberFormulas.length).toBe(8);
+    expect(godNumberFormulas.some((f) => f.id === 'd4-diamond-cross-3')).toBe(true);
+    expect(godNumberFormulas.some((f) => f.id === 'd4-l-diag-combo-3')).toBe(true);
+    expect(godNumberFormulas.some((f) => f.id === 'd4-x-cross-3')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'quad-corner-finish')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'diagonal-spine-flush')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'finish-l-shape-5')).toBe(true);
@@ -513,54 +513,53 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     expect(godTech.some((f) => f.id === 'diagonal-spine-flush')).toBe(true);
   });
 
-  it('28. [마스터 공식: diamond-cross-3m] 다이아몬드 십자 3수 파괴 공식 메타데이터 및 등록 검증', () => {
-    const f = getFormulaById('diamond-cross-3m');
+  it('28. [D4 마스터 공식: d4-diamond-cross-3] D4 다이아몬드 십자 3수 폭파 메타데이터 및 등록 검증', () => {
+    const f = getFormulaById('d4-diamond-cross-3');
     expect(f).toBeDefined();
-    expect(f?.id).toBe('diamond-cross-3m');
+    expect(f?.id).toBe('d4-diamond-cross-3');
     expect(f?.category).toBe('god-number');
-    expect(f?.difficulty).toBe(4);
+    expect(f?.difficulty).toBe(3);
     expect(f?.steps?.length).toBe(4); // 0 + 3수
     expect(f?.tags).toContain('다이아몬드 십자');
     expect(f?.isInteractive).toBe(true);
   });
 
-  it('29. [마스터 공식: diamond-cross-3m] 단계별 인터랙티브 시뮬레이션 및 전 타일 All-ID 올클리어 검증', () => {
-    const f = getFormulaById('diamond-cross-3m')!;
+  it('29. [D4 마스터 공식: d4-diamond-cross-3] 단계별 인터랙티브 시뮬레이션 및 전 타일 All-ID 올클리어 검증', () => {
+    const f = getFormulaById('d4-diamond-cross-3')!;
     expect(f).toBeDefined();
 
-    // 0단계: 십자 에지(1, 3, 5, 7)와 대각 모서리 얽힘
+    // 0단계: 상하 날개(1, 7번: MX), 좌우 날개(3, 5번: R180), 중심(4번: MX)
     const s0 = f.steps![0].boardOps;
-    expect(s0[1]).toBe(D4.MY);
-    expect(s0[3]).toBe(D4.MX);
-    expect(s0[4]).toBe(D4.MAD);
-    expect(s0[5]).toBe(D4.MX);
-    expect(s0[7]).toBe(D4.MY);
-    expect(s0[0]).toBe(D4.MD);
-    expect(s0[8]).toBe(D4.MD);
+    expect(s0[1]).toBe(D4.MX);
+    expect(s0[7]).toBe(D4.MX);
+    expect(s0[3]).toBe(D4.R180);
+    expect(s0[5]).toBe(D4.R180);
+    expect(s0[4]).toBe(D4.MX);
+    expect([0, 2, 6, 8].every((idx) => s0[idx] === D4.ID)).toBe(true);
 
-    // 1수: 2행 MX -> 3, 5번 셀 ID, 4번 셀 R90
+    // 1수: 2행 R90 -> 3, 5번 셀 R270, 4번 셀 MD
     const s1 = f.steps![1].boardOps;
-    expect(s1[3]).toBe(D4.ID);
-    expect(s1[5]).toBe(D4.ID);
-    expect(s1[4]).toBe(D4.R90);
+    expect(s1[3]).toBe(D4.R270);
+    expect(s1[5]).toBe(D4.R270);
+    expect(s1[4]).toBe(D4.MD);
 
-    // 2수: 2열 MY -> 1, 7번 셀 ID, 4번 셀 MD (주대각 0, 4, 8번 모두 MD로 동기화)
+    // 2수: 2열 MX -> 1, 7번 셀 ID 복구, 4번 셀 MD ∘ MX = R270 (2행 3, 4, 5번 모두 R270으로 완전 동기화!)
     const s2 = f.steps![2].boardOps;
     expect(s2[1]).toBe(D4.ID);
     expect(s2[7]).toBe(D4.ID);
-    expect(s2[0]).toBe(D4.MD);
-    expect(s2[4]).toBe(D4.MD);
-    expect(s2[8]).toBe(D4.MD);
+    expect(s2[3]).toBe(D4.R270);
+    expect(s2[4]).toBe(D4.R270);
+    expect(s2[5]).toBe(D4.R270);
 
-    // 3수: 주대각 MD -> MD² = ID 소거, 전 타일 100% All-ID 클리어
+    // 3수: 2행 R90 -> R270 ∘ R90 = ID 소거, 전 타일 100% All-ID 클리어
     const s3 = f.steps![3].boardOps;
     expect(s3.every((op) => op === D4.ID)).toBe(true);
   });
 
-  it('30. [마스터 공식: l-diag-cascade-3m] ㄱ자 사선연계 3수 공식 메타데이터 및 등록 검증', () => {
-    const f = getFormulaById('l-diag-cascade-3m');
+  it('30. [D4 마스터 공식: d4-l-diag-combo-3] D4 ㄱ자 사선연계 3수 올킬 메타데이터 및 등록 검증', () => {
+    const f = getFormulaById('d4-l-diag-combo-3');
     expect(f).toBeDefined();
-    expect(f?.id).toBe('l-diag-cascade-3m');
+    expect(f?.id).toBe('d4-l-diag-combo-3');
     expect(f?.category).toBe('god-number');
     expect(f?.difficulty).toBe(3);
     expect(f?.steps?.length).toBe(4); // 0 + 3수
@@ -568,78 +567,96 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     expect(f?.isInteractive).toBe(true);
   });
 
-  it('31. [마스터 공식: l-diag-cascade-3m] 단계별 인터랙티브 시뮬레이션 및 전 타일 All-ID 올클리어 검증', () => {
-    const f = getFormulaById('l-diag-cascade-3m')!;
+  it('31. [D4 마스터 공식: d4-l-diag-combo-3] 단계별 인터랙티브 시뮬레이션 및 전 타일 All-ID 올클리어 검증', () => {
+    const f = getFormulaById('d4-l-diag-combo-3')!;
     expect(f).toBeDefined();
 
-    // 0단계
+    // 0단계: 1행(0, 1번: R180)과 3열(2, 5, 8번: MD)
     const s0 = f.steps![0].boardOps;
     expect(s0[0]).toBe(D4.R180);
-    expect(s0[1]).toBe(D4.MY);
-    expect(s0[2]).toBe(D4.R270);
-    expect(s0[3]).toBe(D4.MX);
-    expect(s0[4]).toBe(D4.MAD);
-    expect(s0[6]).toBe(D4.R90);
+    expect(s0[1]).toBe(D4.R180);
+    expect(s0[2]).toBe(D4.MD);
+    expect(s0[5]).toBe(D4.MD);
+    expect(s0[8]).toBe(D4.MD);
+    expect([3, 4, 6, 7].every((idx) => s0[idx] === D4.ID)).toBe(true);
 
-    // 1수: 1행 MY
+    // 1수: 1행 R90 -> 0, 1번 셀 R270, 코너 2번 셀 MD ∘ R90 = MY
     const s1 = f.steps![1].boardOps;
-    expect(s1[1]).toBe(D4.ID);
-    expect(s1[0]).toBe(D4.MX);
-    expect(s1[2]).toBe(D4.MAD);
+    expect(s1[0]).toBe(D4.R270);
+    expect(s1[1]).toBe(D4.R270);
+    expect(s1[2]).toBe(D4.MY);
 
-    // 2수: 1열 MX -> 부대각선(2, 4, 6)이 모두 MAD로 통일
+    // 2수: 3열 MD -> 5, 8번 타일 MD² = ID 복구, 코너 2번 타일 MY ∘ MD = R270 (1행 전체 0, 1, 2번이 R270으로 완전 동기화!)
     const s2 = f.steps![2].boardOps;
-    expect(s2[0]).toBe(D4.ID);
-    expect(s2[3]).toBe(D4.ID);
-    expect(s2[2]).toBe(D4.MAD);
-    expect(s2[4]).toBe(D4.MAD);
-    expect(s2[6]).toBe(D4.MAD);
+    expect(s2[5]).toBe(D4.ID);
+    expect(s2[8]).toBe(D4.ID);
+    expect(s2[0]).toBe(D4.R270);
+    expect(s2[1]).toBe(D4.R270);
+    expect(s2[2]).toBe(D4.R270);
 
-    // 3수: 부대각 MAD -> MAD² = ID 소거, 전 타일 100% All-ID 클리어
+    // 3수: 1행 R90 -> R270 ∘ R90 = ID 소거, 전 타일 100% All-ID 클리어
     const s3 = f.steps![3].boardOps;
     expect(s3.every((op) => op === D4.ID)).toBe(true);
   });
 
-  it('32. [마스터 공식: x-cross-3m] X-크로스 3수 공식 메타데이터 및 등록 검증', () => {
-    const f = getFormulaById('x-cross-3m');
+  it('32. [D4 마스터 공식: d4-x-cross-3] D4 X-크로스 모서리동시 3수 폭파 메타데이터 및 등록 검증', () => {
+    const f = getFormulaById('d4-x-cross-3');
     expect(f).toBeDefined();
-    expect(f?.id).toBe('x-cross-3m');
+    expect(f?.id).toBe('d4-x-cross-3');
     expect(f?.category).toBe('god-number');
-    expect(f?.difficulty).toBe(3);
+    expect(f?.difficulty).toBe(4);
     expect(f?.steps?.length).toBe(4); // 0 + 3수
     expect(f?.tags).toContain('X-크로스');
     expect(f?.isInteractive).toBe(true);
   });
 
-  it('33. [마스터 공식: x-cross-3m] 단계별 인터랙티브 시뮬레이션 및 전 타일 All-ID 올클리어 검증', () => {
-    const f = getFormulaById('x-cross-3m')!;
+  it('33. [D4 마스터 공식: d4-x-cross-3] 단계별 인터랙티브 시뮬레이션 및 전 타일 All-ID 올클리어 검증', () => {
+    const f = getFormulaById('d4-x-cross-3')!;
     expect(f).toBeDefined();
 
-    // 0단계: 4코너 X자 대칭과 2행 날개
+    // 0단계: 4개 코너(0, 2, 6, 8번: R270)와 중심(4번: R90), 십자 날개 4개(ID)
     const s0 = f.steps![0].boardOps;
-    expect(s0[0]).toBe(D4.MD);
-    expect(s0[2]).toBe(D4.MAD);
-    expect(s0[3]).toBe(D4.R180);
-    expect(s0[5]).toBe(D4.R180);
-    expect(s0[6]).toBe(D4.MAD);
-    expect(s0[8]).toBe(D4.MD);
+    expect(s0[0]).toBe(D4.R270);
+    expect(s0[2]).toBe(D4.R270);
+    expect(s0[6]).toBe(D4.R270);
+    expect(s0[8]).toBe(D4.R270);
+    expect(s0[4]).toBe(D4.R90);
+    expect([1, 3, 5, 7].every((idx) => s0[idx] === D4.ID)).toBe(true);
 
-    // 1수: 주대각 MD -> 0, 8번 ID, 4번 MD
+    // 1수: 2열 R270 -> 중심 4번 R90 ∘ R270 = ID 즉시 복구, 1, 7번 R270 (1행과 3행이 각각 완전한 R270 라인으로 정렬!)
     const s1 = f.steps![1].boardOps;
-    expect(s1[0]).toBe(D4.ID);
-    expect(s1[8]).toBe(D4.ID);
-    expect(s1[4]).toBe(D4.MD);
+    expect(s1[4]).toBe(D4.ID);
+    expect(s1[0]).toBe(D4.R270);
+    expect(s1[1]).toBe(D4.R270);
+    expect(s1[2]).toBe(D4.R270);
+    expect(s1[6]).toBe(D4.R270);
+    expect(s1[7]).toBe(D4.R270);
+    expect(s1[8]).toBe(D4.R270);
 
-    // 2수: 부대각 MAD -> 2, 6번 ID, 4번 R180 변환 (2행 전체 3, 4, 5번이 R180으로 동기화)
+    // 2수: 3행 R90 -> 3행 전체(6, 7, 8번) R270 ∘ R90 = ID 일괄 소거
     const s2 = f.steps![2].boardOps;
-    expect(s2[2]).toBe(D4.ID);
     expect(s2[6]).toBe(D4.ID);
-    expect(s2[3]).toBe(D4.R180);
-    expect(s2[4]).toBe(D4.R180);
-    expect(s2[5]).toBe(D4.R180);
+    expect(s2[7]).toBe(D4.ID);
+    expect(s2[8]).toBe(D4.ID);
 
-    // 3수: 2행 R180 -> R180² = ID 소거, 전 타일 100% All-ID 클리어
+    // 3수: 1행 R90 -> 1행 전체(0, 1, 2번) R270 ∘ R90 = ID 일괄 소거, 전 타일 100% All-ID 클리어
     const s3 = f.steps![3].boardOps;
     expect(s3.every((op) => op === D4.ID)).toBe(true);
   });
+
+  it('34. D4 신규 마스터 공식 3선 i18n 번역 키 및 god-number 카테고리 등록 검증', async () => {
+    const { translations } = await import('../i18n/translations');
+    expect(translations.ko['formula.item.d4DiamondCross3.title']).toContain('다이아몬드 십자');
+    expect(translations.en['formula.item.d4DiamondCross3.title']).toContain('Diamond Cross');
+    expect(translations.ko['formula.item.d4LDiagCombo3.title']).toContain('ㄱ자 사선연계');
+    expect(translations.en['formula.item.d4LDiagCombo3.title']).toContain('L-Diagonal');
+    expect(translations.ko['formula.item.d4XCross3.title']).toContain('X-크로스');
+    expect(translations.en['formula.item.d4XCross3.title']).toContain('X-Cross');
+
+    const godNumberFormulas = getFormulasByCategory('god-number');
+    expect(godNumberFormulas.some((f) => f.id === 'd4-diamond-cross-3')).toBe(true);
+    expect(godNumberFormulas.some((f) => f.id === 'd4-l-diag-combo-3')).toBe(true);
+    expect(godNumberFormulas.some((f) => f.id === 'd4-x-cross-3')).toBe(true);
+  });
 });
+
