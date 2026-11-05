@@ -564,7 +564,167 @@ const basicsSelfInverseSteps = createInteractiveSteps(emptyBoard, [
   }
 ]);
 
+// 8. [3단계 마스터 일반 해법 인터랙티브 스텝]
+// 초기 상태: 외곽 소거, 반사 정리, 피니시 대상이 섞여 있는 스크램블
+const master3StepInitialBoard: D4Op[] = [
+  D4.MX, D4.MX, D4.R180,
+  D4.R180, D4.R180, D4.MX,
+  D4.ID, D4.ID, D4.MY
+];
+
+const masterMethod3StepSteps = createInteractiveSteps(master3StepInitialBoard, [
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.MX,
+    actionDescKo: '1단계: 1행 상하 반전 (외곽 1행 소거)',
+    actionDescEn: 'Step 1: Row 1 Vertical Flip (Outer Row 1 Reduction)',
+    mathInsightKo: '가장 먼저 외곽 라인을 맞춰 0번, 1번 타일을 항등원(ID)으로 즉시 소거합니다.',
+    mathInsightEn: 'Align boundary lines first, immediately resolving tiles 0 and 1 to Identity (ID).',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '1단계: 외곽 소거',
+    formulaText: 'Row₁ ➔ MX',
+    formulaDesc: '외곽 타일을 먼저 맞추어 미해결 영역을 중앙과 특정 열로 좁힙니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 2,
+    op: D4.MY,
+    actionDescKo: '2단계: 3열 좌우 반전 (반사 성분 짝맞춤 정리)',
+    actionDescEn: 'Step 2: Col 3 Horizontal Flip (Reflection Parity Cleanup)',
+    mathInsightKo: '직교 반사(MY)를 합성하여 뒤집힌 외곽 타일(2번, 8번)을 정리하고 남은 타일을 순수 회전으로 수렴시킵니다.',
+    mathInsightEn: 'Compose orthogonal reflection (MY) to clean outer tiles (2, 8) and convert remaining tiles into pure rotations.',
+    highlightCells: [2, 5, 8],
+    formulaBadge: '2단계: 반사 정리',
+    formulaText: 'Col₃ ➔ MY',
+    formulaDesc: '반사 성분을 정리하여 외곽을 모두 맞추고 마지막 1개 라인으로 피니시 환경을 구축합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 1,
+    op: D4.R180,
+    actionDescKo: '3단계: 2행 180° 회전 (피니시 공식 올클리어)',
+    actionDescEn: 'Step 3: Row 2 Rotate 180° (Surgical Finish Formula)',
+    mathInsightKo: 'R180의 위수 2 자기상쇄(Involution)를 이용하여 남은 2행 전체를 0번(ID)으로 올클리어!',
+    mathInsightEn: 'Utilize order-2 self-inverse of R180 to finish the entire remaining line into 100% ID!',
+    highlightCells: [3, 4, 5],
+    formulaBadge: '3단계: 피니시 공식',
+    formulaText: 'Row₂ ➔ R180 ➔ 100% 클리어',
+    formulaDesc: '남아있는 고립 라인/타일에 피니시 공식을 적용하여 퍼즐을 완벽하게 완성합니다!'
+  }
+]);
+
+// 9. [90° 회전 패리티 법칙 & 3-Cycle 인터랙티브 스텝]
+const parity90CycleSteps = createInteractiveSteps(emptyBoard, [
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.R90,
+    actionDescKo: '1수: 1행 90° 시계 회전 (3개 타일 동시 발생)',
+    actionDescEn: 'Move 1: Row 1 Rotate 90° (3 Tiles Triplet Generated)',
+    mathInsightKo: '90° 회전은 단독 1개나 2개만 생길 수 없으며, 반드시 최소 3개 단위(3-Cycle)로 발생합니다.',
+    mathInsightEn: '90° rotation can never occur on isolated 1 or 2 tiles; it always occurs in units of at least 3 tiles (3-Cycle).',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '1수: 90° 3-Cycle 발생',
+    formulaText: 'Row₁ ➔ R90',
+    formulaDesc: '1행 3개 타일에 90° 회전이 동시에 부여되어 최소 회전 단위 패리티를 증명합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 2,
+    op: D4.R270,
+    actionDescKo: '2수: 3행 270° 회전 (90° + 270° 상쇄쌍 형성)',
+    actionDescEn: 'Move 2: Row 3 Rotate 270° (90° + 270° Cancellation Pair)',
+    mathInsightKo: '1행(+90°)과 3행(-90°/270°)의 회전각 합은 360° ≡ 0°이 되어 전체 패리티 보존 상쇄쌍을 이룹니다.',
+    mathInsightEn: 'The sum of Row 1 (+90°) and Row 3 (270° / -90°) equals 360° ≡ 0°, forming a conserved parity pair.',
+    highlightCells: [6, 7, 8],
+    formulaBadge: '2수: 상쇄쌍 형성',
+    formulaText: 'Row₃ ➔ R270',
+    formulaDesc: '+90°와 +270°가 결합하여 큐브 전체 각도 불변량을 만족하는 상쇄쌍을 형성합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.R270,
+    actionDescKo: '3수: 1행 270° 역회전 (90° 3개 원샷 3-Cycle 해결)',
+    actionDescEn: 'Move 3: Row 1 Rotate 270° (90° Triplet One-Shot 3-Cycle Clear)',
+    mathInsightKo: 'R90 ∘ R270 = ID 성질로 1행 3개 타일이 단 1수로 동시 해결됩니다!',
+    mathInsightEn: 'Via R90 ∘ R270 = ID, the 3 tiles of Row 1 resolve simultaneously in a single stroke!',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '3수: 90° 3개 원샷 해결',
+    formulaText: 'Row₁ ➔ R270 ➔ ID',
+    formulaDesc: '1행 3개 타일이 90° 역원 조작으로 즉시 0번(ID)으로 올클리어 복원됩니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 2,
+    op: D4.R90,
+    actionDescKo: '4수: 3행 90° 회전 (상쇄쌍 잔여 타일 올클리어 완성)',
+    actionDescEn: 'Move 4: Row 3 Rotate 90° (Cancellation Pair Final Full Clear)',
+    mathInsightKo: 'R270 ∘ R90 = ID로 3행 타일까지 모두 0번으로 복원되어 전 타일 완전 클리어!',
+    mathInsightEn: 'Via R270 ∘ R90 = ID, Row 3 fully restores to ID, completing 100% board clearance!',
+    highlightCells: [6, 7, 8],
+    formulaBadge: '4수: 전 타일 복원',
+    formulaText: 'Row₃ ➔ R90 ➔ 100% 클리어',
+    formulaDesc: '상쇄쌍의 반대편 270° 타일들까지 모두 회수되어 보드가 완전 해결됩니다.'
+  }
+]);
+
 export const FORMULAS: FormulaItem[] = [
+  {
+    id: 'master-method-3step',
+    titleKo: '3단계 마스터 일반 해법',
+    titleEn: '3-Step Master General Method',
+    category: 'beginner',
+    badgeKo: '3단계 일반 해법',
+    badgeEn: '3-Step Method',
+    difficulty: 2,
+    formulaSeq: '1단계 외곽소거 ➔ 2단계 반사정리 ➔ 3단계 피니시 공식',
+    summaryKo: '수백 개의 공식을 외울 필요 없이 [1단계: 외곽 소거] ➔ [2단계: 반사 정리] ➔ [3단계: 피니시 공식] 단 3단계 구조화 해법으로 어떤 스크램블이든 100% 풀어내는 갈루아 큐브의 정석 마스터 해법입니다.',
+    summaryEn: 'No need to memorize hundreds of formulas: solve any scrambled state via [Step 1: Outer Reduction] ➔ [Step 2: Reflection Cleanup] ➔ [Step 3: Surgical Finish Formula].',
+    diagramType: 'interactive',
+    steps: masterMethod3StepSteps,
+    latexFormula: '\\text{State} \\xrightarrow{\\text{Outer Reduction}} \\text{Clean Boundary} \\xrightarrow{\\text{Reflection Conjugation}} \\text{Pure Rotation} \\xrightarrow{\\text{Finish Commutator}} \\text{ID}',
+    notesKo: [
+      '1단계 [외곽 소거]: 외곽 행과 열을 우선적으로 스와이프하여 모서리 타일들을 일치시킵니다. 다른 영역이 흐트러지는 것을 두려워하지 마세요.',
+      '2단계 [반사 정리]: 뒷면(거울 반사) 타일들을 직교 반사(MX, MY) 짝맞춤을 통해 앞면(순수 회전) 상태로 승화시킵니다.',
+      '3단계 [피니시 공식]: 남은 1~3개의 국소 타일은 중심 180° 반전 공식, 180° 쌍 상쇄 공식, 또는 3-Cycle 교환자로 깔끔하게 마무리합니다.'
+    ],
+    notesEn: [
+      'Step 1 [Outer Reduction]: Align outer rows and columns first. Do not fear temporary disturbances in untouched areas.',
+      'Step 2 [Reflection Cleanup]: Pair perpendicular reflections (MX, MY) to flip mirror tiles into pure rotations.',
+      'Step 3 [Finish Formulas]: Resolve the remaining 1-3 isolated tiles using Center Inversion, 180° Pair, or 3-Cycle Commutator.'
+    ],
+    tags: ['마스터 해법', '일반 해법', '3단계 공략', '초보자 추천', '외곽소거', '구조적 해법'],
+    isInteractive: true
+  },
+  {
+    id: 'parity-90-cycle',
+    titleKo: '90° 회전 패리티 법칙 & 3-Cycle 해법',
+    titleEn: '90° Rotation Parity Law & 3-Cycle Solution',
+    category: 'intermediate',
+    badgeKo: '90° 패리티 법칙',
+    badgeEn: '90° Parity & 3-Cycle',
+    difficulty: 3,
+    formulaSeq: '90° 1개/2개 ➔ 불가능(패리티 위반), 90° 3개 ➔ 3-Cycle 가능, 90°+270° ➔ 상쇄쌍',
+    summaryKo: '갈루아 큐브에서 90° 회전 타일은 1개나 2개만 단독으로 존재할 수 없으며(패리티 위반), 반드시 [3개 동시 순환(3-Cycle)] 또는 [90° + 270° 상쇄쌍] 형태로만 존재합니다. 3-Cycle 원샷 조작으로 완벽하게 해결할 수 있습니다.',
+    summaryEn: 'Isolated 1 or 2 90° rotated tiles are mathematically impossible in Galois Cube due to parity laws. 90° rotations always exist as [3-Cycle Triplets] or [90° + 270° Cancellation Pairs], resolvable in one shot.',
+    diagramType: 'interactive',
+    steps: parity90CycleSteps,
+    latexFormula: '\\sum_{k} \\theta_k \\equiv 0 \\pmod{360^\\circ} \\quad (\\text{Parity Conservation})',
+    notesKo: [
+      'Q: "90° 회전된 타일이 딱 1개(또는 2개)만 남았는데 버그인가요?" ➔ A: 패리티 불변량 법칙상 정상적인 조작에서는 1개/2개 90° 상태가 절대 생길 수 없습니다. 반드시 다른 타일의 회전(270° 등)이나 반사가 쌍으로 숨어 있습니다!',
+      '90° + 270° 상쇄쌍 원리: +90° 회전과 +270°(-90°) 회전의 합은 360° ≡ 0°으로 큐브 전체 각도 패리티를 완벽히 보존합니다.',
+      '3-Cycle 원샷 해결: 같은 라인에 위치한 90° 타일 3개는 단 1수의 역회전(R270)으로 한 방에 올클리어됩니다.'
+    ],
+    notesEn: [
+      'Q: "Is it a bug if only 1 or 2 tiles are 90° rotated?" ➔ A: Parity laws strictly forbid isolated 1 or 2 90° tiles in valid states. A paired rotation (like 270°) or reflection is always present!',
+      '90° + 270° Cancellation Pair: +90° and +270° (-90°) sum to 360° ≡ 0°, strictly conserving the global angular parity.',
+      '3-Cycle One-Shot Clear: Three 90° tiles on the same line are instantly resolved with a single reverse rotation (R270).'
+    ],
+    tags: ['패리티 법칙', '90도 공식', '3-Cycle', '상쇄쌍', '군론 불변량', '원샷 해법'],
+    isInteractive: true
+  },
   {
     id: 'center-inversion',
     titleKo: '중심 타일 180° 반전 공식',

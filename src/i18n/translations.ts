@@ -381,7 +381,45 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.v4Conquest.step1': 'Move 1: Row 3 R180 (Double tap Row 3)',
     'formula.item.v4Conquest.step2': 'Move 2: Col 3 MY (Vertical swipe Col 3)',
     'formula.item.v4Conquest.step3': 'Move 3: Row 2 MY (Horizontal swipe Row 2)',
-    'formula.item.v4Conquest.step4': 'Move 4: Row 1 R180 (Double tap Row 1) ➔ Board All-Clear (0 ID)!'
+    'formula.item.v4Conquest.step4': 'Move 4: Row 1 R180 (Double tap Row 1) ➔ Board All-Clear (0 ID)!',
+
+    'formula.item.masterMethod3Step.title': '3-Step Master General Method',
+    'formula.item.masterMethod3Step.subtitle': 'Structure-based 3-step master guide without memorizing hundreds of cases',
+    'formula.item.masterMethod3Step.desc': 'A canonical master algorithm that solves any scrambled state in 3 structured phases: [Step 1: Outer Reduction] ➔ [Step 2: Reflection Parity Cleanup] ➔ [Step 3: Surgical Finish Formula].',
+    'formula.item.masterMethod3Step.tip': 'Align outer rows and columns first without fearing temporary disturbances. Pair perpendicular reflections (MX, MY) to flip mirror tiles into pure rotations, then finish with surgical commutators.',
+    'formula.item.masterMethod3Step.step0': 'Initial State: Mixed scramble with outer, reflection, and finish components',
+    'formula.item.masterMethod3Step.step1': 'Step 1: Row 1 MX (Outer row reduction) ➔ Clear boundary tiles 0 and 1 to ID',
+    'formula.item.masterMethod3Step.step2': 'Step 2: Col 3 MY (Reflection parity cleanup) ➔ Outer tiles resolve, leaving clean finish line',
+    'formula.item.masterMethod3Step.step3': 'Step 3: Row 2 R180 (Surgical finish formula) ➔ 100% Full board all-clear!',
+
+    'formula.item.parity90Cycle.title': '90° Rotation Parity Law & 3-Cycle Solution',
+    'formula.item.parity90Cycle.subtitle': 'Angular parity invariant and 3-cycle triplet one-shot clearance',
+    'formula.item.parity90Cycle.desc': 'Due to dihedral parity laws, 90° rotated tiles can never exist in isolation (1 or 2 tiles are strictly forbidden). 90° rotations always occur as a triplet (3-Cycle) or as a 90° + 270° cancellation pair (summing to 360° ≡ 0°).',
+    'formula.item.parity90Cycle.tip': 'If you think only one 90° tile remains, inspect closely: there must be a paired rotation or reflection. Use 3-Cycle or reverse rotation (R270) to clear triplets in one single stroke.',
+    'formula.item.parity90Cycle.step0': 'Initial State: Solved board (ID) for parity demonstration',
+    'formula.item.parity90Cycle.step1': 'Move 1: Row 1 R90 ➔ Generates 3-cycle triplet on Row 1 (proves 3-tile minimum)',
+    'formula.item.parity90Cycle.step2': 'Move 2: Row 3 R270 ➔ 90° + 270° pair forms global angle parity conservation',
+    'formula.item.parity90Cycle.step3': 'Move 3: Row 1 R270 ➔ 3-cycle triplet resolved in one shot (R90 ∘ R270 = ID)',
+    'formula.item.parity90Cycle.step4': 'Move 4: Row 3 R90 ➔ Cancellation pair companion resolved, 100% board clearance!',
+
+    'formula.item.parallel180Pair.title': 'Parallel 180° Pair Cancellation',
+    'formula.item.parallel180Pair.subtitle': 'Orthogonal bridge trick resolving two 180° flips in the same line',
+    'formula.item.parallel180Pair.desc': 'When two 180° flipped tiles appear side-by-side in the same row, flipping Column 3 via MX serves as an orthogonal bridge. Applying Row 1 R180 cleanly cancels the 180° pair back to identity without disturbing other tiles.',
+    'formula.item.parallel180Pair.tip': 'When only two 180° rotations remain in the same row, utilize Column 3 reflection to safely eliminate the pair in just 3 moves.',
+    'formula.item.parallel180Pair.step0': 'Initial State: Two 180° flipped tiles in Row 1 (cells 0 and 1)',
+    'formula.item.parallel180Pair.step1': 'Move 1: Col 3 MX (Vertical flip creates orthogonal intersection)',
+    'formula.item.parallel180Pair.step2': 'Move 2: Row 1 R180 (Cancels tiles 0 & 1 via R180² = ID)',
+    'formula.item.parallel180Pair.step3': 'Move 3: Col 3 MX (Restores Col 3 via MX² = ID, pair eliminated!)',
+
+    'formula.item.diagonal180Pair.title': 'Diagonal Corner 180° Pair Elimination',
+    'formula.item.diagonal180Pair.subtitle': 'Diagonal conjugate trick simultaneously eliminating opposite corner 180° flips',
+    'formula.item.diagonal180Pair.desc': 'When opposite diagonal corners (cells 0 and 8) are flipped by 180°, applying main diagonal reflection (MD) combined with orthogonal 180° rotations eliminates both corner flips simultaneously in 4 moves.',
+    'formula.item.diagonal180Pair.tip': 'With diagonal moves enabled, opposite corner 180° pairs can be solved directly without touching the other 7 tiles.',
+    'formula.item.diagonal180Pair.step0': 'Initial State: Opposite diagonal corners (0 and 8) flipped by 180°',
+    'formula.item.diagonal180Pair.step1': 'Move 1: Main Diagonal MD (Transitions corners to MAD)',
+    'formula.item.diagonal180Pair.step2': 'Move 2: Row 1 R180 (Aligns top-left corner to MD)',
+    'formula.item.diagonal180Pair.step3': 'Move 3: Col 3 R180 (Aligns bottom-right corner to MD and restores cell 2)',
+    'formula.item.diagonal180Pair.step4': 'Move 4: Main Diagonal MD (Restores via MD² = ID: corners solved!)'
   },
 
   ko: {
@@ -713,7 +751,45 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.v4Conquest.step1': '1수: 3행 180° 회전 (R180 더블탭)',
     'formula.item.v4Conquest.step2': '2수: 3열 세로 반사 (MY 세로밀기)',
     'formula.item.v4Conquest.step3': '3수: 2행 세로 반사 (MY 세로밀기)',
-    'formula.item.v4Conquest.step4': '4수: 1행 180° 회전 (R180 더블탭) ➔ 전 타일 0번(ID) 올클리어!'
+    'formula.item.v4Conquest.step4': '4수: 1행 180° 회전 (R180 더블탭) ➔ 전 타일 0번(ID) 올클리어!',
+
+    'formula.item.masterMethod3Step.title': '3단계 마스터 일반 해법',
+    'formula.item.masterMethod3Step.subtitle': '수백 개 공식을 외울 필요 없는 구조적 3단계 마스터 가이드',
+    'formula.item.masterMethod3Step.desc': '수백 개의 복잡한 케이스를 외울 필요 없이, [1단계: 외곽 소거] ➔ [2단계: 반사 정리] ➔ [3단계: 피니시 공식] 단 3단계 구조화 해법으로 어떤 스크램블이든 100% 풀어내는 갈루아 큐브의 정석 마스터 해법입니다.',
+    'formula.item.masterMethod3Step.tip': '외곽 라인을 먼저 맞춰 흩어진 타일을 좁힌 뒤, 직교 반사(MX, MY) 짝맞춤으로 뒷면 타일을 앞면으로 승화시키고, 남은 고립 타일을 피니시 공식으로 깔끔하게 매듭지으세요.',
+    'formula.item.masterMethod3Step.step0': '초기 상태: 외곽 소거, 반사 정리, 피니시 대상이 섞여 있는 스크램블',
+    'formula.item.masterMethod3Step.step1': '1단계: 1행 상하 반전 (외곽 1행 소거) ➔ 0, 1번 타일 즉시 ID 소거',
+    'formula.item.masterMethod3Step.step2': '2단계: 3열 좌우 반전 (반사 성분 짝맞춤 정리) ➔ 외곽 타일 완벽 정렬 및 피니시 라인 형성',
+    'formula.item.masterMethod3Step.step3': '3단계: 2행 180° 회전 (피니시 공식 올클리어) ➔ 전 타일 100% ID 완성!',
+
+    'formula.item.parity90Cycle.title': '90° 회전 패리티 법칙 & 3-Cycle 해법',
+    'formula.item.parity90Cycle.subtitle': '각도 불변량 패리티 법칙과 90도 3개 원샷 3-Cycle 해법',
+    'formula.item.parity90Cycle.desc': '갈루아 큐브에서 90° 회전 타일은 1개나 2개만 단독으로 존재할 수 없으며(패리티 위반), 반드시 [3개 동시 순환(3-Cycle)] 또는 [90° + 270° 상쇄쌍] 형태로만 존재합니다. 3-Cycle 원샷 조작으로 완벽하게 해결할 수 있습니다.',
+    'formula.item.parity90Cycle.tip': '90° 타일이 1~2개만 남은 것처럼 보인다면 다른 타일의 회전(270° 등)이나 반사가 숨어 있습니다. 같은 라인의 90° 타일 3개는 역회전(R270) 단 1수로 동시 해결됩니다.',
+    'formula.item.parity90Cycle.step0': '초기 상태: 패리티 법칙 시연 보드',
+    'formula.item.parity90Cycle.step1': '1수: 1행 90° 시계 회전 ➔ 1행 3개 타일에 90° 발생 (최소 3개 단위 증명)',
+    'formula.item.parity90Cycle.step2': '2수: 3행 270° 회전 ➔ 90° + 270° 상쇄쌍 형성 (전체 각도 불변량 보존)',
+    'formula.item.parity90Cycle.step3': '3수: 1행 270° 역회전 ➔ 90° 3개 타일 원샷 3-Cycle 해결 (R90 ∘ R270 = ID)',
+    'formula.item.parity90Cycle.step4': '4수: 3행 90° 회전 ➔ 상쇄쌍 잔여 타일 올클리어 완성!',
+
+    'formula.item.parallel180Pair.title': '같은 줄 180° 쌍 상쇄 공식 (Parallel 180° Pair)',
+    'formula.item.parallel180Pair.subtitle': '직교 열 반사를 가교 삼아 같은 줄 180° 쌍을 단 3수만에 상쇄',
+    'formula.item.parallel180Pair.desc': '한 줄에 180° 회전 타일이 2개 나란히 남았을 때, 직교하는 3열의 임시 반사(MX)를 가교 삼아 1행 R180으로 잔여 쌍을 깔끔하게 0번(정위치)으로 상쇄하는 실전 비법입니다.',
+    'formula.item.parallel180Pair.tip': '한 줄에 180° 타일이 2개 고립되었을 때 3열 반사를 활용하면 다른 영역 손상 없이 3수만에 완전 해결됩니다.',
+    'formula.item.parallel180Pair.step0': '초기 상태: 1행의 0번, 1번 타일만 180° 회전된 상태',
+    'formula.item.parallel180Pair.step1': '1수: 3열 상하 반전 (MX 가로밀기로 교차 기점 확보)',
+    'formula.item.parallel180Pair.step2': '2수: 1행 180° 회전 (R180 더블탭으로 0, 1번 타일 즉시 ID 상쇄)',
+    'formula.item.parallel180Pair.step3': '3수: 3열 상하 반전 복원 (MX² = ID로 3열 원복, 180° 쌍 소거 완성!)',
+
+    'formula.item.diagonal180Pair.title': '대각선 모서리 180° 쌍 소거 공식 (Diagonal 180° Pair)',
+    'formula.item.diagonal180Pair.subtitle': '주대각선 사선 반사와 직교 회전을 결합해 양 끝 모서리 180°를 동시 소거',
+    'formula.item.diagonal180Pair.desc': '주대각선의 양 끝 모서리(0번, 8번)에 180° 회전이 쌍으로 남았을 때, 주대각선 사선 반사(MD)와 직교 회전들을 결합하여 두 모서리를 깔끔하게 동시 소거하는 고급 공식입니다.',
+    'formula.item.diagonal180Pair.tip': '대각선 옵션이 켜져 있을 때 양 끝 모서리의 180° 쌍을 단 4수 만에 완벽 소거할 수 있습니다.',
+    'formula.item.diagonal180Pair.step0': '초기 상태: 주대각선 양 끝 코너(0번, 8번)만 180° 회전된 상태',
+    'formula.item.diagonal180Pair.step1': '1수: 주대각선 사선 반사 (MD 사선밀기로 대각 축 켤레 변환 준비)',
+    'formula.item.diagonal180Pair.step2': '2수: 1행 180° 회전 (1행 1열 코너 타일 위상 정렬)',
+    'formula.item.diagonal180Pair.step3': '3수: 3열 180° 회전 (3행 3열 코너 위상 정렬 및 2번 셀 복구)',
+    'formula.item.diagonal180Pair.step4': '4수: 주대각선 사선 반사 복원 (MD² = ID로 모서리 180° 쌍 동시 소거 완성!)'
   }
 };
 

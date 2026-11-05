@@ -196,4 +196,18 @@ describe('FormulaModalController (공식 비법서 모달 및 인터랙티브 �
     closeFormulaModal();
     expect(formulaModalController.isOpen()).toBe(false);
   });
+
+  it('11. 신규 마스터 공식(master-method-3step, parity-90-cycle) 모달 열기 및 스텝 조작 검증', () => {
+    controller.open('master-method-3step');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(3);
+
+    controller.selectFormula('parity-90-cycle');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(2);
+    controller.setStep(4);
+    controller.close();
+    expect(controller.isOpen()).toBe(false);
+  });
 });

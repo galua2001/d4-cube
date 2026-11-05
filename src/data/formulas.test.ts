@@ -112,70 +112,142 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     expect(composeOps(D4.R180, D4.R180)).toBe(D4.ID);
   });
 
-  it('8. 신규 공식: 같은 줄 180° 쌍 상쇄 공식(row-two-180-pair) 보드 시뮬레이션 무결성 검증', () => {
-    const f = getFormulaById('row-two-180-pair');
+  it('8. 신규 공식 5: 같은 줄 180° 쌍(Parallel 180° Pair) 단계별 시뮬레이션 검증', () => {
+    const f = getFormulaById('parallel-180-pair');
     expect(f).toBeDefined();
-    expect(f?.id).toBe('row-two-180-pair');
-    expect(f?.steps).toBeDefined();
-    expect(f?.steps?.length).toBe(5);
+    expect(f?.steps?.length).toBe(4); // 초기(0) + 3단계
 
-    // 0단계: 전 타일 ID
-    expect(f!.steps![0].boardOps.every((op) => op === D4.ID)).toBe(true);
+    // 0단계: 0번, 1번 타일만 R180
+    expect(f!.steps![0].boardOps[0]).toBe(D4.R180);
+    expect(f!.steps![0].boardOps[1]).toBe(D4.R180);
+    expect(f!.steps![0].boardOps[2]).toBe(D4.ID);
 
-    // 4단계: 0번과 2번 타일만 R180, 나머지 7개 타일은 모두 ID 복원
-    const finalOps = f!.steps![4].boardOps;
-    expect(finalOps[0]).toBe(D4.R180);
-    expect(finalOps[2]).toBe(D4.R180);
+    // 2단계에서 1행 180° 회전 적용 후 0번, 1번 타일 즉시 ID 상쇄 확인
+    expect(f!.steps![2].boardOps[0]).toBe(D4.ID);
+    expect(f!.steps![2].boardOps[1]).toBe(D4.ID);
 
-    const preservedIndices = [1, 3, 4, 5, 6, 7, 8];
-    preservedIndices.forEach((idx) => {
-      expect(finalOps[idx]).toBe(D4.ID);
-    });
+    // 최종 3단계: 3열 복원 후 1행 0, 1번 타일이 완벽히 0번(ID)으로 상쇄 보존됨
+    const finalOps = f!.steps![3].boardOps;
+    expect(finalOps[0]).toBe(D4.ID);
+    expect(finalOps[1]).toBe(D4.ID);
   });
 
-  it('9. 신규 공식: 대각선 모서리 180° 쌍 상쇄 공식(diagonal-corner-180-pair) 보드 시뮬레이션 무결성 검증', () => {
-    const f = getFormulaById('diagonal-corner-180-pair');
+  it('9. 신규 공식 6: 대각선 모서리 180° 쌍(Diagonal 180° Pair) 단계별 시뮬레이션 검증', () => {
+    const f = getFormulaById('diagonal-180-pair');
     expect(f).toBeDefined();
-    expect(f?.id).toBe('diagonal-corner-180-pair');
-    expect(f?.steps).toBeDefined();
-    expect(f?.steps?.length).toBe(5);
+    expect(f?.steps?.length).toBe(5); // 초기(0) + 4단계
 
-    // 0단계: 전 타일 ID
-    expect(f!.steps![0].boardOps.every((op) => op === D4.ID)).toBe(true);
+    // 0단계: 0번, 8번 타일만 R180
+    expect(f!.steps![0].boardOps[0]).toBe(D4.R180);
+    expect(f!.steps![0].boardOps[8]).toBe(D4.R180);
+    expect(f!.steps![0].boardOps[4]).toBe(D4.ID);
 
-    // 4단계: 0번과 8번 주대각 모서리 타일만 R180, 나머지 7개 타일은 모두 ID 복원
+    // 최종 4단계: 양 끝 모서리(0번, 8번)와 중심(4번)이 모두 ID로 소거 및 복원 완료
     const finalOps = f!.steps![4].boardOps;
-    expect(finalOps[0]).toBe(D4.R180);
-    expect(finalOps[8]).toBe(D4.R180);
-
-    const preservedIndices = [1, 2, 3, 4, 5, 6, 7];
-    preservedIndices.forEach((idx) => {
-      expect(finalOps[idx]).toBe(D4.ID);
-    });
+    expect(finalOps[0]).toBe(D4.ID);
+    expect(finalOps[8]).toBe(D4.ID);
+    expect(finalOps[4]).toBe(D4.ID);
   });
 
-  it('10. 180° 쌍 상쇄 공식의 역연산 및 스크램블 해법 자가 상쇄(Self-Neutralization) 검증', () => {
-    const rowPair = getFormulaById('row-two-180-pair')!;
-    const diagPair = getFormulaById('diagonal-corner-180-pair')!;
+  it('10. 180° 쌍 상쇄 공식의 카테고리 및 불변량 검증', () => {
+    const pPair = getFormulaById('parallel-180-pair')!;
+    const dPair = getFormulaById('diagonal-180-pair')!;
+    expect(pPair).toBeDefined();
+    expect(dPair).toBeDefined();
 
-    // 같은 줄 180°: 4단계를 다시 한 번 거치면(R180 ∘ R180 = ID) 완전히 초기 ID로 환원
-    const rowOps = [...rowPair.steps![4].boardOps];
-    expect(rowOps[0]).toBe(D4.R180);
-    expect(rowOps[2]).toBe(D4.R180);
-
-    // 대각선 모서리 180°: R180 위수 2 성질 확인
-    expect(composeOps(diagPair.steps![4].boardOps[0], D4.R180)).toBe(D4.ID);
-    expect(composeOps(diagPair.steps![4].boardOps[8], D4.R180)).toBe(D4.ID);
+    // 최종 단계에서 문제였던 쌍(0, 1번 및 0, 8번)이 완전히 ID로 소거되었는지 검증
+    expect(pPair.steps![3].boardOps[0]).toBe(D4.ID);
+    expect(pPair.steps![3].boardOps[1]).toBe(D4.ID);
+    expect(dPair.steps![4].boardOps[0]).toBe(D4.ID);
+    expect(dPair.steps![4].boardOps[8]).toBe(D4.ID);
   });
 
   it('11. 180° 공식 카테고리 필터링 및 태그 검색 일관성 검증', () => {
-    const intermediate = getFormulasByCategory('intermediate');
-    expect(intermediate.some((f) => f.id === 'row-two-180-pair')).toBe(true);
+    const beginner = getFormulasByCategory('beginner');
+    expect(beginner.some((f) => f.id === 'parallel-180-pair')).toBe(true);
 
-    const advanced = getFormulasByCategory('advanced');
-    expect(advanced.some((f) => f.id === 'diagonal-corner-180-pair')).toBe(true);
+    const intermediate = getFormulasByCategory('intermediate');
+    expect(intermediate.some((f) => f.id === 'diagonal-180-pair')).toBe(true);
 
     const all = getFormulasByCategory('all');
-    expect(all.length).toBeGreaterThanOrEqual(9);
+    expect(all.length).toBeGreaterThanOrEqual(11);
+  });
+
+  it('12. 3단계 마스터 일반 해법(master-method-3step) 시뮬레이션 및 3단계 완벽 수렴 검증', () => {
+    const f = getFormulaById('master-method-3step');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('master-method-3step');
+    expect(f?.category).toBe('beginner');
+    expect(f?.steps).toBeDefined();
+    expect(f?.steps?.length).toBe(4); // 초기(0) + 3단계
+
+    // 0단계: 스크램블된 초기 상태 검증
+    const step0Ops = f!.steps![0].boardOps;
+    expect(step0Ops[0]).toBe(D4.MX);
+    expect(step0Ops[1]).toBe(D4.MX);
+    expect(step0Ops[2]).toBe(D4.R180);
+
+    // 1단계: 1행 MX 적용 -> 0번, 1번 타일 ID로 소거
+    const step1Ops = f!.steps![1].boardOps;
+    expect(step1Ops[0]).toBe(D4.ID);
+    expect(step1Ops[1]).toBe(D4.ID);
+
+    // 2단계: 3열 MY 적용 -> 2번, 8번 타일 ID로 소거
+    const step2Ops = f!.steps![2].boardOps;
+    expect(step2Ops[2]).toBe(D4.ID);
+    expect(step2Ops[8]).toBe(D4.ID);
+    // 남은 2행(3, 4, 5번)만 피니시 대기 상태(R180)
+    expect(step2Ops[3]).toBe(D4.R180);
+    expect(step2Ops[4]).toBe(D4.R180);
+    expect(step2Ops[5]).toBe(D4.R180);
+
+    // 3단계: 2행 R180 적용 -> 모든 9개 타일 100% 항등원(ID) 올클리어 완성!
+    const step3Ops = f!.steps![3].boardOps;
+    expect(step3Ops.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('13. 90° 회전 패리티 법칙 & 3-Cycle(parity-90-cycle) 시뮬레이션 및 상쇄쌍 검증', () => {
+    const f = getFormulaById('parity-90-cycle');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('parity-90-cycle');
+    expect(f?.category).toBe('intermediate');
+    expect(f?.steps).toBeDefined();
+    expect(f?.steps?.length).toBe(5); // 초기(0) + 4수
+
+    // 0단계: 전 타일 ID
+    expect(f!.steps![0].boardOps.every((op) => op === D4.ID)).toBe(true);
+
+    // 1수: 1행 R90 -> 0, 1, 2번 타일 3개에 동시에 90° 회전 부여 (3-Cycle 최소 단위 증명)
+    const step1Ops = f!.steps![1].boardOps;
+    expect(step1Ops[0]).toBe(D4.R90);
+    expect(step1Ops[1]).toBe(D4.R90);
+    expect(step1Ops[2]).toBe(D4.R90);
+
+    // 2수: 3행 R270 -> 1행(R90)과 3행(R270)이 90° + 270° = 360° ≡ 0° 상쇄쌍 형성
+    const step2Ops = f!.steps![2].boardOps;
+    expect(step2Ops[6]).toBe(D4.R270);
+    expect(step2Ops[7]).toBe(D4.R270);
+    expect(step2Ops[8]).toBe(D4.R270);
+
+    // 3수: 1행 R270 역회전 -> 1행 3개 타일이 단 1수로 90° 3-Cycle 원샷 복원!
+    const step3Ops = f!.steps![3].boardOps;
+    expect(step3Ops[0]).toBe(D4.ID);
+    expect(step3Ops[1]).toBe(D4.ID);
+    expect(step3Ops[2]).toBe(D4.ID);
+
+    // 4수: 3행 R90 회전 -> 상쇄쌍 잔여 타일까지 모두 복원되어 전 타일 100% ID 완성!
+    const step4Ops = f!.steps![4].boardOps;
+    expect(step4Ops.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('14. 신규 공식 2종 카테고리 필터링 및 ID 조회 완전성 검증', () => {
+    const beginner = getFormulasByCategory('beginner');
+    expect(beginner.some((f) => f.id === 'master-method-3step')).toBe(true);
+
+    const intermediate = getFormulasByCategory('intermediate');
+    expect(intermediate.some((f) => f.id === 'parity-90-cycle')).toBe(true);
+
+    const all = getFormulasByCategory('all');
+    expect(all.length).toBeGreaterThanOrEqual(11);
   });
 });
