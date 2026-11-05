@@ -8,6 +8,7 @@
     "build": "tsc && vite build && node scripts/sync-to-unitess.js",
     "build:sync": "npm run build",
     "sync:unitess": "node scripts/sync-to-unitess.js",
+    "mine": "python scripts/formula_miner.py",
     "preview": "vite preview",
     "test": "vitest run"
   },

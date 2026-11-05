@@ -377,4 +377,44 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     const cornerFinal = composeOps(D4.MX, corner);
     expect(cornerFinal).toBe(D4.ID);
   });
+
+  it('22. [AI 채굴 엔진 연동] ai-mined 카테고리 필터링 및 minedFormulas.json 공식 레지스트리 탑재 검증', () => {
+    const aiMined = getFormulasByCategory('ai-mined');
+    expect(aiMined.length).toBeGreaterThanOrEqual(5);
+
+    const triangle = getFormulaById('ai-diagonal-triangle-break');
+    expect(triangle).toBeDefined();
+    expect(triangle?.category).toBe('ai-mined');
+    expect(triangle?.difficulty).toBe(3);
+    expect(triangle?.steps?.length).toBe(4); // 초기(0) + 3수
+
+    const quad = getFormulaById('ai-corner-quad-purge');
+    expect(quad).toBeDefined();
+    expect(quad?.difficulty).toBe(4);
+    expect(quad?.steps?.length).toBe(5); // 초기(0) + 4수
+  });
+
+  it('23. [AI 사선 트라이앵글 3수 공식] 단계별 인터랙티브 시뮬레이션 및 최종 All-ID 올클리어 검증', () => {
+    const f = getFormulaById('ai-diagonal-triangle-break')!;
+    expect(f).toBeDefined();
+    expect(f.steps).toBeDefined();
+
+    // 초기 상태: 비틀려 있는 스크램블 (일부 타일이 ID가 아님)
+    const initialOps = f.steps![0].boardOps;
+    expect(initialOps.some((op) => op !== D4.ID)).toBe(true);
+
+    // 최종 3수: 9개 타일 100% ID 올클리어 완성
+    const finalOps = f.steps![3].boardOps;
+    expect(finalOps.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('24. [AI 양대각·중심십자 4수 공식] 단계별 보드 변환 및 최종 4수 올클리어 검증', () => {
+    const f = getFormulaById('ai-dual-diagonal-cross')!;
+    expect(f).toBeDefined();
+    expect(f.steps).toBeDefined();
+    expect(f.steps?.length).toBe(5); // 0 + 4수
+
+    const finalOps = f.steps![4].boardOps;
+    expect(finalOps.every((op) => op === D4.ID)).toBe(true);
+  });
 });

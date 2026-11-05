@@ -248,4 +248,23 @@ describe('FormulaModalController (공식 비법서 모달 및 인터랙티브 �
     controller.close();
     expect(controller.isOpen()).toBe(false);
   });
+
+  it('14. AI 자율 발굴 공식 (ai-mined) 카테고리 탭 전환 및 사선 트라이앵글 3수 공식 제어 검증', () => {
+    controller.open();
+    controller.setCategory('ai-mined');
+    expect(controller.isOpen()).toBe(true);
+
+    controller.selectFormula('ai-diagonal-triangle-break');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+
+    controller.selectFormula('ai-dual-diagonal-cross');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(4);
+
+    controller.close();
+    expect(controller.isOpen()).toBe(false);
+  });
 });
