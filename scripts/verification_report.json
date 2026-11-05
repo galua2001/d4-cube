@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Firebase 메인 갤러리",
+    "url": "https://unitess-gallery.web.app/",
+    "status": 200,
+    "elapsed_ms": 325.7,
+    "size_bytes": 7574,
+    "bundle_found": false,
+    "pass": true
+  },
+  {
+    "name": "Firebase 플레이어 (play.html)",
+    "url": "https://unitess-gallery.web.app/play.html",
+    "status": 200,
+    "elapsed_ms": 174.4,
+    "size_bytes": 103958,
+    "bundle_found": false,
+    "pass": true
+  },
+  {
+    "name": "Firebase 갈루아 큐브 엔드포인트",
+    "url": "https://unitess-gallery.web.app/matrix-cube/",
+    "status": 200,
+    "elapsed_ms": 182.4,
+    "size_bytes": 1864,
+    "bundle_found": true,
+    "pass": true
+  },
+  {
+    "name": "Firebase 최신 JS 번들",
+    "url": "https://unitess-gallery.web.app/matrix-cube/assets/index-BpxdzSA4.js",
+    "status": 200,
+    "elapsed_ms": 164.3,
+    "size_bytes": 461874,
+    "bundle_found": null,
+    "pass": true
+  },
+  {
+    "name": "Firebase 최신 CSS 번들",
+    "url": "https://unitess-gallery.web.app/matrix-cube/assets/index-Ds7P9bfZ.css",
+    "status": 200,
+    "elapsed_ms": 133.9,
+    "size_bytes": 72652,
+    "bundle_found": null,
+    "pass": true
+  },
+  {
+    "name": "GitHub Pages 프로덕션 라이브",
+    "url": "https://galua2001.github.io/d4-cube/",
+    "status": 200,
+    "elapsed_ms": 307.6,
+    "size_bytes": 1864,
+    "bundle_found": true,
+    "pass": true
+  },
+  {
+    "name": "GitHub Pages 최신 JS 번들",
+    "url": "https://galua2001.github.io/d4-cube/assets/index-BpxdzSA4.js",
+    "status": 200,
+    "elapsed_ms": 301.7,
+    "size_bytes": 461874,
+    "bundle_found": null,
+    "pass": true
+  }
+]
