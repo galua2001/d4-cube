@@ -2369,7 +2369,7 @@ export function filterFormulas(
 
     // 2. 태그 칩 필터
     if (activeTag !== 'all') {
-      if (!item.tags || !item.tags.some((t) => t.toLowerCase() === activeTag.toLowerCase())) {
+      if (!item.tags || !item.tags.some((t) => t.toLowerCase().includes(activeTag.toLowerCase()))) {
         return false;
       }
     }
