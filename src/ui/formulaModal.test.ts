@@ -16,13 +16,38 @@ describe('FormulaModalController (공식 비법서 모달 및 인터랙티브 �
     let rawClassName = '';
     const listeners: Record<string, Function[]> = {};
 
+    let rawInnerHTML = '';
     const el: any = {
       id,
       tagName: tag.toUpperCase(),
       style: {},
       dataset: {},
       textContent: '',
-      innerHTML: '',
+      getContext: vi.fn(() => ({
+        clearRect: vi.fn(),
+        save: vi.fn(),
+        restore: vi.fn(),
+        translate: vi.fn(),
+        rotate: vi.fn(),
+        drawImage: vi.fn(),
+        beginPath: vi.fn(),
+        arc: vi.fn(),
+        fill: vi.fn(),
+        stroke: vi.fn()
+      })),
+      get innerHTML() {
+        return rawInnerHTML;
+      },
+      set innerHTML(html: string) {
+        rawInnerHTML = html;
+        const matches = html.matchAll(/id=["']([^"']+)["']/g);
+        for (const m of matches) {
+          const matchId = m[1];
+          if (!elements[matchId]) {
+            createMockElement(matchId);
+          }
+        }
+      },
       get className() {
         return rawClassName;
       },
@@ -339,4 +364,54 @@ describe('FormulaModalController (공식 비법서 모달 및 인터랙티브 �
     controller.close();
     expect(controller.isOpen()).toBe(false);
   });
+
+  it('18. D4 신규 마스터 공식 3선 (d4-checkerboard-super-4, d4-t-spine-flush-3, d4-chiral-pinwheel-4) 모달 인터랙티브 제어 및 단계별 스텝 시뮬레이션 검증', () => {
+    controller.open('d4-checkerboard-super-4');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+    controller.setStep(4);
+
+    controller.selectFormula('d4-t-spine-flush-3');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+
+    controller.selectFormula('d4-chiral-pinwheel-4');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+    controller.setStep(4);
+
+    controller.setCategory('god-number');
+    expect(controller.isOpen()).toBe(true);
+
+    controller.close();
+    expect(controller.isOpen()).toBe(false);
+  });
+
+  it('19. 공식 비법서 [🚀 이 공식 직접 풀어보기] 실전 연습 콜백 (setPracticeCallback) 연동 및 모달 자동 닫힘 검증', () => {
+    const practiceSpy = vi.fn();
+    controller.setPracticeCallback(practiceSpy);
+
+    controller.open('d4-checkerboard-super-4');
+    expect(controller.isOpen()).toBe(true);
+
+    // 연습 버튼 mock 탐색 및 클릭 트리거
+    const practiceBtn = elements['btn-practice-formula'];
+    expect(practiceBtn).toBeDefined();
+
+    practiceBtn.triggerEvent('click');
+
+    // 콜백이 해당 공식 객체와 함께 호출되었는지 확인
+    expect(practiceSpy).toHaveBeenCalledTimes(1);
+    expect(practiceSpy.mock.calls[0][0].id).toBe('d4-checkerboard-super-4');
+
+    // 모달이 자동으로 닫혔는지 검증
+    expect(controller.isOpen()).toBe(false);
+  });
+
 });

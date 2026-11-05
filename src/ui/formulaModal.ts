@@ -8,6 +8,7 @@ import {
   FORMULAS,
   FormulaCategory,
   FormulaStep,
+  FormulaItem,
   getFormulasByCategory,
   getFormulaById
 } from '../data/formulas';
@@ -17,6 +18,11 @@ import { renderCharacterTileCanvas } from './tileRenderer';
 import { soundEngine } from '../audio/audioEngine';
 
 export class FormulaModalController {
+  private onPracticeCallback?: (formula: FormulaItem) => void;
+
+  public setPracticeCallback(cb: (formula: FormulaItem) => void): void {
+    this.onPracticeCallback = cb;
+  }
   private overlay: HTMLElement | null = null;
   private currentCategory: FormulaCategory | 'all' = 'all';
   private currentFormulaId: string = 'center-inversion';
@@ -415,6 +421,15 @@ export class FormulaModalController {
                   <button class="formula-ctrl-btn" id="btn-step-next">▶</button>
                   <button class="formula-ctrl-btn" id="btn-step-reset">↺ ${t('formula.btnReset')}</button>
                 </div>
+
+                <!-- 실전 보드 연습 액션 바 -->
+                <div class="formula-practice-cta-box">
+                  <button class="btn-practice-formula" id="btn-practice-formula" data-formula-id="${formula.id}">
+                    <span class="cta-icon">🚀</span>
+                    <span class="cta-text">${t('formula.btnPracticeOnBoard')}</span>
+                    <span class="cta-badge">${formula.difficulty}${t('settings.movesSuffix')} 도전</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -443,6 +458,18 @@ export class FormulaModalController {
       this.renderStepInfo();
       this.renderMiniBoard();
     }
+    this.bindPracticeButton(formula);
+  }
+
+  private bindPracticeButton(formula: FormulaItem): void {
+    const btn = this.overlay?.querySelector('#btn-practice-formula');
+    btn?.addEventListener('click', () => {
+      soundEngine.playTap();
+      this.close();
+      if (this.onPracticeCallback) {
+        this.onPracticeCallback(formula);
+      }
+    });
   }
 
   private bindStepControls(steps: FormulaStep[]): void {

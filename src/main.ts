@@ -12,7 +12,8 @@ import { GestureRecognizer } from './ui/gesture';
 import { solutionInlinePanel } from './ui/solutionModal';
 import { showAboutModal } from './ui/aboutModal';
 import { showTutorialModal, isTutorialCompleted } from './ui/tutorialModal';
-import { showFormulaModal } from './ui/formulaModal';
+import { showFormulaModal, formulaModalController } from './ui/formulaModal';
+import { FormulaItem, getFormulaById } from './data/formulas';
 import { victoryManager } from './ui/victoryEffect';
 import { initPWAManager } from './pwaManager';
 import { t, getCurrentLang, setLang, onLangChange, Lang } from './i18n/translations';
@@ -29,7 +30,16 @@ import {
   onColorModeChange
 } from './theme/colorTheme';
 
+
+export interface PracticeSession {
+  formulaId: string;
+  title: string;
+  targetMoves: number;
+  initialOps: D4Op[];
+}
+
 class MatrixCubeApp {
+  private currentPractice: PracticeSession | null = null;
   private boardSize = 3;
   private scrambleMoves = 3; // 기본 3수 섞기
   private isDiagonalEnabled = false; // 기본적으로 대각선 변환 비활성화
@@ -156,6 +166,9 @@ class MatrixCubeApp {
         </div>
       </div>
 
+      <!-- 실전 연습 모드 상단 배너 컨테이너 -->
+      <div id="practice-mode-banner-container"></div>
+
       <div class="board-container">
         <div class="board-grid" id="board-grid"></div>
         <canvas id="gesture-canvas"></canvas>
@@ -190,6 +203,7 @@ class MatrixCubeApp {
     this.gestureRecognizer.setAllowDiagonal(this.isDiagonalEnabled);
 
     this.rebuildBoardDOM();
+    this.renderPracticeBadge();
   }
 
   // 11번 타일 내부 우측 세로 스위치(.tile-switch-11) 모드 클래스 실시간 동기화
@@ -379,6 +393,11 @@ class MatrixCubeApp {
 
     // 공모전 소개 모달 버튼
     // 공식 비법서 모달 버튼
+    // 공식 비법서 모달 버튼 및 실전 연습 콜백 연동
+    formulaModalController.setPracticeCallback((formula) => {
+      this.startPracticeMode(formula);
+    });
+
     document.getElementById('btn-header-formula')?.addEventListener('click', () => {
       soundEngine.playTap();
       showFormulaModal();
@@ -950,6 +969,62 @@ class MatrixCubeApp {
   private checkWinCondition() {
     const isWin = this.currentOps.every(op => op === D4.ID);
     if (isWin) {
+      if (this.currentPractice) {
+        // 1. 연습 모드 승리 처리
+        this.isGameStarted = false;
+        recordManager.stopTimer();
+        this.updateTimerDisplay();
+        soundEngine.playWin();
+
+        const total = this.boardSize * this.boardSize;
+        for (let i = 0; i < total; i++) {
+          const box = this.boardGrid.children[i] as HTMLElement;
+          if (box) {
+            setTimeout(() => {
+              box.classList.add('celebrate-tile');
+            }, i * 40);
+          }
+        }
+
+        const { title, targetMoves, formulaId } = this.currentPractice;
+        const moves = this.movesCount;
+        const curFormula = getFormulaById(formulaId);
+
+        if (moves === targetMoves) {
+          victoryManager.showSpecialPracticeVictory({
+            title: t('practice.perfectTitle'),
+            subtitle: t('practice.perfectDesc', { title, moves }),
+            isPerfect: true,
+            onRetry: () => curFormula && this.startPracticeMode(curFormula),
+            onExit: () => this.endPracticeMode()
+          });
+        } else if (moves < targetMoves) {
+          victoryManager.showSpecialPracticeVictory({
+            title: t('practice.shortcutTitle'),
+            subtitle: t('practice.shortcutDesc', { target: targetMoves, moves }),
+            isPerfect: true,
+            onRetry: () => curFormula && this.startPracticeMode(curFormula),
+            onExit: () => this.endPracticeMode()
+          });
+        } else {
+          victoryManager.showSpecialPracticeVictory({
+            title: t('practice.clearedTitle'),
+            subtitle: t('practice.clearedDesc', { target: targetMoves, moves }),
+            isPerfect: false,
+            onRetry: () => curFormula && this.startPracticeMode(curFormula),
+            onExit: () => this.endPracticeMode()
+          });
+        }
+
+        setTimeout(() => {
+          for (let i = 0; i < total; i++) {
+            const box = this.boardGrid.children[i] as HTMLElement;
+            if (box) box.classList.remove('celebrate-tile');
+          }
+        }, 4200);
+
+        return;
+      }
       // 1. 타이머 정지 및 기록 저장 & 최고 기록 갱신 여부 판정
       this.isGameStarted = false;
       const elapsedMs = recordManager.stopTimer();
@@ -1042,6 +1117,88 @@ class MatrixCubeApp {
         badge.classList.toggle('is-symmetry', info.isSymmetry);
       }
     }
+  }
+
+  /**
+   * 공식 비법서 '실전 보드 연습' 모드 시작 (Board Hydration)
+   */
+  public startPracticeMode(formula: FormulaItem): void {
+    const initStep = formula.steps?.[0];
+    if (!initStep || !initStep.boardOps) return;
+
+    // 1. 공식에 필요한 대각선 축 포함 여부 검사
+    const hasDiagonal = (formula.steps?.some(s => s.highlightLine?.type === 'diag') ?? false) ||
+                        formula.id.includes('diagonal') ||
+                        formula.id.includes('diag') ||
+                        ['MD', 'MAD'].includes(formula.id);
+
+    // 2. 보드 크기 3x3 강제 및 D4 군 모드 자동 세팅
+    if (this.boardSize !== 3) {
+      this.setBoardSize(3);
+    }
+    if (this.currentGroup !== 'D4') {
+      this.switchGroup('D4');
+    }
+    if (hasDiagonal && !this.isDiagonalEnabled) {
+      this.toggleDiagonal();
+    }
+
+    // 3. 보드 상태 즉시 이식 (Board Hydration)
+    const ops = initStep.boardOps as D4Op[];
+    this.currentOps = [...ops];
+    this.moveHistory = [];
+    this.movesCount = 0;
+    this.isGameStarted = false;
+    recordManager.resetTimer();
+    this.updateTimerDisplay();
+
+    // 4. 연습 세션 메타데이터 등록
+    const isKo = getCurrentLang() === 'ko';
+    this.currentPractice = {
+      formulaId: formula.id,
+      title: isKo ? formula.titleKo : formula.titleEn,
+      targetMoves: formula.difficulty,
+      initialOps: [...ops]
+    };
+
+    // 5. UI 배지 렌더링 & 사운드
+    soundEngine.playTap();
+    this.renderPracticeBadge();
+    this.updateBoard();
+    this.updateMovesLabel();
+    this.updateStatusInfo();
+  }
+
+  private renderPracticeBadge(): void {
+    const container = document.getElementById('practice-mode-banner-container');
+    if (!container) return;
+
+    if (!this.currentPractice) {
+      container.innerHTML = '';
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="practice-mode-banner">
+        <div class="practice-active-badge">
+          <span class="practice-icon">🎯</span>
+          <span class="practice-title">${t('practice.badgeTitle', { title: this.currentPractice.title })}</span>
+          <span class="practice-target">${t('practice.targetMoves', { moves: this.currentPractice.targetMoves })}</span>
+          <button class="btn-exit-practice" id="btn-exit-practice" title="${t('practice.exitBtnTitle')}">✕</button>
+        </div>
+      </div>
+    `;
+
+    container.querySelector('#btn-exit-practice')?.addEventListener('click', () => {
+      soundEngine.playTap();
+      this.endPracticeMode();
+    });
+  }
+
+  public endPracticeMode(): void {
+    this.currentPractice = null;
+    this.renderPracticeBadge();
+    this.scrambleBoard();
   }
 }
 
