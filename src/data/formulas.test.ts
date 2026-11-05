@@ -111,4 +111,71 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
     expect(composeOps(D4.MD, D4.MD)).toBe(D4.ID);
     expect(composeOps(D4.R180, D4.R180)).toBe(D4.ID);
   });
+
+  it('8. 신규 공식: 같은 줄 180° 쌍 상쇄 공식(row-two-180-pair) 보드 시뮬레이션 무결성 검증', () => {
+    const f = getFormulaById('row-two-180-pair');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('row-two-180-pair');
+    expect(f?.steps).toBeDefined();
+    expect(f?.steps?.length).toBe(5);
+
+    // 0단계: 전 타일 ID
+    expect(f!.steps![0].boardOps.every((op) => op === D4.ID)).toBe(true);
+
+    // 4단계: 0번과 2번 타일만 R180, 나머지 7개 타일은 모두 ID 복원
+    const finalOps = f!.steps![4].boardOps;
+    expect(finalOps[0]).toBe(D4.R180);
+    expect(finalOps[2]).toBe(D4.R180);
+
+    const preservedIndices = [1, 3, 4, 5, 6, 7, 8];
+    preservedIndices.forEach((idx) => {
+      expect(finalOps[idx]).toBe(D4.ID);
+    });
+  });
+
+  it('9. 신규 공식: 대각선 모서리 180° 쌍 상쇄 공식(diagonal-corner-180-pair) 보드 시뮬레이션 무결성 검증', () => {
+    const f = getFormulaById('diagonal-corner-180-pair');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('diagonal-corner-180-pair');
+    expect(f?.steps).toBeDefined();
+    expect(f?.steps?.length).toBe(5);
+
+    // 0단계: 전 타일 ID
+    expect(f!.steps![0].boardOps.every((op) => op === D4.ID)).toBe(true);
+
+    // 4단계: 0번과 8번 주대각 모서리 타일만 R180, 나머지 7개 타일은 모두 ID 복원
+    const finalOps = f!.steps![4].boardOps;
+    expect(finalOps[0]).toBe(D4.R180);
+    expect(finalOps[8]).toBe(D4.R180);
+
+    const preservedIndices = [1, 2, 3, 4, 5, 6, 7];
+    preservedIndices.forEach((idx) => {
+      expect(finalOps[idx]).toBe(D4.ID);
+    });
+  });
+
+  it('10. 180° 쌍 상쇄 공식의 역연산 및 스크램블 해법 자가 상쇄(Self-Neutralization) 검증', () => {
+    const rowPair = getFormulaById('row-two-180-pair')!;
+    const diagPair = getFormulaById('diagonal-corner-180-pair')!;
+
+    // 같은 줄 180°: 4단계를 다시 한 번 거치면(R180 ∘ R180 = ID) 완전히 초기 ID로 환원
+    const rowOps = [...rowPair.steps![4].boardOps];
+    expect(rowOps[0]).toBe(D4.R180);
+    expect(rowOps[2]).toBe(D4.R180);
+
+    // 대각선 모서리 180°: R180 위수 2 성질 확인
+    expect(composeOps(diagPair.steps![4].boardOps[0], D4.R180)).toBe(D4.ID);
+    expect(composeOps(diagPair.steps![4].boardOps[8], D4.R180)).toBe(D4.ID);
+  });
+
+  it('11. 180° 공식 카테고리 필터링 및 태그 검색 일관성 검증', () => {
+    const intermediate = getFormulasByCategory('intermediate');
+    expect(intermediate.some((f) => f.id === 'row-two-180-pair')).toBe(true);
+
+    const advanced = getFormulasByCategory('advanced');
+    expect(advanced.some((f) => f.id === 'diagonal-corner-180-pair')).toBe(true);
+
+    const all = getFormulasByCategory('all');
+    expect(all.length).toBeGreaterThanOrEqual(9);
+  });
 });

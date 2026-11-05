@@ -390,7 +390,121 @@ const v4ConquestSteps = createInteractiveSteps(v4ScrambledBoard, [
   }
 ]);
 
-// 5. [기초 법칙 1: 반사 + 반사 = 회전 인터랙티브 스텝]
+// 5. [공식 5: 같은 줄 180° 쌍 상쇄 공식 (Same-Row 180° Pair)]
+// 1행 R90 -> 2열 MY -> 1행 R90 -> 2열 MY
+const sameRow180Steps = createInteractiveSteps(emptyBoard, [
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.R90,
+    actionDescKo: '1행 90° 시계 회전 (R90)',
+    actionDescEn: 'Row 1 Rotate 90° (R90)',
+    mathInsightKo: '1행 전체(0, 1, 2번 타일)에 R90 작용',
+    mathInsightEn: 'Apply R90 to Row 1',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '1수: 1행 R90',
+    formulaText: 'Row₁ ➔ R90',
+    formulaDesc: '1행 전체에 90° 시계 회전 변환을 적용합니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 1,
+    op: D4.MY,
+    actionDescKo: '2열 좌우 반전 (MY 세로밀기)',
+    actionDescEn: 'Col 2 Horizontal Flip (MY)',
+    mathInsightKo: '교차 타일(1번)에 R90과 MY가 합성',
+    mathInsightEn: 'Intersection tile (1) composes R90 and MY',
+    highlightCells: [1, 4, 7],
+    formulaBadge: '2수: 2열 MY',
+    formulaText: 'Col₂ ➔ MY',
+    formulaDesc: '2열 전체에 좌우 거울 반사(MY)를 적용합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.R90,
+    actionDescKo: '1행 90° 시계 회전 재적용 (R90)',
+    actionDescEn: 'Row 1 Rotate 90° Repeated (R90)',
+    mathInsightKo: '1행 양끝(0, 2번) 타일에 R90 ∘ R90 = R180 형성',
+    mathInsightEn: 'End tiles (0, 2) compose R90 ∘ R90 = R180',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '3수: 1행 R90',
+    formulaText: 'Row₁ ➔ R90',
+    formulaDesc: '1행 양쪽 타일(0, 2번)이 R90 2회로 180° 반전됩니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 1,
+    op: D4.MY,
+    actionDescKo: '2열 좌우 반전 복원 (MY)',
+    actionDescEn: 'Col 2 Horizontal Flip Restore (MY)',
+    mathInsightKo: '2열 타일들은 MY ∘ MY = ID로 원상 복구, 1행 양끝 2개 타일만 180° 쌍 반전 완성!',
+    mathInsightEn: 'Col 2 restores via MY² = ID, strictly isolating the 180° pair on Row 1!',
+    highlightCells: [0, 2],
+    formulaBadge: '4수: 2열 MY 복원',
+    formulaText: 'Row₁[0, 2] ➔ R180',
+    formulaDesc: '모든 교차점은 복구되고, 오직 같은 줄(1행)의 양끝 2개 타일만 180° 상쇄/반전 완성!'
+  }
+]);
+
+// 6. [공식 6: 대각선 모서리 180° 쌍 상쇄 공식 (Diagonal Corner 180° Pair)]
+// 1행 R180 -> 3행 R180 -> 2열 R180 -> 부대각 R180
+const diagCorner180Steps = createInteractiveSteps(emptyBoard, [
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.R180,
+    actionDescKo: '1행 180° 회전 (R180 더블탭)',
+    actionDescEn: 'Row 1 Rotate 180° (R180)',
+    mathInsightKo: '1행 전체(0, 1, 2번 타일)에 R180 1회 부여',
+    mathInsightEn: 'Row 1 receives 1st R180 rotation',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '1수: 1행 R180',
+    formulaText: 'Row₁ ➔ R180',
+    formulaDesc: '1행 전체에 180° 점대칭 회전을 적용합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 2,
+    op: D4.R180,
+    actionDescKo: '3행 180° 회전 (R180 더블탭)',
+    actionDescEn: 'Row 3 Rotate 180° (R180)',
+    mathInsightKo: '3행 전체(6, 7, 8번 타일)에 R180 1회 부여',
+    mathInsightEn: 'Row 3 receives 1st R180 rotation',
+    highlightCells: [6, 7, 8],
+    formulaBadge: '2수: 3행 R180',
+    formulaText: 'Row₃ ➔ R180',
+    formulaDesc: '3행 전체에 180° 점대칭 회전을 적용합니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 1,
+    op: D4.R180,
+    actionDescKo: '2열 180° 회전 (R180 더블탭)',
+    actionDescEn: 'Col 2 Rotate 180° (R180)',
+    mathInsightKo: '1번 타일과 7번 타일이 R180 ∘ R180 = ID로 자기 상쇄 복원',
+    mathInsightEn: 'Tiles 1 and 7 cancel out to ID via R180² = ID',
+    highlightCells: [1, 4, 7],
+    formulaBadge: '3수: 2열 R180',
+    formulaText: 'Col₂ ➔ R180',
+    formulaDesc: '중앙 십자 타일들이 2회째 R180을 받아 원상태로 상쇄 복원됩니다.'
+  },
+  {
+    lineType: 'diag',
+    lineIndex: 'anti',
+    op: D4.R180,
+    actionDescKo: '부대각선 180° 회전 (R180)',
+    actionDescEn: 'Anti-Diagonal Rotate 180° (R180)',
+    mathInsightKo: '2, 4, 6번 타일이 2회째 R180을 받아 ID 복원, 주대각 양 모서리(0, 8번)만 180° 쌍 완성!',
+    mathInsightEn: 'Tiles 2, 4, 6 cancel out via R180² = ID, isolating 180° on corner pair (0, 8)!',
+    highlightCells: [0, 8],
+    formulaBadge: '4수: 부대각 R180',
+    formulaText: 'Diag[0, 8] ➔ R180',
+    formulaDesc: '모든 중간 타일이 R180² = ID로 소거되어 대각선 모서리 2개만 깔끔하게 해결 완성!'
+  }
+]);
+
+// 7. [기초 법칙 1: 반사 + 반사 = 회전 인터랙티브 스텝]
 const basicsReflectionCompSteps = createInteractiveSteps(emptyBoard, [
   {
     lineType: 'row',
@@ -545,6 +659,54 @@ export const FORMULAS: FormulaItem[] = [
       'Guaranteed God’s number ≤ 4 moves from any valid state.'
     ],
     tags: ['신의 수 테크닉', 'V4 클라인 4원군', '4수 해법', '정석 솔루션'],
+    isInteractive: true
+  },
+  {
+    id: 'row-two-180-pair',
+    titleKo: '같은 줄 180° 쌍 상쇄 공식',
+    titleEn: 'Same-Line 180° Pair Solution',
+    category: 'intermediate',
+    badgeKo: '같은 줄 180° 쌍',
+    badgeEn: 'Line 180° Pair',
+    difficulty: 3,
+    formulaSeq: '1행 R90 ➔ 2열 MY ➔ 1행 R90 ➔ 2열 MY',
+    summaryKo: '같은 줄의 두 타일이 180° 뒤집혀 있을 때, 90° 회전과 직교 반사(MY)의 교대 합성을 통해 다른 타일을 전혀 건드리지 않고 180° 쌍만 상쇄 해결합니다.',
+    summaryEn: 'Alternates 90° rotation and orthogonal reflection (MY) to simultaneously resolve a pair of 180° flipped tiles on the same line without disturbing any other tiles.',
+    diagramType: 'interactive',
+    steps: sameRow180Steps,
+    notesKo: [
+      '1행 양 끝 타일(0, 2번)은 R90이 2회 중첩되어 R180이 완성됩니다.',
+      '중앙 교차 타일(1번)과 2열 타일들은 [R90, MY] 켤레 대칭으로 완전 복원됩니다.'
+    ],
+    notesEn: [
+      'End tiles 0 and 2 receive two R90 rotations, synthesizing R180.',
+      'The intersection and Col 2 tiles fully cancel back to ID.'
+    ],
+    tags: ['180도 공식', '쌍 상쇄', '같은 줄 해법', '신의 수 테크닉'],
+    isInteractive: true
+  },
+  {
+    id: 'diagonal-corner-180-pair',
+    titleKo: '대각선 모서리 180° 쌍 상쇄 공식',
+    titleEn: 'Diagonal Corner 180° Pair Solution',
+    category: 'advanced',
+    badgeKo: '대각 모서리 180° 쌍',
+    badgeEn: 'Corner 180° Pair',
+    difficulty: 4,
+    formulaSeq: '1행 R180 ➔ 3행 R180 ➔ 2열 R180 ➔ 부대각 R180',
+    summaryKo: '대각선 양쪽 모서리(0번, 8번)만 180° 회전되어 있을 때, R180의 위수 2(자기상쇄) 원리를 결합하여 4수만에 양 모서리만 깨끗이 해결합니다.',
+    summaryEn: 'Solves corner pair (0 and 8) flipped at 180° using the order-2 involution property (R180² = ID) across 4 symmetrical double-taps.',
+    diagramType: 'interactive',
+    steps: diagCorner180Steps,
+    notesKo: [
+      '교차점 타일(1, 2, 4, 6, 7번)들이 정확히 2번씩 R180을 받아 항등원(ID)으로 상쇄됩니다.',
+      '오직 주대각선 양 모서리 타일(0, 8번)만 1번의 R180을 유지하여 고립 반전됩니다.'
+    ],
+    notesEn: [
+      'Intersection tiles (1, 2, 4, 6, 7) receive R180 twice and cancel to ID.',
+      'Only diagonal corners (0, 8) receive a single R180, successfully resolving the pair.'
+    ],
+    tags: ['180도 공식', '대각선 해법', '모서리 상쇄', '위수 2 Involution'],
     isInteractive: true
   },
   {
