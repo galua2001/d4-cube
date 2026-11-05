@@ -462,7 +462,34 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.diagonalSpineFlush.step0': 'Initial State: Row 1 corners (0, 2) in MAD, vertical spine (4, 7) in MD',
     'formula.item.diagonalSpineFlush.step1': 'Move 1: Row 1 MY (Vertical swipe) ➔ Corners (0, 2) transition to R270, center tile 1 becomes MY',
     'formula.item.diagonalSpineFlush.step2': 'Move 2: Col 2 MD ➔ Spine tiles (4, 7) eliminate via MD² = ID, Row 1 synchronizes to R270',
-    'formula.item.diagonalSpineFlush.step3': 'Move 3: Row 1 R90 ➔ Row 1 resolves via R270 ∘ R90 = ID, achieving 100% all-clear!'
+    'formula.item.diagonalSpineFlush.step3': 'Move 3: Row 1 R90 ➔ Row 1 resolves via R270 ∘ R90 = ID, achieving 100% all-clear!',
+
+    'formula.item.d4DiamondCross3.title': 'D4 Diamond Cross 3-Move Finish',
+    'formula.item.d4DiamondCross3.subtitle': 'Synchronizing center and cross wings into uniform R270 phase for a clean 3-move wipe',
+    'formula.item.d4DiamondCross3.desc': 'A high-tier dilemma where wings and center are twisted in a cross pattern. Solves wings and center phase alignment in just 3 moves: [Row 2 R90] ➔ [Col 2 MX] ➔ [Row 2 R90] to achieve 100% all-clear.',
+    'formula.item.d4DiamondCross3.tip': 'Rotating Row 2 by 90° transitions side wings into R270, then Column 2 vertical flip (MX) restores top/bottom wings and synthesizes the center into R270. Row 2 R90 then wipes the line clean in one stroke.',
+    'formula.item.d4DiamondCross3.step0': 'Initial State: Cross wings (1, 7: MX; 3, 5: R180) and center (4: MX) form diamond cross pattern',
+    'formula.item.d4DiamondCross3.step1': 'Move 1: Row 2 R90 (Clockwise 90°) ➔ Wings 3 & 5 become R270, center tile 4 becomes MD',
+    'formula.item.d4DiamondCross3.step2': 'Move 2: Col 2 MX (Vertical flip) ➔ Wings 1 & 7 clear via MX² = ID, center tile 4 becomes R270',
+    'formula.item.d4DiamondCross3.step3': 'Move 3: Row 2 R90 (Finish wipe) ➔ All Row 2 tiles clear via R270 ∘ R90 = ID, 100% all-clear!',
+
+    'formula.item.d4LDiagCombo3.title': 'D4 L-Diagonal Combo 3-Move Finish',
+    'formula.item.d4LDiagCombo3.subtitle': 'Harmonizing diagonal reflection with orthogonal rotation to all-kill an L-shaped cascade',
+    'formula.item.d4LDiagCombo3.desc': 'Resolves a 5-error L-shape intersecting Row 1 and Col 3 in just 3 moves: [Row 1 R90] ➔ [Col 3 MD] ➔ [Row 1 R90], utilizing non-commutativity of diagonal symmetry to sweep the entire line.',
+    'formula.item.d4LDiagCombo3.tip': 'Rotate Row 1 first to prepare corner phase, then swipe Column 3 with diagonal reflection (MD) to clear Column 3 and focus all remaining errors into Row 1 for a single finish swipe.',
+    'formula.item.d4LDiagCombo3.step0': 'Initial State: L-shape error with Row 1 (cells 0, 1: R180) and Col 3 (cells 2, 5, 8: MD)',
+    'formula.item.d4LDiagCombo3.step1': 'Move 1: Row 1 R90 (Clockwise 90°) ➔ Tiles 0 & 1 become R270, corner tile 2 becomes MY',
+    'formula.item.d4LDiagCombo3.step2': 'Move 2: Col 3 MD (Diagonal swipe) ➔ Tiles 5 & 8 clear via MD² = ID, corner tile 2 becomes R270',
+    'formula.item.d4LDiagCombo3.step3': 'Move 3: Row 1 R90 (Finish wipe) ➔ Entire Row 1 clears via R270 ∘ R90 = ID, 100% all-clear!',
+
+    'formula.item.d4XCross3.title': 'D4 X-Cross Corner 3-Move Finish',
+    'formula.item.d4XCross3.subtitle': 'Segregating 4 corner errors into clean horizontal lines to annihilate corners in 3 moves',
+    'formula.item.d4XCross3.desc': 'Conquers the X-cross dilemma where 4 corners (0, 2, 6, 8) and center (4) are entangled. [Col 2 R270] restores center and synchronizes top/bottom rows into R270, followed by [Row 3 R90] and [Row 1 R90] for complete clearance.',
+    'formula.item.d4XCross3.tip': 'Col 2 R270 cancels out center tile 4 (R90 ∘ R270 = ID) while segregating corners into Row 1 and Row 3. Two R90 swipes then clear each row in turn.',
+    'formula.item.d4XCross3.step0': 'Initial State: 4 corners (0, 2, 6, 8: R270) and center (4: R90) form an X-cross pattern',
+    'formula.item.d4XCross3.step1': 'Move 1: Col 2 R270 (Counter-clockwise 90°) ➔ Center 4 clears to ID, Rows 1 & 3 become pure R270 lines',
+    'formula.item.d4XCross3.step2': 'Move 2: Row 3 R90 (Row 3 wipe) ➔ Row 3 tiles (6, 7, 8) clear via R270 ∘ R90 = ID',
+    'formula.item.d4XCross3.step3': 'Move 3: Row 1 R90 (Finish wipe) ➔ Row 1 tiles (0, 1, 2) clear via R270 ∘ R90 = ID, 100% all-clear!'
   },
 
   ko: {
@@ -902,7 +929,8 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.d4XCross3.step0': '초기 상태: 4개 모서리(0, 2, 6, 8번: R270)와 중심(4번: R90)이 뒤틀린 X-크로스 패턴',
     'formula.item.d4XCross3.step1': '1수: 2열 90° 반시계 회전 (R270) ➔ 중심 4번 ID 즉시 복구, 1행과 3행이 각각 완전한 R270 라인으로 정렬',
     'formula.item.d4XCross3.step2': '2수: 3행 90° 시계 회전 (R90) ➔ 3행 전체(6, 7, 8번) R270 ∘ R90 = ID 일괄 소거',
-    'formula.item.d4XCross3.step3': '3수: 1행 90° 시계 회전 (R90 피니시) ➔ 1행 전체(0, 1, 2번) R270 ∘ R90 = ID 일괄 소거, 100% 올클리어 완성!'
+    'formula.item.d4XCross3.step3': '3수: 1행 90° 시계 회전 (R90 피니시) ➔ 1행 전체(0, 1, 2번) R270 ∘ R90 = ID 일괄 소거, 100% 올클리어 완성!',
+
   }
 };
 
