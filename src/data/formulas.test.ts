@@ -338,7 +338,9 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
 
   it('18. 실전 빈출 2수 피니시 TOP 3 공식 카테고리(god-number, godTechnique) 및 총 공식 개수 검증', () => {
     const godNumberFormulas = getFormulasByCategory('god-number');
-    expect(godNumberFormulas.length).toBe(3);
+    expect(godNumberFormulas.length).toBe(5);
+    expect(godNumberFormulas.some((f) => f.id === 'quad-corner-finish')).toBe(true);
+    expect(godNumberFormulas.some((f) => f.id === 'diagonal-spine-flush')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'finish-l-shape-5')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'finish-wing-cross-4')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'finish-hybrid-cancel')).toBe(true);
@@ -416,5 +418,95 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
 
     const finalOps = f.steps![4].boardOps;
     expect(finalOps.every((op) => op === D4.ID)).toBe(true);
+  });
+
+
+  it('25. [마스터 공식: quad-corner-finish] 4코너 올킬 3수 파괴 공식 단계별 인터랙티브 시뮬레이션 및 전 타일 All-ID 올클리어 검증', () => {
+    const f = getFormulaById('quad-corner-finish');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('quad-corner-finish');
+    expect(f?.category).toBe('god-number');
+    expect(f?.difficulty).toBe(3);
+    expect(f?.steps?.length).toBe(4); // 초기(0) + 3수
+
+    // 0단계: 4개 모서리(0, 2, 6, 8)가 MX, 중심(4)이 R180
+    const step0Ops = f!.steps![0].boardOps;
+    expect(step0Ops[0]).toBe(D4.MX);
+    expect(step0Ops[2]).toBe(D4.MX);
+    expect(step0Ops[6]).toBe(D4.MX);
+    expect(step0Ops[8]).toBe(D4.MX);
+    expect(step0Ops[4]).toBe(D4.R180);
+    expect([1, 3, 5, 7].every((idx) => step0Ops[idx] === D4.ID)).toBe(true);
+
+    // 1수: 주대각선 MAD -> 0, 8번은 MX ∘ MAD = R270, 중심 4번은 R180 ∘ MAD = MD
+    const step1Ops = f!.steps![1].boardOps;
+    expect(step1Ops[0]).toBe(D4.R270);
+    expect(step1Ops[8]).toBe(D4.R270);
+    expect(step1Ops[4]).toBe(D4.MD);
+    expect(step1Ops[2]).toBe(D4.MX);
+    expect(step1Ops[6]).toBe(D4.MX);
+
+    // 2수: 부대각선 MX -> 2, 6번 코너는 MX² = ID 즉시 소거, 중심 4번은 MD ∘ MX = R270
+    // => 주대각선 전체(0, 4, 8)가 R270으로 완전 동기화!
+    const step2Ops = f!.steps![2].boardOps;
+    expect(step2Ops[2]).toBe(D4.ID);
+    expect(step2Ops[6]).toBe(D4.ID);
+    expect(step2Ops[0]).toBe(D4.R270);
+    expect(step2Ops[4]).toBe(D4.R270);
+    expect(step2Ops[8]).toBe(D4.R270);
+
+    // 3수: 주대각선 R90 -> 동기화된 0, 4, 8번 타일이 R270 ∘ R90 = ID로 일괄 소거되어 9개 타일 100% ID 완성!
+    const step3Ops = f!.steps![3].boardOps;
+    expect(step3Ops.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('26. [마스터 공식: diagonal-spine-flush] 사선 척추-외곽 상쇄 3수 공식 단계별 인터랙티브 시뮬레이션 및 전 타일 All-ID 올클리어 검증', () => {
+    const f = getFormulaById('diagonal-spine-flush');
+    expect(f).toBeDefined();
+    expect(f?.id).toBe('diagonal-spine-flush');
+    expect(f?.category).toBe('god-number');
+    expect(f?.difficulty).toBe(4);
+    expect(f?.steps?.length).toBe(4); // 초기(0) + 3수
+
+    // 0단계: 1행 모서리(0, 2)가 MAD, 척추(4, 7)가 MD
+    const step0Ops = f!.steps![0].boardOps;
+    expect(step0Ops[0]).toBe(D4.MAD);
+    expect(step0Ops[2]).toBe(D4.MAD);
+    expect(step0Ops[4]).toBe(D4.MD);
+    expect(step0Ops[7]).toBe(D4.MD);
+    expect([1, 3, 5, 6, 8].every((idx) => step0Ops[idx] === D4.ID)).toBe(true);
+
+    // 1수: 1행 MY -> 0, 2번은 MAD ∘ MY = R270, 1번은 MY 상태
+    const step1Ops = f!.steps![1].boardOps;
+    expect(step1Ops[0]).toBe(D4.R270);
+    expect(step1Ops[2]).toBe(D4.R270);
+    expect(step1Ops[1]).toBe(D4.MY);
+    expect(step1Ops[4]).toBe(D4.MD);
+    expect(step1Ops[7]).toBe(D4.MD);
+
+    // 2수: 2열 MD -> 척추 4, 7번은 MD² = ID로 즉시 소거, 교차점 1번은 MY ∘ MD = R270
+    // => 1행 전체(0, 1, 2)가 R270으로 완전 동기화!
+    const step2Ops = f!.steps![2].boardOps;
+    expect(step2Ops[4]).toBe(D4.ID);
+    expect(step2Ops[7]).toBe(D4.ID);
+    expect(step2Ops[0]).toBe(D4.R270);
+    expect(step2Ops[1]).toBe(D4.R270);
+    expect(step2Ops[2]).toBe(D4.R270);
+
+    // 3수: 1행 R90 -> 동기화된 1행 0, 1, 2번 타일이 R270 ∘ R90 = ID로 일괄 소거되어 9개 타일 100% ID 완성!
+    const step3Ops = f!.steps![3].boardOps;
+    expect(step3Ops.every((op) => op === D4.ID)).toBe(true);
+  });
+
+  it('27. 신규 마스터 공식 2종 i18n 번역 키 및 godTechnique 카테고리 연계 무결성 검증', async () => {
+    const { translations } = await import('../i18n/translations');
+    expect(translations.ko['formula.item.quadCornerFinish.title']).toContain('4코너 올킬');
+    expect(translations.en['formula.item.quadCornerFinish.title']).toContain('Quad-Corner');
+    expect(translations.ko['formula.item.diagonalSpineFlush.title']).toContain('사선 척추-외곽 상쇄');
+    expect(translations.en['formula.item.diagonalSpineFlush.title']).toContain('Diagonal Spine');
+
+    const godTech = getFormulasByCategory('godTechnique');
+    expect(godTech.some((f) => f.id === 'quad-corner-finish')).toBe(true);
+    expect(godTech.some((f) => f.id === 'diagonal-spine-flush')).toBe(true);
   });
 });

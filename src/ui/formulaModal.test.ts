@@ -267,4 +267,23 @@ describe('FormulaModalController (공식 비법서 모달 및 인터랙티브 �
     controller.close();
     expect(controller.isOpen()).toBe(false);
   });
+  it('15. 신규 마스터 공식 2종 (quad-corner-finish, diagonal-spine-flush) 모달 인터랙티브 제어 및 스텝 시뮬레이션 검증', () => {
+    controller.open('quad-corner-finish');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+
+    controller.selectFormula('diagonal-spine-flush');
+    expect(controller.isOpen()).toBe(true);
+    controller.setStep(1);
+    controller.setStep(2);
+    controller.setStep(3);
+
+    controller.setCategory('god-number');
+    expect(controller.isOpen()).toBe(true);
+
+    controller.close();
+    expect(controller.isOpen()).toBe(false);
+  });
 });

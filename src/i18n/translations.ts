@@ -444,7 +444,25 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.finishHybridCancel.tip': 'When reflection and rotation coexist, cancel the reflection first to synchronize the intersection into a pure rotation.',
     'formula.item.finishHybridCancel.step0': 'Initial State: Hybrid L-shape with reflection (cells 3, 6) and rotation (cells 1, 2)',
     'formula.item.finishHybridCancel.step1': 'Move 1: Col 1 MX (Horizontal swipe) ➔ Clears reflection tiles 3 & 6, turns corner into R180',
-    'formula.item.finishHybridCancel.step2': 'Move 2: Row 1 R180 (Double tap Row 1) ➔ Row 1 resolves via R180² = ID, 100% all-clear!'
+    'formula.item.finishHybridCancel.step2': 'Move 2: Row 1 R180 (Double tap Row 1) ➔ Row 1 resolves via R180² = ID, 100% all-clear!',
+
+    'formula.item.quadCornerFinish.title': 'Quad-Corner Annihilation 3-Move Finish',
+    'formula.item.quadCornerFinish.subtitle': 'Simultaneous annihilation of all 4 mirrored corners and center flip via diagonal conjugation',
+    'formula.item.quadCornerFinish.desc': 'A formidable endgame dilemma where all 4 corners are mirror-reflected (MX) and the center is flipped by 180°. By applying Main Diagonal MAD followed by Anti-Diagonal MX, anti-diagonal corners cancel out immediately while the main diagonal synchronizes to R270. A final Main Diagonal R90 resolves the entire board in 3 moves.',
+    'formula.item.quadCornerFinish.tip': 'When all four corners are reflected, do not handle them individually. Use alternating diagonal swipes to cancel anti-diagonal corners first, then sweep the main diagonal with a quarter turn.',
+    'formula.item.quadCornerFinish.step0': 'Initial State: All 4 corners (0, 2, 6, 8) reflected by MX and center (4) flipped by R180',
+    'formula.item.quadCornerFinish.step1': 'Move 1: Main Diagonal MAD ➔ Corners 0 & 8 transition to R270, center tile 4 converts to MD',
+    'formula.item.quadCornerFinish.step2': 'Move 2: Anti-Diagonal MX ➔ Anti-diagonal corners (2, 6) clear via MX² = ID, main diagonal synchronizes to R270',
+    'formula.item.quadCornerFinish.step3': 'Move 3: Main Diagonal R90 ➔ Main diagonal clears via R270 ∘ R90 = ID, 100% full board all-clear!',
+
+    'formula.item.diagonalSpineFlush.title': 'Diagonal Spine-Perimeter Flush 3-Move Formula',
+    'formula.item.diagonalSpineFlush.subtitle': 'Flush intersecting diagonal spine reflections and perimeter edges into a single row clear',
+    'formula.item.diagonalSpineFlush.desc': 'A high-level geometric scramble intertwining anti-diagonal reflections (MAD) on Row 1 outer edges with diagonal reflections (MD) along the vertical spine (Col 2). [Row 1 MY] converts outer edges into R270, [Col 2 MD] flushes the spine via MD² = ID and elevates intersection tile 1 into R270, and [Row 1 R90] finishes Row 1 in a single stroke.',
+    'formula.item.diagonalSpineFlush.tip': 'When diagonal reflections lock the central spine and outer corners, induce symmetric cancellation along the spine (MD² = ID) to collapse the remaining errors into a single row.',
+    'formula.item.diagonalSpineFlush.step0': 'Initial State: Row 1 corners (0, 2) in MAD, vertical spine (4, 7) in MD',
+    'formula.item.diagonalSpineFlush.step1': 'Move 1: Row 1 MY (Vertical swipe) ➔ Corners (0, 2) transition to R270, center tile 1 becomes MY',
+    'formula.item.diagonalSpineFlush.step2': 'Move 2: Col 2 MD ➔ Spine tiles (4, 7) eliminate via MD² = ID, Row 1 synchronizes to R270',
+    'formula.item.diagonalSpineFlush.step3': 'Move 3: Row 1 R90 ➔ Row 1 resolves via R270 ∘ R90 = ID, achieving 100% all-clear!'
   },
 
   ko: {
@@ -839,7 +857,25 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.finishHybridCancel.tip': '반사 타일과 회전 타일이 섞여 있을 때, 반사를 먼저 조작하여 교차점을 회전 성분으로 승화시키는 것이 하이브리드 해법의 본질입니다.',
     'formula.item.finishHybridCancel.step0': '초기 상태: 반사(3, 6번)와 회전(1, 2번)이 결합된 하이브리드 L자 에러 배치',
     'formula.item.finishHybridCancel.step1': '1수: 1열 상하 반전 (MX 가로밀기) ➔ 반사 성분 소거 및 교차점(0번)을 순수 회전(R180)으로 정렬',
-    'formula.item.finishHybridCancel.step2': '2수: 1행 180° 회전 (R180 더블탭) ➔ 1행 전체가 R180² = ID로 상쇄되며 100% 올클리어 완성!'
+    'formula.item.finishHybridCancel.step2': '2수: 1행 180° 회전 (R180 더블탭) ➔ 1행 전체가 R180² = ID로 상쇄되며 100% 올클리어 완성!',
+
+    'formula.item.quadCornerFinish.title': '4코너 올킬 3수 파괴 공식 (Quad-Corner Annihilation)',
+    'formula.item.quadCornerFinish.subtitle': '대각선 켤레 상쇄를 활용해 4개 모서리 반사와 중심 회전을 단 3수에 일괄 소거',
+    'formula.item.quadCornerFinish.desc': '모든 코너(4개)가 거울 반사(MX)되고 중심이 180° 회전된 난공불락의 에러 패턴! [주대각 MAD] ➔ [부대각 MX] ➔ [주대각 R90] 단 3수로 부대각선 코너를 즉시 소거하고 남은 주대각선 타일들을 동일 위상(R270)으로 정렬하여 일괄 완성하는 신의 수 파괴 공식입니다.',
+    'formula.item.quadCornerFinish.tip': '모든 코너가 반사되어 있을 때 하나씩 풀지 마세요. 주대각선과 부대각선을 번갈아 조작하여 반대각선을 먼저 날린 뒤 주대각선을 한 번의 회전으로 쓸어 담으세요.',
+    'formula.item.quadCornerFinish.step0': '초기 상태: 4개 모서리(0, 2, 6, 8번)가 MX 반사, 중심(4번)이 180° 회전된 상태',
+    'formula.item.quadCornerFinish.step1': '1수: 주대각선 부대각 반사 (MAD) ➔ 0, 8번 코너 R270 전이, 중심 4번 MD 변환',
+    'formula.item.quadCornerFinish.step2': '2수: 부대각선 상하 반전 (MX) ➔ 2, 6번 코너 MX² = ID 즉시 소거, 주대각선 전체(0, 4, 8) R270 완벽 동기화',
+    'formula.item.quadCornerFinish.step3': '3수: 주대각선 90° 회전 (R90) ➔ R270 ∘ R90 = ID 일괄 소거, 전 타일 100% 올클리어 완성!',
+
+    'formula.item.diagonalSpineFlush.title': '사선 척추-외곽 상쇄 3수 공식 (Diagonal Spine-Perimeter Flush)',
+    'formula.item.diagonalSpineFlush.subtitle': '사선 척추 반사와 1행 외곽 모서리를 3수로 동시 상쇄하여 올클리어',
+    'formula.item.diagonalSpineFlush.desc': '1행 양쪽 모서리의 사선 반사(MAD)와 중앙 척추 라인(2열)의 사선 반사(MD)가 교차 결합된 고난도 기하학적 엇갈림! [1행 MY] ➔ [2열 MD] ➔ [1행 R90] 3수로 척추 라인을 자기상쇄(MD² = ID)시키고 교차점을 회전으로 승화시켜 1행을 단 한 방에 클리어합니다.',
+    'formula.item.diagonalSpineFlush.tip': '사선 반사와 축 반사가 얽혀 있을 때, 척추 라인의 대칭 상쇄(MD² = ID)를 유도하여 남은 에러를 1행으로 결집시키는 것이 비법의 핵심입니다.',
+    'formula.item.diagonalSpineFlush.step0': '초기 상태: 1행 모서리(0, 2번)가 MAD, 척추(4, 7번)가 MD인 사선 교차 상태',
+    'formula.item.diagonalSpineFlush.step1': '1수: 1행 좌우 반전 (MY 세로밀기) ➔ 모서리 0, 2번 R270 전이, 교차점 1번 MY 상태',
+    'formula.item.diagonalSpineFlush.step2': '2수: 2열 주대각 반사 (MD) ➔ 척추 라인 4, 7번 MD² = ID 즉시 소거, 1행 전체(0, 1, 2) R270 동기화',
+    'formula.item.diagonalSpineFlush.step3': '3수: 1행 90° 회전 (R90) ➔ 1행 전체 R270 ∘ R90 = ID 일괄 소거, 100% 올클리어 완성!'
   }
 };
 

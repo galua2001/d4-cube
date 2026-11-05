@@ -784,6 +784,106 @@ const finishHybridSteps = createInteractiveSteps(finishHybridInitialBoard, [
   }
 ]);
 
+// 13. [4코너 올킬 3수 파괴 공식 인터랙티브 스텝]
+// 초기 보드: 4개 모서리(0, 2, 6, 8)가 MX, 중심(4)이 R180
+const quadCornerInitialBoard: D4Op[] = [
+  D4.MX,   D4.ID,   D4.MX,
+  D4.ID,   D4.R180, D4.ID,
+  D4.MX,   D4.ID,   D4.MX
+];
+
+const quadCornerSteps = createInteractiveSteps(quadCornerInitialBoard, [
+  {
+    lineType: 'diag',
+    lineIndex: 'main',
+    op: D4.MAD,
+    actionDescKo: '1수: 주대각선 부대각 반사 (MAD)',
+    actionDescEn: 'Move 1: Main Diagonal Anti-Diagonal Flip (MAD)',
+    mathInsightKo: '0, 8번 코너가 MX ∘ MAD = R270으로 전이되고, 중심 4번은 R180 ∘ MAD = MD로 변환됩니다.',
+    mathInsightEn: 'Corners 0 and 8 transition to MX ∘ MAD = R270, while center tile 4 converts to R180 ∘ MAD = MD.',
+    highlightCells: [0, 4, 8],
+    formulaBadge: '1수: 주대각 MAD',
+    formulaText: 'Diag(Main) ➔ MAD',
+    formulaDesc: '주대각선에 MAD를 적용하여 0, 8번 코너를 270° 회전 상태로 유도합니다.'
+  },
+  {
+    lineType: 'diag',
+    lineIndex: 'anti',
+    op: D4.MX,
+    actionDescKo: '2수: 부대각선 상하 반전 (MX)',
+    actionDescEn: 'Move 2: Anti-Diagonal Vertical Flip (MX)',
+    mathInsightKo: '부대각선 코너(2, 6번)가 MX² = ID로 즉시 소거되고, 중심 4번은 MD ∘ MX = R270으로 변환되어 주대각선 전체(0, 4, 8)가 R270으로 완벽 동기화됩니다.',
+    mathInsightEn: 'Anti-diagonal corners (2, 6) instantly clear via MX² = ID, and center tile converts to MD ∘ MX = R270, synchronizing the entire main diagonal (0, 4, 8) to R270.',
+    highlightCells: [2, 4, 6],
+    formulaBadge: '2수: 부대각 MX',
+    formulaText: 'Diag(Anti) ➔ MX',
+    formulaDesc: '부대각선 코너 2개를 즉각 클리어하고, 주대각선 3개 타일을 R270으로 동기화합니다.'
+  },
+  {
+    lineType: 'diag',
+    lineIndex: 'main',
+    op: D4.R90,
+    actionDescKo: '3수: 주대각선 90° 회전 (R90 피니시)',
+    actionDescEn: 'Move 3: Main Diagonal Rotate 90° (R90 Finish)',
+    mathInsightKo: '주대각선에 동기화되었던 0, 4, 8번 타일이 R270 ∘ R90 = ID로 일괄 소거되며 보드 전체 100% 올클리어 완성!',
+    mathInsightEn: 'Synchronized tiles (0, 4, 8) on the main diagonal resolve simultaneously via R270 ∘ R90 = ID, completing 100% board clearance!',
+    highlightCells: [0, 4, 8],
+    formulaBadge: '3수: 주대각 R90 피니시',
+    formulaText: 'Diag(Main) ➔ R90 ➔ 100% 클리어',
+    formulaDesc: '주대각선 90° 시계 회전으로 남아있는 3개 타일을 정위치로 일괄 복원합니다.'
+  }
+]);
+
+// 14. [사선 척추-외곽 상쇄 3수 공식 인터랙티브 스텝]
+// 초기 보드: 1행 모서리(0, 2)가 MAD, 척추(4, 7)가 MD
+const diagSpineFlushInitialBoard: D4Op[] = [
+  D4.MAD, D4.ID, D4.MAD,
+  D4.ID,  D4.MD, D4.ID,
+  D4.ID,  D4.MD, D4.ID
+];
+
+const diagSpineFlushSteps = createInteractiveSteps(diagSpineFlushInitialBoard, [
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.MY,
+    actionDescKo: '1수: 1행 좌우 반전 (MY 세로밀기)',
+    actionDescEn: 'Move 1: Row 1 Horizontal Flip (MY Vertical Swipe)',
+    mathInsightKo: '1행 모서리(0, 2번)가 MAD ∘ MY = R270으로 전이되고, 중앙 1번 타일은 MY 상태가 됩니다.',
+    mathInsightEn: 'Row 1 corners (0, 2) transition to MAD ∘ MY = R270, and center tile 1 becomes MY.',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '1수: 1행 MY',
+    formulaText: 'Row₁ ➔ MY',
+    formulaDesc: '1행 좌우 반전으로 모서리 사선 반사를 270° 회전으로 전환합니다.'
+  },
+  {
+    lineType: 'col',
+    lineIndex: 1,
+    op: D4.MD,
+    actionDescKo: '2수: 2열 주대각 반사 (MD)',
+    actionDescEn: 'Move 2: Col 2 Main Diagonal Flip (MD)',
+    mathInsightKo: '척추 라인의 4, 7번 타일이 MD² = ID로 즉시 동시 소거되고, 교차점 1번 타일은 MY ∘ MD = R270으로 변환되어 1행 전체(0, 1, 2)가 R270으로 완벽 동기화됩니다.',
+    mathInsightEn: 'Spine tiles (4, 7) eliminate via MD² = ID, and intersection tile 1 converts to MY ∘ MD = R270, synchronizing all Row 1 tiles (0, 1, 2) to R270.',
+    highlightCells: [1, 4, 7],
+    formulaBadge: '2수: 2열 MD 척추 상쇄',
+    formulaText: 'Col₂ ➔ MD',
+    formulaDesc: '2열 척추 라인을 일괄 소거하고 교차점 1번 타일을 1행과 동기화합니다.'
+  },
+  {
+    lineType: 'row',
+    lineIndex: 0,
+    op: D4.R90,
+    actionDescKo: '3수: 1행 90° 회전 (R90 피니시)',
+    actionDescEn: 'Move 3: Row 1 Rotate 90° (R90 Finish)',
+    mathInsightKo: '동기화된 1행의 0, 1, 2번 타일이 R270 ∘ R90 = ID로 일괄 소거되며 보드 전체 100% 올클리어 완성!',
+    mathInsightEn: 'Synchronized Row 1 tiles (0, 1, 2) resolve simultaneously via R270 ∘ R90 = ID, achieving 100% all-clear!',
+    highlightCells: [0, 1, 2],
+    formulaBadge: '3수: 1행 R90 피니시',
+    formulaText: 'Row₁ ➔ R90 ➔ 100% 클리어',
+    formulaDesc: '1행 90° 시계 회전으로 남아있는 1행 전체를 정위치로 일괄 복원합니다.'
+  }
+]);
+
 const BASE_FORMULAS: FormulaItem[] = [
   {
     id: 'master-method-3step',
@@ -912,6 +1012,56 @@ const BASE_FORMULAS: FormulaItem[] = [
       'An advanced practical technique exploiting D4 non-commutativity (MY ∘ MX = R180) to resolve reflection and rotation simultaneously.'
     ],
     tags: ['실전 피니시', '2수 피니시', '하이브리드', '신의 수', 'TOP 3', '반사회전', '신의 수 테크닉'],
+    isInteractive: true
+  },
+  {
+    id: 'quad-corner-finish',
+    titleKo: '4코너 올킬 3수 파괴 공식',
+    titleEn: 'Quad-Corner Annihilation 3-Move Finish',
+    category: 'god-number',
+    badgeKo: '4코너 올킬',
+    badgeEn: 'Quad-Corner Kill',
+    difficulty: 3,
+    formulaSeq: '주대각 MAD ➔ 부대각 MX ➔ 주대각 R90 = 4코너 올클리어',
+    summaryKo: '모든 코너(4개)가 거울 반사(MX)되고 중심이 180° 회전된 난공불락의 에러 패턴! [주대각 MAD] ➔ [부대각 MX] ➔ [주대각 R90] 단 3수로 4개 모서리와 중심을 일괄 소거하는 신의 수 파괴 공식입니다.',
+    summaryEn: 'A formidable pattern where all 4 corners are mirror-reflected (MX) and the center is flipped by 180°. [Main Diag MAD] ➔ [Anti Diag MX] ➔ [Main Diag R90] annihilates all 4 corners and the center simultaneously in just 3 moves.',
+    diagramType: 'interactive',
+    steps: quadCornerSteps,
+    latexFormula: '\\\\text{Diag}_M(\\\\text{MAD}) \\\\circ \\\\text{Diag}_A(\\\\text{MX}) \\\\circ \\\\text{Diag}_M(\\\\text{R90}) = \\\\text{ID}',
+    notesKo: [
+      '4개 코너 전체가 반사되어 있을 때 대각선 조작 2회와 회전 1회로 깔끔하게 정리하는 고급 대칭 공식입니다.',
+      '부대각선 MX 조작으로 2, 6번 코너를 즉시 소거하고, 남은 주대각선 타일들을 동일 위상(R270)으로 통일하는 것이 핵심입니다.'
+    ],
+    notesEn: [
+      'An advanced symmetry algorithm cleanly resolving all 4 reflected corners using two diagonal swipes and one rotation.',
+      'The key is to immediately clear corners 2 and 6 with anti-diagonal MX, unifying the remaining main diagonal tiles into the same phase (R270).'
+    ],
+    tags: ['4코너 올킬', '3수 피니시', '대각선 공식', '신의 수', '고급 피니시', '신의 수 테크닉'],
+    isInteractive: true
+  },
+  {
+    id: 'diagonal-spine-flush',
+    titleKo: '사선 척추-외곽 상쇄 3수 공식',
+    titleEn: 'Diagonal Spine-Perimeter Flush 3-Move Formula',
+    category: 'god-number',
+    badgeKo: '사선 척추 상쇄',
+    badgeEn: 'Spine Flush',
+    difficulty: 4,
+    formulaSeq: '1행 MY ➔ 2열 MD ➔ 1행 R90 = 전 타일 올클리어',
+    summaryKo: '1행 양쪽 모서리의 사선 반사(MAD)와 중앙 척추 라인(2열)의 사선 반사(MD)가 교차 결합된 난이도 높은 기하학적 엇갈림! [1행 MY] ➔ [2열 MD] ➔ [1행 R90] 3수로 사선 척추를 완전히 소거하고 1행을 동기화하여 올클리어합니다.',
+    summaryEn: 'A high-difficulty geometric entanglement combining anti-diagonal reflections (MAD) on Row 1 edges with diagonal reflections (MD) along the spine (Col 2). [Row 1 MY] ➔ [Col 2 MD] ➔ [Row 1 R90] flushes the spine and synchronizes Row 1 for 100% clearance.',
+    diagramType: 'interactive',
+    steps: diagSpineFlushSteps,
+    latexFormula: '\\\\text{Row}_1(\\\\text{MY}) \\\\circ \\\\text{Col}_2(\\\\text{MD}) \\\\circ \\\\text{Row}_1(\\\\text{R90}) = \\\\text{ID}',
+    notesKo: [
+      '사선 반사와 축 반사가 얽혀 있을 때, 척추 라인의 대칭 상쇄(MD² = ID)를 유도하는 것이 비법의 핵심입니다.',
+      '교차점인 1번 타일의 위상을 MY ∘ MD = R270으로 합성하여 1행 전체를 한 번에 쓸어 담습니다.'
+    ],
+    notesEn: [
+      'When diagonal and axial reflections intertwine, inducing symmetric cancellation along the spine (MD² = ID) is the key.',
+      'Synthesizes intersection tile 1 phase via MY ∘ MD = R270 to sweep the entire Row 1 in a single final stroke.'
+    ],
+    tags: ['사선 척추 상쇄', '3수 피니시', '사선 반사', '신의 수', '척추 소거', '신의 수 테크닉'],
     isInteractive: true
   },
   {
