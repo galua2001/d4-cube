@@ -315,6 +315,10 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.tabReflection': 'Reflection',
     'formula.tabGodTechnique': 'God Techniques',
     'formula.tabAiMined': 'AI Mined',
+    'formula.tabFavorites': 'Favorites',
+    'formula.favoriteEmptyMsg': 'No favorite formulas saved yet. Tap the star icon (☆) on any formula to bookmark it here!',
+    'formula.btnAddToFavorites': 'Add to Favorites',
+    'formula.btnRemoveFromFavorites': 'Remove from Favorites',
     'formula.stepCount': 'Step {current} / {total}',
     'formula.btnPlay': '▶ Step Through',
     'formula.btnPause': '⏸ Pause',
@@ -336,6 +340,15 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.searchPlaceholder': 'Search formulas by name, ID, moves, or tags...',
     'formula.searchEmptyMsg': 'No matching formulas found. Try a different keyword.',
     'formula.searchClearBtn': 'Clear search',
+
+    // Formula Sort (Round 8)
+    'formula.sortLabel': 'Sort by',
+    'formula.sortDefault': 'Default Order',
+    'formula.sortDiffAsc': 'Difficulty (Low ➔ High)',
+    'formula.sortDiffDesc': 'Difficulty (High ➔ Low)',
+    'formula.sortNameAsc': 'Name (A ➔ Z)',
+    'formula.itemCount': '{count} Formulas',
+
     'formula.tagAll': 'All',
     'formula.badgeMoveCount': '{count} Moves',
 
@@ -604,6 +617,36 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.d4DiagonalWindmill4.step3': 'Move 3: Anti Diag R90 ➔ Opposite corners 2 and 6 cleared (Double-Kill); isolates Row 2 into pure MX phase',
     'formula.item.d4DiagonalWindmill4.step4': 'Move 4: Row 2 MX ➔ Row 2 tiles (3, 4, 5) wiped simultaneously via MX ∘ MX = ID (Triple-Kill Finish), 100% all-clear!',
 
+    // Round 8 D4 Master Formulas (en)
+    'formula.item.d4ZigzagDiagonalFlush4.title': 'D4 Zigzag Diagonal Flush 4-Move Formula',
+    'formula.item.d4ZigzagDiagonalFlush4.subtitle': 'S-shaped zigzag pattern (0, 1, 4, 7, 8) cleared via dual diagonal and orthogonal sweeps in 4 moves',
+    'formula.item.d4ZigzagDiagonalFlush4.desc': 'Clears an S-shaped zigzag pattern across cells 0, 1, 4, 7, 8 via dual diagonal and orthogonal sweeps in 4 minimal moves: [Main Diag R180] ➔ [Anti Diag MX] ➔ [Row 3 MX] ➔ [Row 1 MX] achieving 100% all-clear.',
+    'formula.item.d4ZigzagDiagonalFlush4.tip': 'Main diagonal R180 aligns the zigzag path into MX phase. Anti Diag MX resolves the center tile, priming Rows 3 and 1 for consecutive clean triple-kills.',
+    'formula.item.d4ZigzagDiagonalFlush4.step0': 'Initial State: S-shaped zigzag path (0, 1, 4, 7, 8) entangled with MY and MX phases',
+    'formula.item.d4ZigzagDiagonalFlush4.step1': 'Move 1: Main Diag R180 (Diagonal ↖) ➔ MY ∘ R180 = MX aligns the zigzag path into MX phase',
+    'formula.item.d4ZigzagDiagonalFlush4.step2': 'Move 2: Anti Diag MX (Diagonal ↗) ➔ Center tile 4 clears to ID via MX ∘ MX = ID; partitions board into Rows 1 & 3',
+    'formula.item.d4ZigzagDiagonalFlush4.step3': 'Move 3: Row 3 MX (Horizontal flip) ➔ Tiles 6, 7, 8 wipe out simultaneously (Triple-Kill)',
+    'formula.item.d4ZigzagDiagonalFlush4.step4': 'Move 4: Row 1 MX (Triple-Kill Finish) ➔ Tiles 0, 1, 2 vanish simultaneously via MX ∘ MX = ID, 100% all-clear!',
+
+    'formula.item.d4CornerSandwich3.title': 'D4 Corner Sandwich Blitz 3-Move Formula',
+    'formula.item.d4CornerSandwich3.subtitle': '4 corners and center sandwiching Column 2 eradicated in minimal 3 moves via orthogonal sweeps',
+    'formula.item.d4CornerSandwich3.desc': 'Conquers 4 corners (0, 2, 6, 8) and center 4 sandwiching Column 2 in minimal 3 moves via orthogonal column and row interference cancellation: [Col 1 MX] ➔ [Col 3 MX] ➔ [Row 2 MX] achieving 100% all-clear.',
+    'formula.item.d4CornerSandwich3.tip': 'Column moves create temporary intermediate phases at intersection tiles 3 and 5, which are wiped out simultaneously by the final Row 2 sweep.',
+    'formula.item.d4CornerSandwich3.step0': 'Initial State: 4 corners (0, 2, 6, 8) and center (4) carrying MX phase in an X-sandwich shape',
+    'formula.item.d4CornerSandwich3.step1': 'Move 1: Col 1 MX (Vertical swipe) ➔ Corners 0 and 6 clear to ID; intersection 3 armed with intermediate MX',
+    'formula.item.d4CornerSandwich3.step2': 'Move 2: Col 3 MX (Vertical swipe) ➔ Corners 2 and 8 clear to ID; Row 2 (3, 4, 5) synchronizes uniformly to MX',
+    'formula.item.d4CornerSandwich3.step3': 'Move 3: Row 2 MX (Triple-Kill Finish) ➔ Center row tiles (3, 4, 5) wipe out simultaneously via MX ∘ MX = ID, 100% all-clear!',
+
+    'formula.item.d4CheckerSuperposition4.title': 'D4 Checker Superposition 4-Move Formula',
+    'formula.item.d4CheckerSuperposition4.subtitle': 'Alternating checkerboard of 4 corners (R180) and 4 cross edges (MD) resolved via 4-fold symmetry',
+    'formula.item.d4CheckerSuperposition4.desc': 'Solves an alternating checkerboard of 4 corners (R180) and 4 cross edges (MD) surrounding center ID via dual diagonal and dual orthogonal strokes in 4 minimal moves: [Main Diag R180] ➔ [Anti Diag R180] ➔ [Col 2 MD] ➔ [Row 2 MD] achieving 100% all-clear.',
+    'formula.item.d4CheckerSuperposition4.tip': 'Sweeps all 4 corners first via dual diagonal 180° rotations, then detonates cross edges via Col 2 and Row 2 MD reflections.',
+    'formula.item.d4CheckerSuperposition4.step0': 'Initial State: Checkerboard superposition with 4 corners in R180 and 4 cross edges in MD',
+    'formula.item.d4CheckerSuperposition4.step1': 'Move 1: Main Diag R180 (Diagonal ↖) ➔ Corners 0 and 8 clear to ID; center 4 temporarily armed with R180',
+    'formula.item.d4CheckerSuperposition4.step2': 'Move 2: Anti Diag R180 (Diagonal ↗) ➔ Corners 2 and 6 clear to ID; center 4 restored to ID via R180² = ID',
+    'formula.item.d4CheckerSuperposition4.step3': 'Move 3: Col 2 MD (Diagonal reflection) ➔ Edges 1 and 7 clear to ID; Row 2 (3, 4, 5) synchronizes to pure MD phase',
+    'formula.item.d4CheckerSuperposition4.step4': 'Move 4: Row 2 MD (Triple-Kill Finish) ➔ Center row tiles (3, 4, 5) wipe out simultaneously via MD ∘ MD = ID, 100% all-clear!',
+
     // Round 6 Master Formulas 3 (en)
     'formula.item.d4TwinColumnFlux4.title': 'Twin Column Flux (4-Move Super Finish)',
     'formula.item.d4TwinColumnFlux4.subtitle': 'Symmetric flux between Col 1 and Col 3 resolved in 4 moves via Row 2 orthogonal alternation',
@@ -633,7 +676,6 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.d4StarBurstVortex4.step2': 'Move 2: Anti Diag R90 ➔ Corners 2 and 6 cleared (Double-Kill); center 4 transitions to R180',
     'formula.item.d4StarBurstVortex4.step3': 'Move 3: Row 2 R270 ➔ Center row tiles (3, 5) cleared (Double-Kill); vertical spine aligned to R90',
     'formula.item.d4StarBurstVortex4.step4': 'Move 4: Col 2 R270 ➔ Col 2 tiles (1, 4, 7) wiped simultaneously (Triple-Kill Finish), 100% all-clear!',
-
 
   },
 
@@ -900,6 +942,10 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.tabReflection': '반사 공식',
     'formula.tabGodTechnique': '신의 수 테크닉',
     'formula.tabAiMined': 'AI 발굴 공식',
+    'formula.tabFavorites': '⭐ 즐겨찾기',
+    'formula.favoriteEmptyMsg': '즐겨찾기한 공식이 없습니다. 공식 목록이나 상세 화면에서 별표(☆)를 눌러 보관해 보세요!',
+    'formula.btnAddToFavorites': '즐겨찾기에 추가',
+    'formula.btnRemoveFromFavorites': '즐겨찾기에서 제거',
     'formula.stepCount': '{current} / {total} 단계',
     'formula.btnPlay': '▶ 단계별 보기',
     'formula.btnPause': '⏸ 일시 정지',
@@ -921,6 +967,15 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.searchPlaceholder': '공식 이름, 번호, 태그, 수순 실시간 검색...',
     'formula.searchEmptyMsg': '검색 결과와 일치하는 공식이 없습니다. 다른 키워드를 입력해 보세요.',
     'formula.searchClearBtn': '검색어 지우기',
+
+    // 공식 정렬 (Round 8)
+    'formula.sortLabel': '정렬 기준',
+    'formula.sortDefault': '기본순',
+    'formula.sortDiffAsc': '난이도 낮은순 (2수➔4수)',
+    'formula.sortDiffDesc': '난이도 높은순 (4수➔2수)',
+    'formula.sortNameAsc': '이름순 (가나다/ABC)',
+    'formula.itemCount': '공식 ({count}개)',
+
     'formula.tagAll': '전체',
     'formula.badgeMoveCount': '{count}수 완성',
 
@@ -1218,6 +1273,36 @@ export const translations: Record<Lang, Record<string, any>> = {
     'formula.item.d4StarBurstVortex4.step2': '2수: 부대각선(↗) R90 ➔ 2번과 6번 코너 타일 소거 (더블 킬), 4대 코너 완전 정복',
     'formula.item.d4StarBurstVortex4.step3': '3수: 2행 R270 ➔ 3번과 5번 변 타일 소거 (더블 킬), 2열 척추가 R90 단일 위상으로 정렬',
     'formula.item.d4StarBurstVortex4.step4': '4수: 2열 R270 ➔ 2열 3개 타일(1, 4, 7) 일제 소거 (트리플 킬 피니시), 100% 올클리어!',
+
+    // Round 7 D4 신규 마스터 공식 3선 (KO)
+    'formula.item.d4CornerKiteFlux4.title': '코너 카이트 플럭스 4수 슈퍼 소거',
+    'formula.item.d4CornerKiteFlux4.subtitle': '주대각선 축 연(Kite) 형태 4타일 에러를 양대각선 교차 반사와 외곽 스위프로 소거하는 4수 공식',
+    'formula.item.d4CornerKiteFlux4.desc': '주대각선 축을 따라 0번 꼭짓점, 5번·7번 날개, 8번 꼬리로 구성된 연(Kite) 형태 4개 타일의 MX 위상을 주대각선·부대각선 교차 반사와 3열, 3행 스위프로 단 4수만에 완전 소거합니다.',
+    'formula.item.d4CornerKiteFlux4.tip': 'BFS 전수 탐색(754,922개 상태)으로 증명된 지름길 없는 4수 마스터 공식입니다. 1수 주대각선으로 0, 8번 코너를 동시 소거하고 2수 부대각선으로 중심을 정리한 뒤 3열과 3행으로 종결합니다.',
+    'formula.item.d4CornerKiteFlux4.step0': '초기 상태: 주대각선 축 연(Kite) 형태 4개 타일(0, 5, 7, 8번)이 MX 위상으로 얽힌 배치',
+    'formula.item.d4CornerKiteFlux4.step1': '1수: 주대각선(↖) MX ➔ 0번과 8번 코너 타일 동시 소거 (더블 킬)',
+    'formula.item.d4CornerKiteFlux4.step2': '2수: 부대각선(↗) MX ➔ 중심 4번 타일 소거 및 3열·3행 동기화',
+    'formula.item.d4CornerKiteFlux4.step3': '3수: 3열 MX ➔ 2번과 5번 타일 소거 및 3행 단일 위상 정렬',
+    'formula.item.d4CornerKiteFlux4.step4': '4수: 3행 MX ➔ 3행 6, 7, 8번 타일 일제 소거 (트리플 킬 피니시), 100% 올클리어',
+
+    'formula.item.d4PlusOmegaCross3.title': '오메가 십자 대각 복합 3수 킬',
+    'formula.item.d4PlusOmegaCross3.subtitle': '십자 변 4개의 부대각 반사(MAD)와 주대각선 3개의 주대각 반사(MD)를 직교·대각 결합 3수로 일격 킬',
+    'formula.item.d4PlusOmegaCross3.desc': '십자 변 4개(1, 3, 5, 7번)의 MAD 위상과 주대각선(0, 4, 8번)의 MD 위상이 상호 직교 결합된 최고난도 패턴을 2행 MAD, 2열 MAD, 주대각선 MD로 3수만에 종결합니다.',
+    'formula.item.d4PlusOmegaCross3.tip': 'BFS 48,743개 상태 전수 탐색으로 증명된 지름길 없는 3수 공식입니다. 중심 십자축에 MAD를 연속 적용하여 엣지를 소거하고 중심을 MD로 동기화한 뒤 주대각선 MD로 올클리어합니다.',
+    'formula.item.d4PlusOmegaCross3.step0': '초기 상태: 십자 변 4개는 MAD, 주대각선 3개는 MD 위상을 보유한 복합 대칭 배치',
+    'formula.item.d4PlusOmegaCross3.step1': '1수: 2행 MAD ➔ 3번과 5번 좌우 십자 변 즉시 동시 소거 (더블 킬)',
+    'formula.item.d4PlusOmegaCross3.step2': '2수: 2열 MAD ➔ 1번과 7번 상하 십자 변 소거 및 주대각선 전체 MD 동기화',
+    'formula.item.d4PlusOmegaCross3.step3': '3수: 주대각선(↖) MD ➔ 주대각선 0, 4, 8번 타일 일제 소거 (트리플 킬 피니시), 100% 올클리어',
+
+    'formula.item.d4HyperCubeFrame4.title': '하이퍼 프레임 4수 피니시',
+    'formula.item.d4HyperCubeFrame4.subtitle': '외곽 프레임 전체 8개 타일의 회전 대칭을 외곽 4개 행·열의 90° 스위프로 단 4수만에 종결',
+    'formula.item.d4HyperCubeFrame4.desc': '중심(4번)은 완전한 ID이고 외곽 4개 코너는 R180, 4개 변은 R270으로 정렬된 완전 프레임 대칭을 외곽 4개 행/열에 R90을 연속 가하여 4수만에 완벽 클리어합니다.',
+    'formula.item.d4HyperCubeFrame4.tip': 'BFS 754,922개 상태 전수 탐색으로 증명된 지름길 없는 4수 마스터 공식입니다. 상하행 R90으로 엣지를 소거하고 코너를 R270으로 동기화한 뒤 좌우열 R90으로 트리플 킬 피니시합니다.',
+    'formula.item.d4HyperCubeFrame4.step0': '초기 상태: 중심 4번은 ID, 외곽 코너 4개 R180, 외곽 변 4개 R270인 프레임 대칭 배치',
+    'formula.item.d4HyperCubeFrame4.step1': '1수: 1행 R90 ➔ 1번 상단 엣지 소거 및 0, 2번 코너 R270 정렬',
+    'formula.item.d4HyperCubeFrame4.step2': '2수: 3행 R90 ➔ 7번 하단 엣지 소거 및 1열·3열 전체 R270 완벽 동기화',
+    'formula.item.d4HyperCubeFrame4.step3': '3수: 1열 R90 ➔ 1열 0, 3, 6번 타일 일제 소거 (트리플 킬)',
+    'formula.item.d4HyperCubeFrame4.step4': '4수: 3열 R90 ➔ 3열 2, 5, 8번 타일 일제 소거 (트리플 킬 피니시), 100% 올클리어',
 
 
 
