@@ -1491,7 +1491,7 @@ describe('갈루아 큐브 공식 비법서 (Formula Guidebook) 레지스트리 
 
     // 총 god-number 개수 정확히 26개 검증
     const godNumberFormulas = getFormulasByCategory('god-number');
-    expect(godNumberFormulas.length).toBe(26);
+    expect(godNumberFormulas.length).toBe(29);
     expect(godNumberFormulas.some((f) => f.id === 'd4-zigzag-diagonal-flush-4')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-corner-sandwich-3')).toBe(true);
     expect(godNumberFormulas.some((f) => f.id === 'd4-checker-superposition-4')).toBe(true);
