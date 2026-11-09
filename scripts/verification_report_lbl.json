@@ -1,0 +1,79 @@
+[
+  {
+    "index": 1,
+    "name": "Firebase Gallery Root (HTML)",
+    "url": "https://unitess-gallery.web.app/",
+    "status": 200,
+    "latency_ms": 360,
+    "size_bytes": 7574,
+    "sha256": "0d3495deef81",
+    "verified": true,
+    "detail": "갤러리 메인 정상 서빙 (7,574 bytes)"
+  },
+  {
+    "index": 2,
+    "name": "Firebase Play Page (HTML)",
+    "url": "https://unitess-gallery.web.app/play.html",
+    "status": 200,
+    "latency_ms": 257,
+    "size_bytes": 103958,
+    "sha256": "bda12179324f",
+    "verified": true,
+    "detail": "최신 캐시 버스팅 파라미터 v=20261109_1852 탑재 확인 (일치: True)"
+  },
+  {
+    "index": 3,
+    "name": "Firebase Editor Page (HTML)",
+    "url": "https://unitess-gallery.web.app/editor.html",
+    "status": 200,
+    "latency_ms": 240,
+    "size_bytes": 63284,
+    "sha256": "4281c957491b",
+    "verified": true,
+    "detail": "에디터 페이지 정상 서빙 (63,284 bytes)"
+  },
+  {
+    "index": 4,
+    "name": "Firebase Matrix-Cube (HTML)",
+    "url": "https://unitess-gallery.web.app/matrix-cube/",
+    "status": 200,
+    "latency_ms": 340,
+    "size_bytes": 1864,
+    "sha256": "880642e6c417",
+    "verified": true,
+    "detail": "최신 번들(index-BpxdzSA4.js) 참조 확인 (일치: True)"
+  },
+  {
+    "index": 5,
+    "name": "Firebase Matrix-Cube JS Bundle",
+    "url": "https://unitess-gallery.web.app/matrix-cube/assets/index-BpxdzSA4.js",
+    "status": 200,
+    "latency_ms": 303,
+    "size_bytes": 461874,
+    "sha256": "3cdfcbfd202c",
+    "verified": true,
+    "detail": "JS 번들 크기: 461,874 bytes | LBL 및 마스터 공식 29선 탑재 확인 (SHA256: 3cdfcbfd202c)"
+  },
+  {
+    "index": 6,
+    "name": "GitHub Pages D4-Cube (HTML)",
+    "url": "https://galua2001.github.io/d4-cube/",
+    "status": 200,
+    "latency_ms": 274,
+    "size_bytes": 1864,
+    "sha256": "880642e6c417",
+    "verified": true,
+    "detail": "최신 번들(index-BpxdzSA4.js) 참조 확인 (일치: True)"
+  },
+  {
+    "index": 7,
+    "name": "GitHub Pages D4-Cube JS Bundle",
+    "url": "https://galua2001.github.io/d4-cube/assets/index-BpxdzSA4.js",
+    "status": 200,
+    "latency_ms": 311,
+    "size_bytes": 461874,
+    "sha256": "3cdfcbfd202c",
+    "verified": true,
+    "detail": "JS 번들 크기: 461,874 bytes | LBL 및 마스터 공식 29선 탑재 확인 (SHA256: 3cdfcbfd202c)"
+  }
+]
